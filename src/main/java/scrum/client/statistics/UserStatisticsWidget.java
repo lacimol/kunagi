@@ -1,3 +1,18 @@
+/*
+ * Copyright 2011 Laszlo Molnar <lacimol@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package scrum.client.statistics;
 
 import ilarkesto.core.scope.Scope;
@@ -33,8 +48,8 @@ public class UserStatisticsWidget extends AScrumWidget {
 			team.add(0, currentUser);
 		}
 		for (User user : team) {
-			usersBurndown.addHeader(user.getName() + "'s burndown",
-				new HyperlinkWidget(nav.createSwitchAction(widgets.getSprintBacklog())));
+			usersBurndown.addHeader(user.getName() + "'s burndown", new HyperlinkWidget(nav.createSwitchAction(widgets
+					.getSprintBacklog())));
 			usersBurndown.addSection(new UserWorkWidget(user.getName()));
 		}
 

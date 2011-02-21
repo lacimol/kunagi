@@ -1,3 +1,18 @@
+/*
+ * Copyright 2011 Laszlo Molnar <lacimol@gmail.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package scrum.client.statistics;
 
 import ilarkesto.core.scope.Scope;
@@ -26,14 +41,13 @@ public class MyStatisticsWidget extends AScrumWidget {
 
 		PagePanel currentUserBurndown = new PagePanel();
 		User currentUser = getCurrentUser();
-		currentUserBurndown.addHeader("My burndown",
-			new HyperlinkWidget(nav.createSwitchAction(widgets.getSprintBacklog())));
+		currentUserBurndown.addHeader("My burndown", new HyperlinkWidget(nav.createSwitchAction(widgets
+				.getSprintBacklog())));
 		currentUserBurndown.addSection(new UserWorkWidget(currentUser.getName()));
 
 		PagePanel todayBurnHours = new PagePanel();
-		todayBurnHours.addHeader("My burned hours at today",
-			new HyperlinkWidget(nav.createSwitchAction(widgets.getWhiteboard())),
-			new HyperlinkWidget(nav.createSwitchAction(widgets.getIssueList())));
+		todayBurnHours.addHeader("My burned hours at today", new HyperlinkWidget(nav.createSwitchAction(widgets
+				.getWhiteboard())), new HyperlinkWidget(nav.createSwitchAction(widgets.getIssueList())));
 		todayBurnHours.addSection(new BurnHoursWidget(Date.today(), currentUser));
 
 		PagePanel beforeBurnHours = new PagePanel();
