@@ -106,6 +106,7 @@ public class Sprint extends GSprint implements Numbered {
 		if (!isBeginSet() || !isEndSet()) return null;
 		return getBegin().getPeriodTo(getEnd()).toDays();
 	}
+
 	public Integer getLengthInWorkDays() {
 		if (!isBeginSet() || !isEndSet()) return null;
 		Date date = getBegin();
@@ -193,6 +194,7 @@ public class Sprint extends GSprint implements Numbered {
 		int days = getBegin().getPeriodTo(getEnd()).toDays();
 		days -= (days / 7) * 2;
 		int defaultWorkPerDay = getRemainingWork() / days;
+		Set<User> teamMembers = getProject().getTeamMembers();
 
 		getDaySnapshot(begin).updateWithCurrentSprint();
 		begin = begin.nextDay();
@@ -203,6 +205,7 @@ public class Sprint extends GSprint implements Numbered {
 				for (Task task : getTasks()) {
 					if (toBurn == 0) break;
 					int remaining = task.getRemainingWork();
+					task.setInitialWork(remaining + Utl.randomInt(0, defaultWorkPerDay));
 					int burn = Math.min(toBurn, remaining);
 					remaining -= burn;
 					toBurn -= burn;
@@ -215,6 +218,10 @@ public class Sprint extends GSprint implements Numbered {
 						totalRemaining = remaining;
 					}
 					task.setRemainingWork(remaining);
+					if (task.getOwner() == null) {
+						task.setOwner((User) teamMembers.toArray()[Utl.randomInt(0, teamMembers.size() - 1)]);
+					}
+					task.getDaySnapshot(begin).updateWithCurrentTask();
 				}
 			}
 			getDaySnapshot(begin).updateWithCurrentSprint();

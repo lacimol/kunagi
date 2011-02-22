@@ -60,13 +60,16 @@ public class ProjectDao extends GProjectDao {
 		project.setIssueReplyTemplate("Hello ${issuer.name},\n" + "\n"
 				+ "Thank you for your feedback. You can check the status of your issue here: "
 				+ "${homepage.url}/${issue.reference}.html" + "\n" + "\nKind regards,\n" + "${user.name}");
+		project.setFreeDays(65);
 
 		project.addAdmin(owner);
 		project.addProductOwner(po);
 		project.addProductOwner(owner);
 		project.addScrumMaster(sm);
 		project.addScrumMaster(owner);
-		project.addTeamMember(owner);
+		for (User user : team) {
+			project.addTeamMember(user);
+		}
 		project.addParticipants(project.getAdmins());
 		project.addParticipants(project.getTeamMembers());
 		project.addParticipants(project.getProductOwners());

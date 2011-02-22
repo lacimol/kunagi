@@ -102,7 +102,7 @@
                 <exclude name="**/jcip-annotations.jar" />
             </fileset>
         </copy>
-        <war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp" />
+        <!--war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp" /-->
     </target>
 
     <target name="package" depends="webapp">
