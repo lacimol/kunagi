@@ -11,6 +11,9 @@ import ilarkesto.persistence.AEntity;
 import ilarkesto.testng.ATest;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import scrum.server.KunagiRootConfig;
 import scrum.server.ScrumWebApplication;
@@ -18,6 +21,7 @@ import scrum.server.admin.User;
 import scrum.server.calendar.SimpleEvent;
 import scrum.server.collaboration.Comment;
 import scrum.server.collaboration.Wikipage;
+import scrum.server.common.Chart;
 import scrum.server.impediments.Impediment;
 import scrum.server.issues.Issue;
 import scrum.server.pr.BlogEntry;
@@ -52,6 +56,23 @@ public class TestUtil {
 		duke.setEmail("duke@kunagi.org");
 		duke.setEmailVerified(true);
 		return duke;
+	}
+
+	public static List<User> getTestUsers() {
+		initialize();
+		List<User> users = new ArrayList<User>();
+		User user = null;
+		Iterator<String> colors = Chart.userColors.keySet().iterator();
+		colors.next();
+		for (int x = 1; x < 8; x++) {
+			user = app.getUserDao().getUserByName("testUser" + x);
+			if (user == null) user = app.getUserDao().postUserWithDefaultPassword("testUser" + x);
+			user.setEmail("testUser" + x + "@kunagi.org");
+			user.setEmailVerified(true);
+			if (colors.hasNext()) user.setColor(colors.next());
+			users.add(user);
+		}
+		return users;
 	}
 
 	public static User getAdmin() {

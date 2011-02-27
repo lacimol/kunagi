@@ -75,8 +75,8 @@ public class Chart {
 
 	// --- ---
 
-	Map<String, Color> userColors = new HashMap<String, Color>();
-	{
+	public static Map<String, Color> userColors = new HashMap<String, Color>();
+	static {
 		userColors.put("team", Color.RED);
 		userColors.put("black", Color.BLACK);
 		userColors.put("darkred", Color.decode("#8B0000"));

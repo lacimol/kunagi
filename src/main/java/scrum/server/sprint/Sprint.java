@@ -218,7 +218,7 @@ public class Sprint extends GSprint implements Numbered {
 						totalRemaining = remaining;
 					}
 					task.setRemainingWork(remaining);
-					if (task.getOwner() == null) {
+					if (task.getOwner() == null && teamMembers.size() > 0) {
 						task.setOwner((User) teamMembers.toArray()[Utl.randomInt(0, teamMembers.size() - 1)]);
 					}
 					task.getDaySnapshot(begin).updateWithCurrentTask();

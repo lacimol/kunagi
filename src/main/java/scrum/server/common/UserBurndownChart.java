@@ -50,23 +50,23 @@ public class UserBurndownChart extends Chart {
 
 	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height, String userName) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new UserBurndownChart().writeSprintBurndownChart(out, sprint, width, height, userName);
+		new UserBurndownChart().writeChart(out, sprint, width, height, userName);
 		return out.toByteArray();
 	}
 
 	public void writeChart(OutputStream out, String sprintId, int width, int height, String userName) {
 		Sprint sprint = sprintDao.getById(sprintId);
 		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeSprintBurndownChart(out, sprint, width, height, userName);
+		writeChart(out, sprint, width, height, userName);
 	}
 
-	public void writeSprintBurndownChart(OutputStream out, Sprint sprint, int width, int height, String userName) {
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height, String userName) {
 		this.userName = userName;
 		WeekdaySelector freeDays = sprint.getProject().getFreeDaysAsWeekdaySelector();
-		writeSprintBurndownChart(out, sprint, freeDays, width, height);
+		writeChart(out, sprint, freeDays, width, height);
 	}
 
-	void writeSprintBurndownChart(OutputStream out, Sprint sprint, WeekdaySelector freeDays, int width, int height) {
+	void writeChart(OutputStream out, Sprint sprint, WeekdaySelector freeDays, int width, int height) {
 
 		Date firstDay = sprint.getBegin();
 		Date lastDay = sprint.getEnd();

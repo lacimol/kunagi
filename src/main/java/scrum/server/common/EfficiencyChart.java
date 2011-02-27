@@ -38,17 +38,17 @@ public class EfficiencyChart extends Chart {
 
 	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new EfficiencyChart().writeSprintBurndownChart(out, sprint, width, height);
+		new EfficiencyChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
 	public void writeChart(OutputStream out, String sprintId, int width, int height) {
 		Sprint sprint = sprintDao.getById(sprintId);
 		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeSprintBurndownChart(out, sprint, width, height);
+		writeChart(out, sprint, width, height);
 	}
 
-	void writeSprintBurndownChart(OutputStream out, Sprint sprint, int width, int height) {
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		Date firstDay = sprint.getBegin();
 		Date lastDay = sprint.getEnd();
@@ -60,8 +60,8 @@ public class EfficiencyChart extends Chart {
 		for (User user : sprint.getProject().getTeamMembers()) {
 			efficiency = getUserEfficiency(sprint, firstDay, lastDay, user.getName());
 			if (efficiency.getEfficiency() > 0) {
-				barDataset.addValue(efficiency.getEfficiency(), "S1", user.getName()
-						+ efficiency.getBurnedHoursPerInitial());
+				barDataset.addValue(efficiency.getEfficiency(), "S1",
+					user.getName() + efficiency.getBurnedHoursPerInitial());
 			}
 		}
 

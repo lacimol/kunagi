@@ -76,6 +76,20 @@
             </classpath>
         </testng>
     </target>
+	
+	<target name="test-chart" depends="compile-java">
+        <delete dir="${test.output.dir}" />
+        <taskdef name="testng" classpath="${ilarkesto.dir}/lib/testng-5.8.jar" classname="org.testng.TestNGAntTask" />
+        <testng outputDir="${test.output.dir}" haltonfailure="true">
+            <classfileset dir="${build.dir}/test-classes" includes="**/ChartTest.class" />
+            <classpath>
+                <path location="${classes.output.dir}" />
+                <path location="${build.dir}/test-classes" />
+                <fileset dir="${ilarkesto.dir}/lib" />
+            </classpath>
+        	<jvmarg value="-Xmx512M"/>
+        </testng>
+    </target>
 
     <target name="webapp" depends="compile-java, compile-gwt">
         <copy todir="${build.dir}/webapp" preservelastmodified="true">

@@ -15,6 +15,8 @@
 
 package scrum.server.common;
 
+import ilarkesto.core.logging.Log;
+
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,30 +38,31 @@ import scrum.server.sprint.Task;
 
 public class AccomplishChart extends Chart {
 
+	private static final Log LOG = Log.get(AccomplishChart.class);
 	private static final String TEAM_AVG = TEAM + " avg";
-	private Integer teamMembersCount;
 
 	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new AccomplishChart().writeSprintBurndownChart(out, sprint, width, height);
+		new AccomplishChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
 	public void writeChart(OutputStream out, String sprintId, int width, int height) {
 		Sprint sprint = sprintDao.getById(sprintId);
 		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		teamMembersCount = sprint.getProject().getTeamMembersCount();
-		writeSprintBurndownChart(out, sprint, width, height);
+		writeChart(out, sprint, width, height);
 	}
 
-	void writeSprintBurndownChart(OutputStream out, Sprint sprint, int width, int height) {
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
 		barDataset.addValue(0, "S1", TEAM_AVG);
 
-		Double burnedHours = null;
+		Double burnedHours = 0.0;
+		Integer teamMembersCount = sprint.getProject().getTeamMembersCount();
 		for (User user : sprint.getProject().getTeamMembers()) {
 			burnedHours = getUserBurnedHours(sprint, user.getName());
+			LOG.info(user, "'s burnedHours: " + burnedHours);
 			if (burnedHours > 0) {
 				barDataset.addValue(burnedHours, "S1", user.getName());
 			} else {
