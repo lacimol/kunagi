@@ -41,13 +41,14 @@ public class MyStatisticsWidget extends AScrumWidget {
 
 		PagePanel currentUserBurndown = new PagePanel();
 		User currentUser = getCurrentUser();
-		currentUserBurndown.addHeader("My burndown", new HyperlinkWidget(nav.createSwitchAction(widgets
-				.getSprintBacklog())));
+		currentUserBurndown.addHeader("My burndown",
+			new HyperlinkWidget(nav.createSwitchAction(widgets.getSprintBacklog())));
 		currentUserBurndown.addSection(new UserWorkWidget(currentUser.getName()));
 
 		PagePanel todayBurnHours = new PagePanel();
-		todayBurnHours.addHeader("My burned hours at today", new HyperlinkWidget(nav.createSwitchAction(widgets
-				.getWhiteboard())), new HyperlinkWidget(nav.createSwitchAction(widgets.getIssueList())));
+		todayBurnHours.addHeader("My burned hours at today",
+			new HyperlinkWidget(nav.createSwitchAction(widgets.getWhiteboard())),
+			new HyperlinkWidget(nav.createSwitchAction(widgets.getIssueList())));
 		todayBurnHours.addSection(new BurnHoursWidget(Date.today(), currentUser));
 
 		PagePanel beforeBurnHours = new PagePanel();

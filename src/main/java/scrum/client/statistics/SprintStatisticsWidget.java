@@ -33,9 +33,9 @@ public class SprintStatisticsWidget extends AScrumWidget {
 	@Override
 	protected Widget onInitialization() {
 
-		PagePanel teamBurndown = new PagePanel();
-		teamBurndown.addHeader("Team burndown");
-		teamBurndown.addSection(new UserWorkWidget());
+		PagePanel velocity = new PagePanel();
+		velocity.addHeader("Velocity history");
+		velocity.addSection(new VelocityWidget());
 
 		PagePanel efficiency = new PagePanel();
 		efficiency.addHeader("Team efficiency");
@@ -65,7 +65,7 @@ public class SprintStatisticsWidget extends AScrumWidget {
 			yesterdayBurnHours.addSection(new BurnHoursWidget(yesterday, user));
 		}
 
-		Widget left = TableBuilder.column(5, teamBurndown, efficiency, accomplish);
+		Widget left = TableBuilder.column(5, velocity, efficiency, accomplish);
 		Widget right = TableBuilder.column(5, todayBurnHours, yesterdayBurnHours);
 
 		return TableBuilder.row(5, left, right);

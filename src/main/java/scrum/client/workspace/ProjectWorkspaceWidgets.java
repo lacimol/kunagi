@@ -203,8 +203,7 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 		}
 	}
 
-	@Override
-	public void onProjectDataReceived(ProjectDataReceivedEvent event) {
+	public void activate() {
 		Scope.get().getComponent(Ui.class).show(sidebar, dashboard);
 	}
 
@@ -252,8 +251,8 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 						String pageName = reference.substring(2, reference.length() - 2);
 						showWiki(pageName);
 					} else {
-						Scope.get().getComponent(Chat.class).postSystemMessage("Object does not exist: " + reference,
-							false);
+						Scope.get().getComponent(Chat.class)
+								.postSystemMessage("Object does not exist: " + reference, false);
 					}
 					return;
 				}
@@ -570,6 +569,11 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 
 	public WhiteboardWidget getWhiteboard() {
 		return whiteboard;
+	}
+
+	@Override
+	public void onProjectDataReceived(ProjectDataReceivedEvent event) {
+		activate();
 	}
 
 }

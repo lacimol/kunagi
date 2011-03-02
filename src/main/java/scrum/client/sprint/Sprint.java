@@ -115,6 +115,10 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		return getChartUrl(width, height) + "&chart=accomplishChart";
 	}
 
+	public String getVelocityChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=velocityChart";
+	}
+
 	public boolean isCompleted() {
 		return getVelocity() != null;
 	}

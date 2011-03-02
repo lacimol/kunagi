@@ -77,7 +77,7 @@ public class Chart {
 
 	public static Map<String, Color> userColors = new HashMap<String, Color>();
 	static {
-		userColors.put("team", Color.RED);
+		userColors.put("team", Color.decode("#006000"));
 		userColors.put("black", Color.BLACK);
 		userColors.put("darkred", Color.decode("#8B0000"));
 		userColors.put("darkgreen", Color.decode("#008400"));
@@ -91,7 +91,7 @@ public class Chart {
 	}
 
 	public int getWorkingHoursPerDay(Integer hours) {
-		// default is 7 houts/day/user
+		// default is 7 hours/day/user
 		return hours == null ? 7 : hours;
 	}
 
@@ -218,16 +218,17 @@ public class Chart {
 
 		chart.setBackgroundPaint(Color.WHITE);
 
-		// get a reference to the plot for further customisation...
+		// get a reference to the plot for further customization...
 		final CategoryPlot plot = chart.getCategoryPlot();
 		plot.setRangeGridlinesVisible(true);
 		plot.setDomainGridlinesVisible(true);
 		plot.setNoDataMessage("NO DATA!");
 
-		final CategoryItemRenderer renderer = new CustomRenderer(getColors(dataset, sprint));
+		final CategoryItemRenderer renderer = sprint != null ? new CustomRenderer(getColors(dataset, sprint)) : plot
+				.getRenderer();
 		renderer.setSeriesItemLabelGenerator(0, itemLabelGenerator);
 		renderer.setBaseItemLabelsVisible(true);
-		renderer.setSeriesPaint(0, COLOR_OPTIMUM_LINE);
+		renderer.setSeriesPaint(0, COLOR_PAST_LINE);
 		plot.setRenderer(renderer);
 
 		// change the margin at the top of the range axis...
@@ -240,14 +241,20 @@ public class Chart {
 		return chart;
 	}
 
+	void setChartMarker(JFreeChart chart, int avg, int max) {
+		final IntervalMarker target = new IntervalMarker(avg, max);
+		target.setPaint(new Color(222, 222, 255, 128));
+		chart.getCategoryPlot().addRangeMarker(target, Layer.BACKGROUND);
+	}
+
+	void setUpperBoundary(JFreeChart chart, int max) {
+		double upperBoundary = Math.min(max * 1.15f, max + 15);
+		chart.getCategoryPlot().getRangeAxis().setUpperBound(upperBoundary);
+	}
+
 	private Paint[] getColors(final CategoryDataset dataset, Sprint sprint) {
 		List<Paint> colors = new ArrayList<Paint>();
-		double teamValue = dataset.getValue(0, 0).doubleValue();
-		if (teamValue < 0.9) {
-			colors.add(userColors.get(TEAM));
-		} else {
-			colors.add(Color.decode("#005000"));
-		}
+		colors.add(userColors.get(TEAM));
 		for (User user : sprint.getProject().getTeamMembers()) {
 			colors.add(userColors.get(user.getColor()));
 		}

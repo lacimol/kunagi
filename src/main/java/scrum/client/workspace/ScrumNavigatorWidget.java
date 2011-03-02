@@ -23,6 +23,7 @@ public class ScrumNavigatorWidget extends SwitchingNavigatorWidget {
 	protected void showItem(Widget widget) {
 		String page = Str.getSimpleName(widget.getClass());
 		page = Str.removeSuffix(page, "Widget");
+		Scope.get().getComponent(Navigator.class).setPage(page);
 		super.showItem(widget);
 	}
 

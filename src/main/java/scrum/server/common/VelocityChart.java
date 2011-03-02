@@ -20,7 +20,8 @@ import ilarkesto.core.logging.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jfree.chart.ChartUtilities;
@@ -28,19 +29,17 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import scrum.server.ScrumWebApplication;
-import scrum.server.admin.User;
+import scrum.server.project.Project;
 import scrum.server.sprint.Sprint;
-import scrum.server.sprint.Task;
 
-public class AccomplishChart extends Chart {
+public class VelocityChart extends Chart {
 
-	private static final Log LOG = Log.get(AccomplishChart.class);
-	private static final String TEAM_AVG = TEAM + " avg";
+	private static final Log LOG = Log.get(VelocityChart.class);
+	private static final String AVG = "average";
 
 	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new AccomplishChart().writeChart(out, sprint, width, height);
+		new VelocityChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
@@ -52,49 +51,40 @@ public class AccomplishChart extends Chart {
 
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
+		Project project = sprint.getProject();
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
-		barDataset.addValue(0, "S1", TEAM_AVG);
+		barDataset.addValue(0, "S1", AVG);
 
-		Double burnedHours = 0.0;
-		Integer teamMembersCount = sprint.getProject().getTeamMembersCount();
-		for (User user : sprint.getProject().getTeamMembers()) {
-			burnedHours = getUserBurnedHours(sprint, user.getName());
-			LOG.info(user, "'s burnedHours: " + burnedHours);
-			if (burnedHours > 0) {
-				barDataset.addValue(burnedHours, "S1", user.getName());
-			} else {
-				teamMembersCount--;
-			}
+		List<Sprint> sprints = new ArrayList<Sprint>(project.getSprints());
+		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		int maxVelocity = 0;
+		float sum = 0;
+		int count = 0;
+		for (Sprint completedSprint : sprints) {
+			Float velocity = completedSprint.getVelocity();
+			if (velocity == null || velocity.intValue() == 0) continue;
+			barDataset.addValue(velocity, "S1", completedSprint.getLabel());
+			maxVelocity = Math.max(velocity.intValue(), maxVelocity);
+			sum += velocity;
+			count++;
+			if (count >= 12) break;
 		}
-		burnedHours = getUserBurnedHours(sprint, TEAM);
-		int teamAvg = (int) (burnedHours / teamMembersCount);
-		barDataset.setValue(teamAvg, "S1", TEAM_AVG);
 
-		JFreeChart chart = createBarChart(barDataset, sprint, new StandardCategoryItemLabelGenerator());
-		int maxWorkHours = sprint.getLengthInWorkDays()
-				* getWorkingHoursPerDay(ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay());
-		setChartMarker(chart, teamAvg, maxWorkHours);
-		setUpperBoundary(chart, maxWorkHours);
+		int avarage = 0;
+		if (count > 0 && sum > 0) {
+			avarage = (int) sum / count;
+		}
+		barDataset.setValue(avarage, "S1", AVG);
+
+		JFreeChart chart = createBarChart(barDataset, null, new StandardCategoryItemLabelGenerator());
+		setChartMarker(chart, avarage, maxVelocity);
+		setUpperBoundary(chart, maxVelocity);
 		try {
 			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
 			out.flush();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private Double getUserBurnedHours(Sprint sprint, String userName) {
-
-		Double allBurnedHours = 0.0;
-		List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
-
-		for (Task task : sprintTasks) {
-			if (userName.equals(TEAM) || (task.getOwner() != null && userName.equals(task.getOwner().getName()))) {
-				allBurnedHours += task.getBurnedWork();
-			}
-		}
-
-		return allBurnedHours;
 	}
 
 }

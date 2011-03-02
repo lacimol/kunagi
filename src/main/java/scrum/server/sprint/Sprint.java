@@ -8,6 +8,7 @@ import ilarkesto.core.logging.Log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -228,5 +229,14 @@ public class Sprint extends GSprint implements Numbered {
 			begin = begin.nextDay();
 		}
 	}
+
+	public static final Comparator<Sprint> END_DATE_COMPARATOR = new Comparator<Sprint>() {
+
+		@Override
+		public int compare(Sprint a, Sprint b) {
+			return Utl.compare(b.getEnd(), a.getEnd());
+		}
+
+	};
 
 }

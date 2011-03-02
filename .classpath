@@ -5,8 +5,16 @@
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="lib" path="C:/dev/workspace_helios/ilarkesto/lib/gwt-user.jar"/>
-	<classpathentry kind="lib" path="C:/dev/workspace_helios/ilarkesto/lib/gwt-dev.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ilarkesto"/>
+	<classpathentry kind="lib" path="E:/dev/eclipse_helios/plugins/com.google.gwt.eclipse.sdkbundle.2.2.0_2.2.0.v201102111811/gwt-2.2.0/gwt-user.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/dev/eclipse_helios/plugins/com.google.gwt.eclipse.sdkbundle.2.2.0_2.2.0.v201102111811/gwt-2.2.0/doc/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/dev/eclipse_helios/plugins/com.google.gwt.eclipse.sdkbundle.2.2.0_2.2.0.v201102111811/gwt-2.2.0/gwt-dev.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/dev/eclipse_helios/plugins/com.google.gwt.eclipse.sdkbundle.2.2.0_2.2.0.v201102111811/gwt-2.2.0/doc/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/webapp/WEB-INF/classes"/>
 </classpath>
