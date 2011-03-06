@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -48,7 +48,7 @@ public class UserBurndownChart extends Chart {
 
 	private String userName;
 
-	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height, String userName) {
+	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height, String userName) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		new UserBurndownChart().writeChart(out, sprint, width, height, userName);
 		return out.toByteArray();

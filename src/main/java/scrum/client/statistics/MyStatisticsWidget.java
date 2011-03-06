@@ -22,6 +22,7 @@ import ilarkesto.gwt.client.SwitchingNavigatorWidget;
 import ilarkesto.gwt.client.TableBuilder;
 import scrum.client.admin.User;
 import scrum.client.common.AScrumWidget;
+import scrum.client.common.WeekdaySelector;
 import scrum.client.workspace.PagePanel;
 import scrum.client.workspace.ProjectWorkspaceWidgets;
 
@@ -39,14 +40,19 @@ public class MyStatisticsWidget extends AScrumWidget {
 		teamBurndown.addHeader("Team burndown");
 		teamBurndown.addSection(new UserWorkWidget());
 
-		PagePanel currentUserBurndown = new PagePanel();
 		User currentUser = getCurrentUser();
+		PagePanel currentUserBurndown = new PagePanel();
 		currentUserBurndown.addHeader("My burndown",
 			new HyperlinkWidget(nav.createSwitchAction(widgets.getSprintBacklog())));
 		currentUserBurndown.addSection(new UserWorkWidget(currentUser.getName()));
 
 		PagePanel todayBurnHours = new PagePanel();
-		todayBurnHours.addHeader("My burned hours at today",
+		WeekdaySelector freeDays = getCurrentProject().getFreeDaysWeekdaySelectorModel().getValue();
+		StringBuffer header = new StringBuffer("My burned hours at today");
+		if (freeDays.isFree(Date.today().getWeekday() + 1)) {
+			header.append(" (free day)");
+		}
+		todayBurnHours.addHeader(header.toString(),
 			new HyperlinkWidget(nav.createSwitchAction(widgets.getWhiteboard())),
 			new HyperlinkWidget(nav.createSwitchAction(widgets.getIssueList())));
 		todayBurnHours.addSection(new BurnHoursWidget(Date.today(), currentUser));
@@ -55,7 +61,11 @@ public class MyStatisticsWidget extends AScrumWidget {
 		Date dateBefore = null;
 		for (int x = 1; x < 5; x++) {
 			dateBefore = Date.today().addDays(-x);
-			beforeBurnHours.addHeader("My burned hours at " + dateBefore);
+			header = new StringBuffer("My burned hours at " + dateBefore);
+			if (freeDays.isFree(dateBefore.getWeekday() + 1)) {
+				header.append(" (free day)");
+			}
+			beforeBurnHours.addHeader(header.toString());
 			beforeBurnHours.addSection(new BurnHoursWidget(dateBefore, currentUser));
 		}
 

@@ -118,6 +118,13 @@ public class PdfTest extends ATest {
 	}
 
 	@Test
+	public void sprintReportWithStats() {
+		Sprint sprint = new ChartTest().createTestProjectForCharts().getCurrentSprint();
+		// sprint.close();
+		createPdf(new SprintReportPdfCreator(sprint));
+	}
+
+	@Test
 	public void wikipage() {
 		Wikipage wikipage = new Wikipage();
 		wikipage.setName("wikipage");

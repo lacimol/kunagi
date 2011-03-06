@@ -36,7 +36,7 @@ public class EfficiencyChart extends Chart {
 
 	private static final Log LOG = Log.get(EfficiencyChart.class);
 
-	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
+	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		new EfficiencyChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();

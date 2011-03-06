@@ -55,6 +55,7 @@ import scrum.server.release.ReleaseDao;
 import scrum.server.risks.Risk;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
+import scrum.server.task.TaskDaySnapshot;
 
 public class ScrumServiceImpl extends GScrumServiceImpl {
 
@@ -500,7 +501,10 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	private void onTaskChanged(GwtConversation conversation, Task task, Map properties) {
 		// update sprint day snapshot after change
 		conversation.getProject().getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
-		task.getDaySnapshot(Date.today()).updateWithCurrentTask();
+		// update and send back task day snapshot
+		TaskDaySnapshot taskDaySnapshot = task.getDaySnapshot(Date.today());
+		taskDaySnapshot.updateWithCurrentTask();
+		sendToClients(conversation, taskDaySnapshot);
 		Requirement requirement = task.getRequirement();
 		if (requirement.isInCurrentSprint()) {
 			User currentUser = conversation.getSession().getUser();

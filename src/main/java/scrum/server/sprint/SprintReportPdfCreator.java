@@ -12,8 +12,11 @@ import java.awt.Color;
 import java.util.List;
 
 import scrum.server.common.APdfCreator;
+import scrum.server.common.AccomplishChart;
 import scrum.server.common.BurndownChart;
+import scrum.server.common.EfficiencyChart;
 import scrum.server.common.ScrumPdfContext;
+import scrum.server.common.UserBurndownChart;
 import scrum.server.common.WikiToPdfConverter;
 import scrum.server.sprint.SprintReportHelper.StoryInfo;
 import scrum.server.sprint.SprintReportHelper.TaskInfo;
@@ -36,7 +39,7 @@ public class SprintReportPdfCreator extends APdfCreator {
 		fields.field("Sprint").text(sprint.getLabel());
 		fields.field("Period").text(
 			sprint.getBegin() + " - " + sprint.getEnd() + " / " + sprint.getLengthInDays() + " days");
-		fields.field("Velocity").text(sprint.getVelocity() + " StoryPoints");
+		fields.field("Velocity").text(sprint.getVelocity() == null ? 0 : sprint.getVelocity() + " StoryPoints");
 		fields.field("Burned work").text(
 			getBurnedWork(sprint.getCompletedRequirementsData())
 					+ getBurnedWork(sprint.getIncompletedRequirementsData()) + " hours");
@@ -44,8 +47,7 @@ public class SprintReportPdfCreator extends APdfCreator {
 		fields.field("Scrum Master").text(sprint.getScrumMastersAsString());
 		fields.field("Team").text(sprint.getTeamMembersAsString());
 
-		pdf.nl();
-		pdf.image(BurndownChart.createBurndownChartAsByteArray(sprint, 1000, 500)).setScaleByWidth(150f);
+		buildCharts(pdf);
 
 		if (sprint.isGoalSet()) {
 			sectionHeader(pdf, "Goal");
@@ -72,7 +74,30 @@ public class SprintReportPdfCreator extends APdfCreator {
 
 	}
 
+	private void buildCharts(APdfContainerElement pdf) {
+		pdf.nl();
+		pdf.text("BurndownChart").image(BurndownChart.createBurndownChartAsByteArray(sprint, 1000, 500))
+				.setScaleByWidth(150f);
+		pdf.nl();
+		pdf.text("EfficiencyChart").image(EfficiencyChart.createBurndownChartAsByteArray(sprint, 1000, 300))
+				.setScaleByWidth(150f);
+		pdf.nl();
+		pdf.text("AccomplishChart").image(AccomplishChart.createBurndownChartAsByteArray(sprint, 1000, 300))
+				.setScaleByWidth(150f);
+		pdf.nl();
+		pdf.text("TeamChart").image(UserBurndownChart.createBurndownChartAsByteArray(sprint, 1000, 300, null))
+				.setScaleByWidth(150f);
+		// XXX later
+		// for (User user : sprint.getProject().getTeamMembers()) {
+		// pdf.nl();
+		// pdf.text(user.getName())
+		// .image(UserBurndownChart.createBurndownChartAsByteArray(sprint, 800, 150, user.getName()))
+		// .setScaleByWidth(150f);
+		// }
+	}
+
 	private int getBurnedWork(String requirementsData) {
+		if (requirementsData == null) return 0;
 		List<StoryInfo> requirements = SprintReportHelper.parseRequirementsAndTasks(requirementsData);
 		if (requirements.isEmpty()) return 0;
 		int sum = 0;

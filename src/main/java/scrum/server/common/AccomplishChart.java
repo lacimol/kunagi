@@ -38,7 +38,7 @@ public class AccomplishChart extends Chart {
 	private static final Log LOG = Log.get(AccomplishChart.class);
 	private static final String TEAM_AVG = TEAM + " avg";
 
-	public byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
+	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		new AccomplishChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();

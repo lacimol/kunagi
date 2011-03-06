@@ -23,6 +23,7 @@ import java.util.List;
 
 import scrum.client.admin.User;
 import scrum.client.common.AScrumWidget;
+import scrum.client.common.WeekdaySelector;
 import scrum.client.project.Project;
 import scrum.client.workspace.PagePanel;
 
@@ -53,13 +54,22 @@ public class SprintStatisticsWidget extends AScrumWidget {
 			team.remove(currentUser);
 			team.add(0, currentUser);
 		}
-		// yesterday
-		Date yesterday = Date.today().prevDay();
+		// yesterday (last work day)
+		Date yesterday = project.getCurrentSprint().getLastWorkDay();
 		PagePanel yesterdayBurnHours = new PagePanel();
-		yesterdayBurnHours.addHeader("Team burned hours at " + yesterday);
+		WeekdaySelector freeDays = getCurrentProject().getFreeDaysWeekdaySelectorModel().getValue();
+		StringBuffer header = new StringBuffer("Team burned hours at " + yesterday);
+		if (freeDays.isFree(yesterday.getWeekday() + 1)) {
+			header.append(" (free day)");
+		}
+		yesterdayBurnHours.addHeader(header.toString());
 		Date today = Date.today();
 		PagePanel todayBurnHours = new PagePanel();
-		todayBurnHours.addHeader("Team burned hours at today");
+		header = new StringBuffer("Team burned hours at today");
+		if (freeDays.isFree(Date.today().getWeekday() + 1)) {
+			header.append(" (free day)");
+		}
+		todayBurnHours.addHeader(header.toString());
 		for (User user : team) {
 			todayBurnHours.addSection(new BurnHoursWidget(today, user));
 			yesterdayBurnHours.addSection(new BurnHoursWidget(yesterday, user));

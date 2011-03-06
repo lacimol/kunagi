@@ -42,14 +42,16 @@ import scrum.server.sprint.Sprint;
 
 public class ChartTest extends ATest {
 
+	Project project;
+
 	@BeforeSuite
 	public void init() {
 		Sys.setHeadless(true);
 		TestUtil.initialize();
-		createProject();
+		if (project == null) {
+			project = createTestProjectForCharts();
+		}
 	}
-
-	Project project;
 
 	@Test
 	public void accomplishChart() throws IOException {
@@ -111,26 +113,25 @@ public class ChartTest extends ATest {
 		return new BufferedOutputStream(new FileOutputStream(file));
 	}
 
-	private void createProject() {
-		if (project == null) {
-			project = TestUtil.createProject(TestUtil.getAdmin());
-			// project.addTeamMember(TestUtil.getAdmin());
-			for (User user : TestUtil.getTestUsers()) {
-				project.addTeamMember(user);
-			}
-			project.addParticipants(project.getAdmins());
-			project.addParticipants(project.getTeamMembers());
-
-			Sprint sprint = TestUtil.createSprint(project, Date.today().addDays(-14), Date.today());
-			project.setCurrentSprint(sprint);
-
-			sprint.setLabel(Str.generateRandomSentence(2, 4));
-			sprint.setGoal(Str.generateRandomParagraph());
-
-			createTasksForSprint(sprint);
-
-			sprint.burndownTasksRandomly(sprint.getBegin(), Date.today());
+	public Project createTestProjectForCharts() {
+		Project project = TestUtil.createProject(TestUtil.getAdmin());
+		// project.addTeamMember(TestUtil.getAdmin());
+		for (User user : TestUtil.getTestUsers()) {
+			project.addTeamMember(user);
 		}
+		project.addParticipants(project.getAdmins());
+		project.addParticipants(project.getTeamMembers());
+
+		Sprint sprint = TestUtil.createSprint(project, Date.today().addDays(-14), Date.today());
+		project.setCurrentSprint(sprint);
+
+		sprint.setLabel(Str.generateRandomSentence(2, 4));
+		sprint.setGoal(Str.generateRandomParagraph());
+
+		createTasksForSprint(sprint);
+
+		sprint.burndownTasksRandomly(sprint.getBegin(), Date.today());
+		return project;
 	}
 
 	private void createTasksForSprint(Sprint sprint) {
@@ -138,6 +139,7 @@ public class ChartTest extends ATest {
 		for (int i = 1; i <= 5; i++) {
 			story = TestUtil.createRequirement(project, i);
 			story.setSprint(sprint);
+			story.setProject(sprint.getProject());
 			story.setEstimatedWorkAsString(Utl.randomElement(scrum.client.project.Requirement.WORK_ESTIMATION_VALUES));
 			story.setDirty(false);
 			for (int j = 1; j <= 3; j++) {
@@ -153,11 +155,13 @@ public class ChartTest extends ATest {
 			issue = TestUtil.createIssue(project, i);
 			issue.setAcceptDate(Date.today());
 			issue.setUrgent(true);
+			issue.setProject(sprint.getProject());
 			if (i == 1) TestUtil.createComments(issue, 2);
 		}
 		for (int i = 6; i <= 8; i++) {
 			issue = TestUtil.createIssue(project, i);
 			issue.setAcceptDate(Date.today());
+			issue.setProject(sprint.getProject());
 		}
 	}
 
