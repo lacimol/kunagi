@@ -1,5 +1,6 @@
 package scrum.client.tasks;
 
+import ilarkesto.core.scope.Scope;
 import ilarkesto.gwt.client.ButtonWidget;
 import ilarkesto.gwt.client.Gwt;
 
@@ -25,9 +26,14 @@ import scrum.client.workspace.PagePanel;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer, UserHighlightSupport {
+
+	private WhiteboardManager whiteboardManager;
+	private SimplePanel whiteboardWrapper;
+	private HTML whiteboardHeader;
 
 	private Grid grid;
 	private HTML openLabel;
@@ -49,6 +55,7 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 
 	@Override
 	protected Widget onInitialization() {
+		whiteboardManager = Scope.get().getComponent(WhiteboardManager.class);
 		sprint = getCurrentSprint();
 		predicate = null;
 
@@ -75,7 +82,11 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		grid.setCellSpacing(0);
 
 		PagePanel page = new PagePanel();
-		page.addHeader("Whiteboard", new ButtonWidget(new PullNextRequirementAction(getCurrentSprint())));
+		whiteboardWrapper = new SimplePanel();
+		whiteboardWrapper.setVisible(sprint.getProject().isTeamMember(getCurrentUser()));
+		whiteboardHeader = new HTML();
+		page.addHeader(whiteboardHeader, new ButtonWidget(new PullNextRequirementAction(getCurrentSprint())),
+			whiteboardWrapper);
 		page.addSection(grid);
 		userGuide = new UserGuideWidget(getLocalizer().views().whiteboard(), getCurrentProject().getCurrentSprint()
 				.getRequirements().size() < 3, getCurrentUser().getHideUserGuideWhiteboardModel());
@@ -83,9 +94,17 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		return page;
 	}
 
+	private String getPageHeader() {
+		return whiteboardManager.isMyRequirementsVisible() ? "Whiteboard (only my tasks)" : "Whiteboard";
+	}
+
 	@Override
 	protected void onUpdate() {
-		Sprint sprint = getCurrentProject().getCurrentSprint();
+
+		whiteboardHeader.setHTML(getPageHeader());
+		whiteboardWrapper.setWidget(new ButtonWidget(
+				whiteboardManager.isMyRequirementsVisible() ? new HideMyWhiteboardAction()
+						: new ShowMyWhiteboardAction()));
 
 		openLabel.setHTML("<strong>Free Tasks</strong> (" + hours(sprint.getRemainingWorkInUnclaimedTasks())
 				+ " to do)");
@@ -93,7 +112,7 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 				+ " to do, " + hours(sprint.getBurnedWorkInClaimedTasks()) + " done)");
 		doneLabel.setHTML("<strong>Completed Tasks</strong> (" + hours(sprint.getBurnedWorkInClosedTasks()) + " done)");
 
-		List<Requirement> requirements = sprint.getRequirements();
+		List<Requirement> requirements = getRequirements(sprint);
 		Collections.sort(requirements, sprint.getRequirementsOrderComparator());
 
 		if (requirements.equals(knownRequirements)) {
@@ -105,11 +124,86 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			return;
 		}
 		knownRequirements = requirements;
-
 		selectionManager = new BlockListSelectionManager();
-
 		grid.resize((requirements.size() * 2) + 1, 3);
+		updateTasks(requirements);
+		setLabels();
+		// grid.getColumnFormatter().setWidth(0, "1*");
+		// grid.getColumnFormatter().setWidth(1, "1*");
+		// grid.getColumnFormatter().setWidth(2, "1*");
 
+		int row = 1;
+		for (Requirement requirement : requirements) {
+
+			grid.setWidget(row, 0, getRequirementList(requirement));
+			grid.getCellFormatter().getElement(row, 0).setAttribute("colspan", "3");
+			row++;
+
+			updateTaskLists(requirement);
+			setWidgets(row, requirement);
+			row++;
+		}
+
+		userGuide.update();
+		super.onUpdate();
+	}
+
+	private void setLabels() {
+		setWidget(0, 0, openLabel, "33%", "WhiteboardWidget-header");
+		setWidget(0, 1, ownedLabel, "33%", "WhiteboardWidget-header");
+		setWidget(0, 2, doneLabel, "33%", "WhiteboardWidget-header");
+	}
+
+	private void setWidgets(int row, Requirement requirement) {
+		// grid.setWidget(row, 0, new Label(requirement.getLabel()));
+		setWidget(row, 0, openTasks.get(requirement), null, "WhiteboardWidget-open");
+		setWidget(row, 1, ownedTasks.get(requirement), null, "WhiteboardWidget-owned");
+		setWidget(row, 2, closedTasks.get(requirement), null, "WhiteboardWidget-done");
+	}
+
+	private List<Requirement> getRequirements(Sprint sprint) {
+		List<Requirement> results = new ArrayList<Requirement>();
+		if (whiteboardManager.isMyRequirementsVisible()) {
+			for (Requirement req : sprint.getRequirements()) {
+				if (hasCurrentUserTask(req)) {
+					results.add(req);
+				}
+			}
+		} else {
+			results = sprint.getRequirements();
+		}
+		return results;
+	}
+
+	/**
+	 * True, if requirement has a task which owned by current user
+	 * 
+	 * @param requirement
+	 * @return
+	 */
+	private boolean hasCurrentUserTask(Requirement requirement) {
+
+		boolean hasReqUserTask = false;
+		User currentUser = getCurrentUser();
+		for (Task task : requirement.getTasks()) {
+			if (currentUser.equals(task.getOwner())) {
+				hasReqUserTask = true;
+				break;
+			}
+		}
+		return hasReqUserTask;
+
+	}
+
+	private boolean isTaskListable(Task task) {
+		boolean isTaskListable = true;
+		if (whiteboardManager.isMyRequirementsVisible()) {
+			isTaskListable = task.isOwnerSet() && task.getOwner().equals(getCurrentUser());
+		}
+		return isTaskListable;
+	}
+
+	private void updateTasks(List<Requirement> requirements) {
 		for (Requirement requirement : requirements) {
 			openTasks.put(requirement, new TaskListWidget(requirement, this, new UnclaimTaskDropAction(requirement),
 					true));
@@ -118,33 +212,6 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			closedTasks.put(requirement, new TaskListWidget(requirement, this, new CloseTaskDropAction(requirement),
 					false));
 		}
-
-		setWidget(0, 0, openLabel, "33%", "WhiteboardWidget-header");
-		setWidget(0, 1, ownedLabel, "33%", "WhiteboardWidget-header");
-		setWidget(0, 2, doneLabel, "33%", "WhiteboardWidget-header");
-		// grid.getColumnFormatter().setWidth(0, "1*");
-		// grid.getColumnFormatter().setWidth(1, "1*");
-		// grid.getColumnFormatter().setWidth(2, "1*");
-
-		int row = 1;
-		for (int i = 0; i < requirements.size(); i++) {
-			Requirement requirement = requirements.get(i);
-
-			grid.setWidget(row, 0, getRequirementList(requirement));
-			grid.getCellFormatter().getElement(row, 0).setAttribute("colspan", "3");
-			row++;
-
-			updateTaskLists(requirement);
-
-			// grid.setWidget(row, 0, new Label(requirement.getLabel()));
-			setWidget(row, 0, openTasks.get(requirement), null, "WhiteboardWidget-open");
-			setWidget(row, 1, ownedTasks.get(requirement), null, "WhiteboardWidget-owned");
-			setWidget(row, 2, closedTasks.get(requirement), null, "WhiteboardWidget-done");
-
-			row++;
-		}
-
-		userGuide.update();
 	}
 
 	private BlockListWidget<Requirement> getRequirementList(Requirement requirement) {
@@ -168,16 +235,19 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 	}
 
 	private void updateTaskLists(Requirement requirement) {
+
 		List<Task> openTaskList = new ArrayList<Task>();
 		List<Task> ownedTaskList = new ArrayList<Task>();
 		List<Task> closedTaskList = new ArrayList<Task>();
 		for (Task task : requirement.getTasks()) {
-			if (task.isClosed()) {
-				closedTaskList.add(task);
-			} else if (task.isOwnerSet()) {
-				ownedTaskList.add(task);
-			} else {
-				openTaskList.add(task);
+			if (isTaskListable(task)) {
+				if (task.isClosed()) {
+					closedTaskList.add(task);
+				} else if (task.isOwnerSet()) {
+					ownedTaskList.add(task);
+				} else {
+					openTaskList.add(task);
+				}
 			}
 		}
 
@@ -276,6 +346,18 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		public boolean contains(Task element) {
 			return element.getOwner() != null && element.getOwner().equals(user);
 		}
+	}
+
+	public HTML getOpenLabel() {
+		return openLabel;
+	}
+
+	public HTML getOwnedLabel() {
+		return ownedLabel;
+	}
+
+	public HTML getDoneLabel() {
+		return doneLabel;
 	}
 
 }

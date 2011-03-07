@@ -24,6 +24,7 @@ import scrum.client.journal.ChangeHistoryManager;
 import scrum.client.project.CloseProjectServiceCall;
 import scrum.client.project.Project;
 import scrum.client.search.Search;
+import scrum.client.tasks.WhiteboardManager;
 import scrum.client.undo.Undo;
 import scrum.client.workspace.DndManager;
 import scrum.client.workspace.Navigator;
@@ -95,6 +96,7 @@ public class ScrumScopeManager {
 		scope.putComponent(new Search());
 		scope.putComponent(new UsersStatus());
 		scope.putComponent(new IssueManager());
+		scope.putComponent(new WhiteboardManager());
 
 		projectScope.wireComponents();
 	}
