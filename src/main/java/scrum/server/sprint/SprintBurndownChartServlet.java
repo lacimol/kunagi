@@ -29,6 +29,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		boolean isSprintWorkChart = "sprintWorkChart".equals(req.getParameter("chart"));
 		boolean isSprintRangeChart = "sprintRangeChart".equals(req.getParameter("chart"));
 		boolean isCurrentSprintRangeChart = "currentSprintRangeChart".equals(req.getParameter("chart"));
+		boolean isTaskRangeChart = "taskRangeChart".equals(req.getParameter("chart"));
 		String userNameParam = req.getParameter("userName");
 		String userName = (userNameParam == null || userNameParam.isEmpty() || "null".equals(userNameParam)) ? null
 				: userNameParam;
@@ -57,6 +58,9 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		} else if (isCurrentSprintRangeChart) {
 			// current sprint range history
 			ScrumWebApplication.get().getCurrentSprintRangeChart().writeChart(out, sprintId, width, height);
+		} else if (isTaskRangeChart) {
+			// task range history
+			ScrumWebApplication.get().getTaskRangeChart().writeChart(out, sprintId, width, height);
 		} else if (isAccomplishChart) {
 			// burned hours per user
 			ScrumWebApplication.get().getAccomplishChart().writeChart(out, sprintId, width, height);

@@ -128,6 +128,15 @@ public class ChartTest extends ATest {
 
 	}
 
+	@Test
+	public void taskRangeChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/taskRange.png");
+		new TaskRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 300);
+		out.close();
+
+	}
+
 	private void createFormerSprints() {
 		Set<Sprint> sprints = project.getSprints();
 		sprints.add(TestUtil.createSprint(project, Date.today().addDays(-20), Date.today().addDays(-14)));

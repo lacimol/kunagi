@@ -42,6 +42,10 @@ public class SprintStatisticsWidget extends AScrumWidget {
 		accomplish.addHeader("Team accomplishment");
 		accomplish.addSection(new AccomplishWidget());
 
+		PagePanel taskRange = new PagePanel();
+		taskRange.addHeader("Task range");
+		taskRange.addSection(new TaskRangeWidget());
+
 		// burned hours
 		Project project = getCurrentProject();
 		List<User> team = new LinkedList<User>(project.getTeamMembers());
@@ -71,7 +75,7 @@ public class SprintStatisticsWidget extends AScrumWidget {
 			yesterdayBurnHours.addSection(new BurnHoursWidget(yesterday, user));
 		}
 
-		Widget left = TableBuilder.column(5, efficiency, accomplish);
+		Widget left = TableBuilder.column(5, efficiency, accomplish, taskRange);
 		Widget right = TableBuilder.column(5, todayBurnHours, yesterdayBurnHours);
 
 		return TableBuilder.row(5, left, right);

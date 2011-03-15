@@ -19,6 +19,7 @@ public class Task extends GTask implements Numbered {
 		return scrum.client.sprint.Task.REFERENCE_PREFIX + getNumber();
 	}
 
+	@Override
 	public void updateNumber() {
 		if (getNumber() == 0) setNumber(getRequirement().getProject().generateTaskNumber());
 	}
@@ -59,6 +60,7 @@ public class Task extends GTask implements Numbered {
 		return getRequirement().getProject();
 	}
 
+	@Override
 	public boolean isVisibleFor(User user) {
 		return getProject().isVisibleFor(user);
 	}
@@ -74,6 +76,29 @@ public class Task extends GTask implements Numbered {
 
 	public List<TaskDaySnapshot> getTaskDaySnapshots(Sprint sprint) {
 		return taskDaySnapshotDao.getTaskDaySnapshots(sprint, this);
+	}
+
+	public Date getBurnBegin(Sprint sprint) {
+		Date begin = null;
+		for (TaskDaySnapshot shot : getTaskDaySnapshots(sprint)) {
+			if (shot.getBurnedWork() > 0 && (begin == null || begin.isBefore(shot.getDate()))) {
+				begin = shot.getDate();
+				break;
+			}
+		}
+		return begin;
+	}
+
+	public Date getBurnEnd(Sprint sprint) {
+		Date end = sprint.getEnd();
+		int formerBurned = 0;
+		for (TaskDaySnapshot shot : getTaskDaySnapshots(sprint)) {
+			if (shot.getBurnedWork() > 0 && shot.getBurnedWork() > formerBurned) {
+				formerBurned = shot.getBurnedWork();
+				end = shot.getDate();
+			}
+		}
+		return end;
 	}
 
 }

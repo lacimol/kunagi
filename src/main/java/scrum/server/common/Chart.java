@@ -340,8 +340,34 @@ public class Chart {
 		}
 	}
 
+	public void setDayDateAxis(final TaskSeries s1, final JFreeChart chart) {
+		DateAxis dateAx = (DateAxis) chart.getCategoryPlot().getRangeAxis();
+		dateAx.setUpperMargin(0.01);
+		dateAx.setLowerMargin(0.01);
+		if (s1.getItemCount() > 90) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 7, new SimpleDateFormat("MMM.yyyy")));
+		} else if (s1.getItemCount() > 30) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 3, new SimpleDateFormat("dd.MMM")));
+		} else if (s1.getItemCount() > 15) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 1, new SimpleDateFormat("dd")));
+		} else {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 1, new SimpleDateFormat("dd.MMM")));
+		}
+	}
+
 	public Task getGanttTask(Sprint sprint, String label) {
 		return new Task(label, new SimpleTimePeriod(sprint.getBegin().toJavaDate(), sprint.getEnd().toJavaDate()));
+	}
+
+	public Task getGanttTask(scrum.server.sprint.Task task, Date begin, Date end) {
+		String label = task.getLabel().substring(0, Math.min(task.getLabel().length(), 45));
+		// if it untouched than show empty line
+		if (begin == null) { return new Task(label, new SimpleTimePeriod(end.toJavaDate(), end.toJavaDate())); }
+		// want to see less than one day long tasks too
+		if (begin.isAfterOrSame(end)) {
+			end = end.addDays(1);
+		}
+		return new Task(label, new SimpleTimePeriod(begin.toJavaDate(), end.toJavaDate()));
 	}
 
 	private Paint[] getColors(final CategoryDataset dataset, Sprint sprint) {
