@@ -26,6 +26,9 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		boolean isEfficiencyChart = "efficiencyChart".equals(req.getParameter("chart"));
 		boolean isAccomplishChart = "accomplishChart".equals(req.getParameter("chart"));
 		boolean isVelocityChart = "velocityChart".equals(req.getParameter("chart"));
+		boolean isSprintWorkChart = "sprintWorkChart".equals(req.getParameter("chart"));
+		boolean isSprintRangeChart = "sprintRangeChart".equals(req.getParameter("chart"));
+		boolean isCurrentSprintRangeChart = "currentSprintRangeChart".equals(req.getParameter("chart"));
 		String userNameParam = req.getParameter("userName");
 		String userName = (userNameParam == null || userNameParam.isEmpty() || "null".equals(userNameParam)) ? null
 				: userNameParam;
@@ -45,6 +48,15 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		} else if (isVelocityChart) {
 			// velocity history
 			ScrumWebApplication.get().getVelocityChart().writeChart(out, sprintId, width, height);
+		} else if (isSprintWorkChart) {
+			// sprint work history
+			ScrumWebApplication.get().getSprintWorkChart().writeChart(out, sprintId, width, height);
+		} else if (isSprintRangeChart) {
+			// sprint range history
+			ScrumWebApplication.get().getSprintRangeChart().writeChart(out, sprintId, width, height);
+		} else if (isCurrentSprintRangeChart) {
+			// current sprint range history
+			ScrumWebApplication.get().getCurrentSprintRangeChart().writeChart(out, sprintId, width, height);
 		} else if (isAccomplishChart) {
 			// burned hours per user
 			ScrumWebApplication.get().getAccomplishChart().writeChart(out, sprintId, width, height);

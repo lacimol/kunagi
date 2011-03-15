@@ -38,8 +38,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class BurnHoursWidget extends AScrumWidget {
 
-	private static final String replacement = "*burnedHours*";
-
 	private HTML html;
 
 	@Override
@@ -99,15 +97,14 @@ public class BurnHoursWidget extends AScrumWidget {
 						if (taskDaySnapshot.getBurnedWork() > 0) {
 							boolean remained = taskDaySnapshot.getRemainingWork() > 0;
 							Task task = taskDaySnapshot.getTask();
-							sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>").append(
-								taskDaySnapshot.getDate() + ", ").append(task.toHtml()).append(" (").append(
-								ScrumGwt.createHtmlReference(task.getRequirement())).append("), burned: ").append(
-								taskDaySnapshot.getBurnedWork()).append(
-								", remained " + taskDaySnapshot.getRemainingWork() + " hours</li>");
+							sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>")
+									.append(taskDaySnapshot.getDate() + ", ").append(task.toHtml()).append(" (")
+									.append(ScrumGwt.createHtmlReference(task.getRequirement())).append("), burned: ")
+									.append(taskDaySnapshot.getBurnedWork())
+									.append(", remained " + taskDaySnapshot.getRemainingWork() + " hours</li>");
 						}
 					}
-					// sb.replace(sb.indexOf(replacement), sb.indexOf(replacement) + replacement.length(),
-					// burnedHours + "");
+
 					sb.append("</ul></div>");
 				} else {
 					sb.append("</span> has burned <span style='color: red;'>nothing</span>");

@@ -702,4 +702,10 @@ public class Project extends GProject implements ForumSupport {
 		};
 		return freeDaysWeekdaySelectorModel;
 	}
+
+	public List<Sprint> getReverseFormerSprints() {
+		List<Sprint> sprints = getSprints();
+		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
+		return sprints;
+	}
 }

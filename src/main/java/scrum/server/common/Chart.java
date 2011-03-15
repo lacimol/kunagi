@@ -23,6 +23,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
@@ -46,12 +49,18 @@ import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.GanttRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.Range;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.gantt.Task;
+import org.jfree.data.gantt.TaskSeries;
+import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.Layer;
 
+import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
 import scrum.server.css.ScreenCssBuilder;
 import scrum.server.sprint.Sprint;
@@ -90,12 +99,13 @@ public class Chart {
 		userColors.put("green", Color.GREEN);
 	}
 
-	public int getWorkingHoursPerDay(Integer hours) {
+	public int getWorkingHoursPerDay() {
 		// default is 7 hours/day/user
+		Integer hours = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
 		return hours == null ? 7 : hours;
 	}
 
-	protected static JFreeChart createChart(Date firstDay, Date lastDay, int dateMarkTickUnit, float widthPerDay,
+	public static JFreeChart createXYLineChart(Date firstDay, Date lastDay, int dateMarkTickUnit, float widthPerDay,
 			DefaultXYDataset data, double max, int height) {
 
 		double valueLabelTickUnit = calculateTick(max, height);
@@ -197,7 +207,7 @@ public class Chart {
 		return array;
 	}
 
-	protected JFreeChart createEfficiencyChart(final CategoryDataset dataset, Sprint sprint) {
+	public JFreeChart createEfficiencyChart(final CategoryDataset dataset, Sprint sprint) {
 
 		StandardCategoryItemLabelGenerator itemLabelGenerator = new StandardCategoryItemLabelGenerator("{2}",
 				new DecimalFormat("###%"));
@@ -211,11 +221,71 @@ public class Chart {
 
 	}
 
-	protected JFreeChart createBarChart(final CategoryDataset dataset, Sprint sprint,
+	public JFreeChart createBarChart(final CategoryDataset dataset) {
+		return createBarChart(dataset, null, new StandardCategoryItemLabelGenerator());
+	}
+
+	public JFreeChart createBarChart(final CategoryDataset dataset, Sprint sprint,
 			StandardCategoryItemLabelGenerator itemLabelGenerator) {
+
 		final JFreeChart chart = ChartFactory.createBarChart("", "", "", dataset, PlotOrientation.VERTICAL, false,
 			true, false);
 
+		final CategoryPlot plot = getChartBasicData(chart);
+		setChartNumberAxis(chart);
+		final CategoryItemRenderer renderer = getColorRenderer(dataset, sprint, plot);
+		renderer.setSeriesItemLabelGenerator(0, itemLabelGenerator);
+		renderer.setSeriesItemLabelGenerator(1, itemLabelGenerator);
+		renderer.setBaseItemLabelsVisible(true);
+		renderer.setSeriesPaint(0, COLOR_PAST_LINE);
+		plot.setRenderer(renderer);
+
+		return chart;
+	}
+
+	public JFreeChart createStackedBarChart(final CategoryDataset dataset) {
+
+		final JFreeChart chart = ChartFactory.createStackedBarChart("", "", "", dataset, PlotOrientation.VERTICAL,
+			true, true, false);
+
+		final CategoryPlot plot = getChartBasicData(chart);
+		setChartNumberAxis(chart);
+		final CategoryItemRenderer renderer = plot.getRenderer();
+		renderer.setSeriesItemLabelGenerator(0, new StandardCategoryItemLabelGenerator());
+		renderer.setSeriesItemLabelGenerator(1, new StandardCategoryItemLabelGenerator());
+		renderer.setSeriesItemLabelGenerator(2, new StandardCategoryItemLabelGenerator());
+		renderer.setBaseItemLabelsVisible(true);
+		renderer.setSeriesPaint(0, COLOR_PAST_LINE);
+		renderer.setSeriesPaint(1, COLOR_PROJECTION_LINE);
+		renderer.setSeriesPaint(2, COLOR_OPTIMUM_LINE);
+		renderer.setSeriesItemLabelPaint(0, COLOR_OPTIMUM_LINE);
+		renderer.setSeriesItemLabelPaint(1, COLOR_OPTIMUM_LINE);
+		renderer.setSeriesItemLabelPaint(2, COLOR_PAST_LINE);
+
+		return chart;
+	}
+
+	public JFreeChart createGanttChart(final TaskSeriesCollection dataset, int currentSprintColumn) {
+
+		final JFreeChart chart = ChartFactory.createGanttChart("", "", "", dataset, false, true, false);
+
+		final CategoryPlot plot = getChartBasicData(chart);
+		plot.setDomainGridlinePaint(COLOR_PROJECTION_LINE);
+		plot.setRangeGridlinePaint(COLOR_PROJECTION_LINE);
+
+		final GanttRenderer renderer = new CustomGanttRenderer(currentSprintColumn);
+		renderer.setSeriesPaint(0, COLOR_PROJECTION_LINE);
+		renderer.setSeriesPaint(1, COLOR_OPTIMUM_LINE);
+		plot.setRenderer(renderer);
+
+		return chart;
+	}
+
+	private CategoryItemRenderer getColorRenderer(final CategoryDataset dataset, Sprint sprint, final CategoryPlot plot) {
+		return sprint != null ? new CustomRenderer(getColors(dataset, sprint)) : plot.getRenderer();
+	}
+
+	private CategoryPlot getChartBasicData(final JFreeChart chart) {
 		chart.setBackgroundPaint(Color.WHITE);
 
 		// get a reference to the plot for further customization...
@@ -223,33 +293,55 @@ public class Chart {
 		plot.setRangeGridlinesVisible(true);
 		plot.setDomainGridlinesVisible(true);
 		plot.setNoDataMessage("NO DATA!");
+		plot.getDomainAxis().setMaximumCategoryLabelLines(2);
 
-		final CategoryItemRenderer renderer = sprint != null ? new CustomRenderer(getColors(dataset, sprint)) : plot
-				.getRenderer();
-		renderer.setSeriesItemLabelGenerator(0, itemLabelGenerator);
-		renderer.setBaseItemLabelsVisible(true);
-		renderer.setSeriesPaint(0, COLOR_PAST_LINE);
-		plot.setRenderer(renderer);
+		return plot;
+	}
 
+	private void setChartNumberAxis(final JFreeChart chart) {
+		final CategoryPlot plot = chart.getCategoryPlot();
 		// change the margin at the top of the range axis...
 		final ValueAxis rangeAxis = plot.getRangeAxis();
 		rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
 		rangeAxis.setLowerMargin(0.15);
 		rangeAxis.setUpperMargin(0.15);
-
-		plot.getDomainAxis().setMaximumCategoryLabelLines(2);
-		return chart;
 	}
 
-	void setChartMarker(JFreeChart chart, int avg, int max) {
+	public void setChartMarker(JFreeChart chart, int avg, int max) {
 		final IntervalMarker target = new IntervalMarker(avg, max);
 		target.setPaint(new Color(222, 222, 255, 128));
 		chart.getCategoryPlot().addRangeMarker(target, Layer.BACKGROUND);
 	}
 
-	void setUpperBoundary(JFreeChart chart, int max) {
+	public void setUpperBoundary(JFreeChart chart, int max) {
 		double upperBoundary = Math.min(max * 1.15f, max + 15);
 		chart.getCategoryPlot().getRangeAxis().setUpperBound(upperBoundary);
+	}
+
+	public void createPic(OutputStream out, int width, int height, JFreeChart chart) {
+		try {
+			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
+			out.flush();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void setDateAxis(final TaskSeries s1, final JFreeChart chart) {
+		DateAxis dateAx = (DateAxis) chart.getCategoryPlot().getRangeAxis();
+		dateAx.setUpperMargin(0.01);
+		dateAx.setLowerMargin(0.01);
+		if (s1.getItemCount() > 8) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.MONTH, 1, new SimpleDateFormat("MMM.yyyy")));
+		} else if (s1.getItemCount() > 4) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 7, new SimpleDateFormat("w")));
+		} else {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 1, new SimpleDateFormat("dd")));
+		}
+	}
+
+	public Task getGanttTask(Sprint sprint, String label) {
+		return new Task(label, new SimpleTimePeriod(sprint.getBegin().toJavaDate(), sprint.getEnd().toJavaDate()));
 	}
 
 	private Paint[] getColors(final CategoryDataset dataset, Sprint sprint) {
@@ -289,8 +381,35 @@ public class Chart {
 		 */
 		@Override
 		public Paint getItemPaint(final int row, final int column) {
+			if (row > 0) {
+				// Color p = (Color) this.colors[column % this.colors.length];
+				// return p.brighter();
+				return COLOR_PROJECTION_LINE;
+			}
 			return this.colors[column % this.colors.length];
 		}
+
+		@Override
+		public Paint getSeriesItemLabelPaint(int series) {
+			return Color.BLACK;
+		}
+
+	}
+
+	class CustomGanttRenderer extends GanttRenderer {
+
+		private int currentSprintRow;
+
+		public CustomGanttRenderer(int currentSprintRow) {
+			this.currentSprintRow = currentSprintRow;
+		}
+
+		@Override
+		public Paint getItemPaint(int row, int column) {
+			if (column == currentSprintRow) { return COLOR_PAST_LINE; }
+			return super.getItemPaint(row, column);
+		}
+
 	}
 
 }

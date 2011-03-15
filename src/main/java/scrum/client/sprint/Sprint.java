@@ -119,6 +119,18 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		return getChartUrl(width, height) + "&chart=velocityChart";
 	}
 
+	public String getSprintWorkChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=sprintWorkChart";
+	}
+
+	public String getSprintRangeChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=sprintRangeChart";
+	}
+
+	public String getCurrentSprintRangeChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=currentSprintRangeChart";
+	}
+
 	public boolean isCompleted() {
 		return getVelocity() != null;
 	}
@@ -301,6 +313,15 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		@Override
 		public int compare(Sprint a, Sprint b) {
 			return Utl.compare(b.getEnd(), a.getEnd());
+		}
+
+	};
+
+	public static final Comparator<Sprint> REVERSE_END_DATE_COMPARATOR = new Comparator<Sprint>() {
+
+		@Override
+		public int compare(Sprint a, Sprint b) {
+			return Utl.compare(a.getEnd(), b.getEnd());
 		}
 
 	};

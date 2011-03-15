@@ -891,4 +891,16 @@ public class Project extends GProject {
 		return requirementsOrderComparator;
 	}
 
+	public List<Sprint> getReverseFormerSprints() {
+		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
+		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
+		return sprints;
+	}
+
+	public Sprint getPrevSprint() {
+		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
+		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		return sprints.size() > 2 ? sprints.get(2) : null;
+	}
+
 }

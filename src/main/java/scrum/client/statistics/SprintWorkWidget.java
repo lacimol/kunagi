@@ -15,12 +15,11 @@
 
 package scrum.client.statistics;
 
-
-public class AccomplishWidget extends ChartWidget {
+public class SprintWorkWidget extends TwoThirdsChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getAccomplishChartUrl(width, CHART_HEIGHT);
+		return getCurrentSprint().getSprintWorkChartUrl(width, CHART_HEIGHT);
 	}
 
 }

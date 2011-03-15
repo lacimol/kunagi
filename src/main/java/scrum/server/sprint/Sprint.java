@@ -143,6 +143,18 @@ public class Sprint extends GSprint implements Numbered {
 		return sum;
 	}
 
+	public int getInitialWork() {
+		return getDaySnapshot(getBegin()).getRemainingWork();
+	}
+
+	public int getAllBurnedWork() {
+		return getDaySnapshot(getEnd()).getBurnedWork();
+	}
+
+	public int getAllRemainedWork() {
+		return getDaySnapshot(getEnd()).getRemainingWork();
+	}
+
 	public Set<Task> getTasks() {
 		return taskDao.getTasksBySprint(this);
 	}
@@ -235,6 +247,15 @@ public class Sprint extends GSprint implements Numbered {
 		@Override
 		public int compare(Sprint a, Sprint b) {
 			return Utl.compare(b.getEnd(), a.getEnd());
+		}
+
+	};
+
+	public static final Comparator<Sprint> REVERSE_END_DATE_COMPARATOR = new Comparator<Sprint>() {
+
+		@Override
+		public int compare(Sprint a, Sprint b) {
+			return Utl.compare(a.getEnd(), b.getEnd());
 		}
 
 	};

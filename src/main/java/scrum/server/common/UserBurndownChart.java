@@ -36,7 +36,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import scrum.client.common.WeekdaySelector;
-import scrum.server.ScrumWebApplication;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
 import scrum.server.task.TaskDaySnapshot;
@@ -149,7 +148,7 @@ public class UserBurndownChart extends Chart {
 		data = createWorkDataset(userBurnedHours, firstDay, lastDay, freeDays);
 		max = Math.max(max, UserBurndownChart.getMaximum(data));
 
-		return createChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, max, height);
+		return createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, max, height);
 	}
 
 	public DefaultXYDataset createWorkDataset(final Map<String, Integer> userBurnedHours, final Date firstDay,
@@ -173,8 +172,7 @@ public class UserBurndownChart extends Chart {
 		double all = 0;
 		double workDays = 0;
 
-		int workingHoursPerDay = getWorkingHoursPerDay(ScrumWebApplication.get().getSystemConfig()
-				.getWorkingHoursPerDay());
+		int workingHoursPerDay = getWorkingHoursPerDay();
 		Double idealWorkingHours = (double) (userName != null ? workingHoursPerDay : workingHoursPerDay
 				* teamMembersCount);
 

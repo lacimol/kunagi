@@ -98,7 +98,7 @@ public class BurndownChart extends Chart {
 
 		List<BurndownSnapshot> burndownSnapshots = new ArrayList<BurndownSnapshot>(snapshots);
 		DefaultXYDataset data = createSprintBurndownChartDataset(burndownSnapshots, firstDay, lastDay, freeDays);
-		JFreeChart chart = createChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, getMaximum(data), height);
+		JFreeChart chart = createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, getMaximum(data), height);
 		try {
 			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
 			out.flush();

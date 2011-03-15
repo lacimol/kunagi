@@ -50,6 +50,7 @@ public class ChartTest extends ATest {
 		TestUtil.initialize();
 		if (project == null) {
 			project = createTestProjectForCharts();
+			createFormerSprints();
 		}
 	}
 
@@ -94,17 +95,46 @@ public class ChartTest extends ATest {
 	@Test
 	public void velocityChart() throws IOException {
 
+		BufferedOutputStream out = getOutputStream("/velocityChart.png");
+		new VelocityChart().writeChart(out, project.getCurrentSprint(), 1000, 500);
+		out.close();
+
+	}
+
+	@Test
+	public void sprintRangeChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/sprintRange.png");
+		new SprintRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 300);
+		out.close();
+
+	}
+
+	@Test
+	public void currentSprintRangeChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/currentSprintRange.png");
+		new SprintRangeChart(true, true).writeChart(out, project.getCurrentSprint(), 1000, 90);
+		out.close();
+
+	}
+
+	@Test
+	public void sprintWorkChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/sprintWork.png");
+		new SprintWorkChart().writeChart(out, project.getCurrentSprint(), 1000, 190);
+		out.close();
+
+	}
+
+	private void createFormerSprints() {
 		Set<Sprint> sprints = project.getSprints();
 		sprints.add(TestUtil.createSprint(project, Date.today().addDays(-20), Date.today().addDays(-14)));
 		sprints.add(TestUtil.createSprint(project, Date.today().addDays(-25), Date.today().addDays(-20)));
 		for (Sprint sprint : sprints) {
 			sprint.setVelocity(Float.valueOf(Utl.randomInt(10, 100)));
 		}
-
-		BufferedOutputStream out = getOutputStream("/velocityChart.png");
-		new VelocityChart().writeChart(out, project.getCurrentSprint(), 1000, 500);
-		out.close();
-
 	}
 
 	private BufferedOutputStream getOutputStream(String fileName) throws FileNotFoundException {

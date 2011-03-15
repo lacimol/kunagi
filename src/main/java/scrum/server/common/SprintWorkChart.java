@@ -19,9 +19,6 @@ import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -29,14 +26,17 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import scrum.server.project.Project;
 import scrum.server.sprint.Sprint;
 
-public class VelocityChart extends Chart {
+public class SprintWorkChart extends Chart {
 
-	private static final Log LOG = Log.get(VelocityChart.class);
+	private static final String REMAINED_SERIES = "Remained";
+	private static final String EXTRA_SERIES = "Extra";
+	private static final String INITIAL_SERIES = "Initial";
+	private static final Log LOG = Log.get(SprintWorkChart.class);
 	private static final String AVG = "average";
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new VelocityChart().writeChart(out, sprint, width, height);
+		new SprintWorkChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
@@ -50,34 +50,54 @@ public class VelocityChart extends Chart {
 
 		Project project = sprint.getProject();
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
-		barDataset.addValue(0, "S1", AVG);
+		barDataset.addValue(0, INITIAL_SERIES, AVG);
+		barDataset.addValue(0, EXTRA_SERIES, AVG);
+		barDataset.addValue(0, REMAINED_SERIES, AVG);
 
-		List<Sprint> sprints = new ArrayList<Sprint>(project.getSprints());
-		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
-		int maxVelocity = 0;
-		float sum = 0;
+		int maxValue = 0;
+		int sumBurned = 0;
+		int sumRemained = 0;
+		int sumInitial = 0;
 		int count = 0;
-		Float velocity;
-		for (Sprint completedSprint : sprints) {
-			velocity = completedSprint.getVelocity();
-			if (velocity == null || velocity.intValue() == 0) continue;
-			barDataset.addValue(velocity, "S1", completedSprint.getLabel());
-			maxVelocity = Math.max(velocity.intValue(), maxVelocity);
-			sum += velocity;
-			count++;
-			if (count >= 10) break;
+
+		int burned;
+		int remained;
+		int initial;
+
+		for (Sprint completedSprint : project.getReverseFormerSprints()) {
+
+			initial = completedSprint.getInitialWork();
+			barDataset.addValue(initial, INITIAL_SERIES, completedSprint.getLabel());
+			sumInitial += initial;
+
+			burned = Math.max(completedSprint.getAllBurnedWork() - initial, 0);
+			barDataset.addValue(burned, EXTRA_SERIES, completedSprint.getLabel());
+			sumBurned += burned;
+
+			remained = completedSprint.getAllRemainedWork();
+			barDataset.addValue(remained, REMAINED_SERIES, completedSprint.getLabel());
+			sumRemained += remained;
+
+			maxValue = Math.max(initial + burned + remained, maxValue);
+			if (++count >= 10) break;
 		}
 
+		barDataset.setValue(getAverage(sumInitial, count), INITIAL_SERIES, AVG);
+		barDataset.setValue(getAverage(sumBurned, count), EXTRA_SERIES, AVG);
+		barDataset.setValue(getAverage(sumRemained, count), REMAINED_SERIES, AVG);
+
+		JFreeChart chart = createStackedBarChart(barDataset);
+		// setChartMarker(chart, avarageRemained, maxValue);
+		setUpperBoundary(chart, maxValue);
+		createPic(out, width, height, chart);
+	}
+
+	private int getAverage(int sum, int count) {
 		int avarage = 0;
 		if (count > 0 && sum > 0) {
-			avarage = (int) sum / count;
+			avarage = sum / count;
 		}
-		barDataset.setValue(avarage, "S1", AVG);
-
-		JFreeChart chart = createBarChart(barDataset);
-		setChartMarker(chart, avarage, maxVelocity);
-		setUpperBoundary(chart, maxVelocity + 25);
-		createPic(out, width, height, chart);
+		return avarage;
 	}
 
 }

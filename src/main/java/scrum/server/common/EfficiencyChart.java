@@ -19,12 +19,10 @@ import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
@@ -59,19 +57,12 @@ public class EfficiencyChart extends Chart {
 
 		for (User user : sprint.getProject().getTeamMembers()) {
 			efficiency = getUserEfficiency(sprint, firstDay, lastDay, user.getName());
-			if (efficiency.getEfficiency() > 0) {
-				barDataset.addValue(efficiency.getEfficiency(), "S1",
-					user.getName() + efficiency.getBurnedHoursPerInitial());
-			}
+			barDataset.addValue(efficiency.getEfficiency(), "S1",
+				user.getName() + efficiency.getBurnedHoursPerInitial());
 		}
 
 		JFreeChart chart = createEfficiencyChart(barDataset, sprint);
-		try {
-			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
-			out.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		createPic(out, width, height, chart);
 	}
 
 	private UserEfficiency getUserEfficiency(Sprint sprint, Date firstDay, Date lastDay, String userName) {
