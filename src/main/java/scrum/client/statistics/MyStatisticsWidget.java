@@ -30,6 +30,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class MyStatisticsWidget extends AScrumWidget {
 
+	private static final int daysBefore = 7;
+
 	@Override
 	protected Widget onInitialization() {
 		ProjectWorkspaceWidgets widgets = Scope.get().getComponent(ProjectWorkspaceWidgets.class);
@@ -59,14 +61,16 @@ public class MyStatisticsWidget extends AScrumWidget {
 
 		PagePanel beforeBurnHours = new PagePanel();
 		Date dateBefore = null;
-		for (int x = 1; x < 5; x++) {
+		for (int x = 1; x < daysBefore; x++) {
 			dateBefore = Date.today().addDays(-x);
-			header = new StringBuffer("My burned hours at " + dateBefore);
-			if (freeDays.isFree(dateBefore.getWeekday() + 1)) {
-				header.append(" (free day)");
+			if (dateBefore.isSameOrAfter(getCurrentSprint().getBegin())) {
+				header = new StringBuffer("My burned hours at " + dateBefore);
+				if (freeDays.isFree(dateBefore.getWeekday() + 1)) {
+					header.append(" (free day)");
+				}
+				beforeBurnHours.addHeader(header.toString());
+				beforeBurnHours.addSection(new BurnHoursWidget(dateBefore, currentUser));
 			}
-			beforeBurnHours.addHeader(header.toString());
-			beforeBurnHours.addSection(new BurnHoursWidget(dateBefore, currentUser));
 		}
 
 		Widget left = TableBuilder.column(5, teamBurndown, currentUserBurndown);

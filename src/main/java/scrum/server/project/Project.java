@@ -891,10 +891,12 @@ public class Project extends GProject {
 		return requirementsOrderComparator;
 	}
 
-	public List<Sprint> getReverseFormerSprints() {
+	public List<Sprint> getFormerSprints(int toIndex) {
 		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
-		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
-		return sprints;
+		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		List<Sprint> reverseSprints = sprints.subList(0, Math.min(toIndex, sprints.size()));
+		Collections.sort(reverseSprints, Sprint.REVERSE_END_DATE_COMPARATOR);
+		return reverseSprints;
 	}
 
 	public Sprint getPrevSprint() {

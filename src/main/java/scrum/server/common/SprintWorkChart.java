@@ -40,12 +40,7 @@ public class SprintWorkChart extends Chart {
 		return out.toByteArray();
 	}
 
-	public void writeChart(OutputStream out, String sprintId, int width, int height) {
-		Sprint sprint = sprintDao.getById(sprintId);
-		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeChart(out, sprint, width, height);
-	}
-
+	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		Project project = sprint.getProject();
@@ -58,14 +53,15 @@ public class SprintWorkChart extends Chart {
 		int sumBurned = 0;
 		int sumRemained = 0;
 		int sumInitial = 0;
-		int count = 0;
+		int count = 10;
 
 		int burned;
 		int remained;
 		int initial;
 
-		for (Sprint completedSprint : project.getReverseFormerSprints()) {
+		for (Sprint completedSprint : project.getFormerSprints(count)) {
 
+			if (completedSprint.getVelocity() == null || completedSprint.getVelocity().intValue() == 0) continue;
 			initial = completedSprint.getInitialWork();
 			barDataset.addValue(initial, INITIAL_SERIES, completedSprint.getLabel());
 			sumInitial += initial;
@@ -79,7 +75,6 @@ public class SprintWorkChart extends Chart {
 			sumRemained += remained;
 
 			maxValue = Math.max(initial + burned + remained, maxValue);
-			if (++count >= 10) break;
 		}
 
 		barDataset.setValue(getAverage(sumInitial, count), INITIAL_SERIES, AVG);

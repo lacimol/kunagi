@@ -4,12 +4,10 @@ import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
@@ -23,7 +21,7 @@ public class BurndownChart extends Chart {
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new BurndownChart().writeSprintBurndownChart(out, sprint, width, height);
+		new BurndownChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
@@ -36,13 +34,8 @@ public class BurndownChart extends Chart {
 	// project.getFreeDaysAsWeekdaySelector(), width, height);
 	// }
 
-	public void writeChart(OutputStream out, String sprintId, int width, int height) {
-		Sprint sprint = sprintDao.getById(sprintId);
-		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeSprintBurndownChart(out, sprint, width, height);
-	}
-
-	public void writeSprintBurndownChart(OutputStream out, Sprint sprint, int width, int height) {
+	@Override
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 		List<SprintDaySnapshot> snapshots = sprint.getDaySnapshots();
 		if (snapshots.isEmpty()) {
 			Date date = Date.today();
@@ -83,7 +76,7 @@ public class BurndownChart extends Chart {
 	// }
 	// }
 
-	static void writeSprintBurndownChart(OutputStream out, List<? extends BurndownSnapshot> snapshots, Date firstDay,
+	void writeSprintBurndownChart(OutputStream out, List<? extends BurndownSnapshot> snapshots, Date firstDay,
 			Date lastDay, WeekdaySelector freeDays, int width, int height) {
 		LOG.debug("Creating burndown chart:", snapshots.size(), "snapshots from", firstDay, "to", lastDay, "(" + width
 				+ "x" + height + " px)");
@@ -98,16 +91,12 @@ public class BurndownChart extends Chart {
 
 		List<BurndownSnapshot> burndownSnapshots = new ArrayList<BurndownSnapshot>(snapshots);
 		DefaultXYDataset data = createSprintBurndownChartDataset(burndownSnapshots, firstDay, lastDay, freeDays);
-		JFreeChart chart = createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, getMaximum(data), height);
-		try {
-			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
-			out.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		JFreeChart chart = createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, getMaximum(data),
+			height);
+		createPic(out, width, height, chart);
 	}
 
-	static DefaultXYDataset createSprintBurndownChartDataset(final List<BurndownSnapshot> snapshots,
+	private DefaultXYDataset createSprintBurndownChartDataset(final List<BurndownSnapshot> snapshots,
 			final Date firstDay, final Date lastDay, final WeekdaySelector freeDays) {
 
 		ChartDataFactory factory = new ChartDataFactory();
@@ -115,7 +104,7 @@ public class BurndownChart extends Chart {
 		return factory.getDataset();
 	}
 
-	static class ChartDataFactory {
+	private class ChartDataFactory {
 
 		List<Double> mainDates = new ArrayList<Double>();
 		List<Double> mainValues = new ArrayList<Double>();

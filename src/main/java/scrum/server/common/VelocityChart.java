@@ -19,9 +19,6 @@ import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -40,32 +37,23 @@ public class VelocityChart extends Chart {
 		return out.toByteArray();
 	}
 
-	public void writeChart(OutputStream out, String sprintId, int width, int height) {
-		Sprint sprint = sprintDao.getById(sprintId);
-		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeChart(out, sprint, width, height);
-	}
-
+	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		Project project = sprint.getProject();
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
 		barDataset.addValue(0, "S1", AVG);
 
-		List<Sprint> sprints = new ArrayList<Sprint>(project.getSprints());
-		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
 		int maxVelocity = 0;
 		float sum = 0;
-		int count = 0;
+		int count = 10;
 		Float velocity;
-		for (Sprint completedSprint : sprints) {
+		for (Sprint completedSprint : project.getFormerSprints(count)) {
 			velocity = completedSprint.getVelocity();
 			if (velocity == null || velocity.intValue() == 0) continue;
 			barDataset.addValue(velocity, "S1", completedSprint.getLabel());
 			maxVelocity = Math.max(velocity.intValue(), maxVelocity);
 			sum += velocity;
-			count++;
-			if (count >= 10) break;
 		}
 
 		int avarage = 0;

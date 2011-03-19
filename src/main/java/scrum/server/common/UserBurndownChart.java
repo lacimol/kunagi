@@ -19,7 +19,6 @@ import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
@@ -53,14 +51,20 @@ public class UserBurndownChart extends Chart {
 		return out.toByteArray();
 	}
 
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height, String userName) {
+		this.userName = userName;
+		writeChart(out, sprint, width, height);
+	}
+
 	public void writeChart(OutputStream out, String sprintId, int width, int height, String userName) {
 		Sprint sprint = sprintDao.getById(sprintId);
 		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeChart(out, sprint, width, height, userName);
+		this.userName = userName;
+		writeChart(out, sprint, width, height);
 	}
 
-	public void writeChart(OutputStream out, Sprint sprint, int width, int height, String userName) {
-		this.userName = userName;
+	@Override
+	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 		WeekdaySelector freeDays = sprint.getProject().getFreeDaysAsWeekdaySelector();
 		writeChart(out, sprint, freeDays, width, height);
 	}
@@ -86,12 +90,7 @@ public class UserBurndownChart extends Chart {
 
 		JFreeChart chart = createSprintBurndownChart(userBurnedHours, firstDay, lastDay, freeDays, dateMarkTickUnit,
 			widthPerDay, height);
-		try {
-			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
-			out.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		createPic(out, width, height, chart);
 	}
 
 	private Map<String, Integer> getUserBurnedHours(Sprint sprint, Date firstDay, Date lastDay) {
@@ -131,11 +130,6 @@ public class UserBurndownChart extends Chart {
 		};
 		Map<String, Integer> sorted = new TreeMap<String, Integer>(comparer);
 		sorted.putAll(userBurnedHours);
-
-		// System.out.println("*** Stat for " + userBurnedHours.size() + "***");
-		// for (Entry<String, Integer> entry : userBurnedHours.entrySet()) {
-		// System.out.println(entry.getKey() + ": " + entry.getValue());
-		// }
 
 		return sorted;
 	}

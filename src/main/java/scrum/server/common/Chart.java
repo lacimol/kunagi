@@ -18,6 +18,7 @@ package scrum.server.common;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
+import ilarkesto.core.logging.Log;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -66,7 +67,9 @@ import scrum.server.css.ScreenCssBuilder;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.SprintDao;
 
-public class Chart {
+public abstract class Chart {
+
+	private static final Log LOG = Log.get(Chart.class);
 
 	protected static final Color COLOR_PAST_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownLine);
 	protected static final Color COLOR_PROJECTION_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownProjectionLine);
@@ -81,6 +84,14 @@ public class Chart {
 	public void setSprintDao(SprintDao sprintDao) {
 		this.sprintDao = sprintDao;
 	}
+
+	public void writeChart(OutputStream out, String sprintId, int width, int height) {
+		Sprint sprint = sprintDao.getById(sprintId);
+		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
+		writeChart(out, sprint, width, height);
+	}
+
+	public abstract void writeChart(OutputStream out, Sprint sprint, int width, int height);
 
 	// --- ---
 
@@ -360,7 +371,7 @@ public class Chart {
 	}
 
 	public Task getGanttTask(scrum.server.sprint.Task task, Date begin, Date end) {
-		String label = task.getLabel().substring(0, Math.min(task.getLabel().length(), 45));
+		String label = task.getLabel().substring(0, Math.min(task.getLabel().length(), 40));
 		// if it untouched than show empty line
 		if (begin == null) { return new Task(label, new SimpleTimePeriod(end.toJavaDate(), end.toJavaDate())); }
 		// want to see less than one day long tasks too

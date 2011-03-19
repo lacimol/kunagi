@@ -14,10 +14,12 @@ import java.util.Set;
 
 import scrum.client.common.WeekdaySelector;
 import scrum.server.admin.User;
+import scrum.server.common.BurndownSnapshot;
 import scrum.server.common.Numbered;
 import scrum.server.project.Project;
 import scrum.server.project.Requirement;
 import scrum.server.release.Release;
+import scrum.server.task.TaskDaySnapshot;
 
 public class Sprint extends GSprint implements Numbered {
 
@@ -101,6 +103,21 @@ public class Sprint extends GSprint implements Numbered {
 
 	public Set<SprintDaySnapshot> getExistingDaySnapshots() {
 		return sprintDaySnapshotDao.getSprintDaySnapshotsBySprint(this);
+	}
+
+	public List<TaskDaySnapshot> getTaskDaySnapshots() {
+		List<TaskDaySnapshot> shots = new ArrayList<TaskDaySnapshot>();
+		List<Task> tasks = new ArrayList<Task>(getTasks());
+		for (Task task : tasks) {
+			shots.addAll(task.getTaskDaySnapshots(this));
+		}
+		return shots;
+	}
+
+	public List<BurndownSnapshot> getTaskBurndownSnapshots() {
+		List<BurndownSnapshot> shots = new ArrayList<BurndownSnapshot>();
+		shots.addAll(getTaskDaySnapshots());
+		return shots;
 	}
 
 	public Integer getLengthInDays() {

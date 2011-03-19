@@ -40,12 +40,7 @@ public class AccomplishChart extends Chart {
 		return out.toByteArray();
 	}
 
-	public void writeChart(OutputStream out, String sprintId, int width, int height) {
-		Sprint sprint = sprintDao.getById(sprintId);
-		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeChart(out, sprint, width, height);
-	}
-
+	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
@@ -57,13 +52,9 @@ public class AccomplishChart extends Chart {
 		for (User user : sprint.getProject().getTeamMembers()) {
 			burnedHours = getUserBurnedHours(sprint, user.getName());
 			remainingHours = getUserRemainingHours(sprint, user.getName());
-			LOG.info(user, "'s burnedHours: ", burnedHours, ", remining: ", remainingHours);
-			if (burnedHours > 0) {
-				barDataset.addValue(burnedHours, "Burned", user.getName());
-				barDataset.addValue(remainingHours, "Remaining", user.getName());
-			} else {
-				teamMembersCount--;
-			}
+			LOG.debug(user, "'s burnedHours: ", burnedHours, ", remining: ", remainingHours);
+			barDataset.addValue(burnedHours, "Burned", user.getName());
+			barDataset.addValue(remainingHours, "Remaining", user.getName());
 		}
 		burnedHours = getUserBurnedHours(sprint, TEAM);
 		remainingHours = getUserRemainingHours(sprint, TEAM);
@@ -74,7 +65,7 @@ public class AccomplishChart extends Chart {
 		JFreeChart chart = createStackedBarChart(barDataset);
 		int maxWorkHours = sprint.getLengthInWorkDays() * getWorkingHoursPerDay();
 		setChartMarker(chart, teamAvg, maxWorkHours);
-		setUpperBoundary(chart, maxWorkHours);
+		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (int) (burnedHours + remainingHours)));
 		createPic(out, width, height, chart);
 	}
 

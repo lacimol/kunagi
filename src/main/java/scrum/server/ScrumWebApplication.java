@@ -76,7 +76,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private VelocityChart velocityChart;
 	private SprintWorkChart sprintWorkChart;
 	private SprintRangeChart sprintRangeChart;
-	private TaskRangeChart taskRangeChart;
 	private AccomplishChart accomplishChart;
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
@@ -145,14 +144,14 @@ public class ScrumWebApplication extends GScrumWebApplication {
 
 	public SprintRangeChart getSprintRangeChart() {
 		if (sprintRangeChart == null) {
-			sprintRangeChart = new SprintRangeChart();
+			sprintRangeChart = new SprintRangeChart(12);
 			sprintRangeChart.setSprintDao(getSprintDao());
 		}
 		return sprintRangeChart;
 	}
 
 	public SprintRangeChart getCurrentSprintRangeChart() {
-		SprintRangeChart sprintRangeChart = new SprintRangeChart(true, true);
+		SprintRangeChart sprintRangeChart = new SprintRangeChart(3);
 		sprintRangeChart.setSprintDao(getSprintDao());
 		return sprintRangeChart;
 	}

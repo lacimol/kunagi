@@ -99,6 +99,10 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 				+ height;
 	}
 
+	public String getTaskBurndownChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=taskBurndownChart";
+	}
+
 	public String getWorkChartUrl(int width, int height) {
 		return getChartUrl(width, height) + "&chart=workChart";
 	}

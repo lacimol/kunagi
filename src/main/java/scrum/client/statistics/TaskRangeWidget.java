@@ -19,7 +19,7 @@ public class TaskRangeWidget extends ChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getTaskRangeChartUrl(width, 500);
+		return getCurrentSprint().getTaskRangeChartUrl(width, 600);
 	}
 
 }

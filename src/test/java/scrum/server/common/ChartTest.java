@@ -105,7 +105,7 @@ public class ChartTest extends ATest {
 	public void sprintRangeChart() throws IOException {
 
 		BufferedOutputStream out = getOutputStream("/sprintRange.png");
-		new SprintRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 300);
+		new SprintRangeChart(12).writeChart(out, project.getCurrentSprint(), 1000, 300);
 		out.close();
 
 	}
@@ -114,7 +114,7 @@ public class ChartTest extends ATest {
 	public void currentSprintRangeChart() throws IOException {
 
 		BufferedOutputStream out = getOutputStream("/currentSprintRange.png");
-		new SprintRangeChart(true, true).writeChart(out, project.getCurrentSprint(), 1000, 90);
+		new SprintRangeChart(3).writeChart(out, project.getCurrentSprint(), 1000, 90);
 		out.close();
 
 	}
@@ -133,6 +133,15 @@ public class ChartTest extends ATest {
 
 		BufferedOutputStream out = getOutputStream("/taskRange.png");
 		new TaskRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 300);
+		out.close();
+
+	}
+
+	@Test
+	public void sprintBurndownChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/sprintBurndownChart2.png");
+		new BurndownChart().writeChart(out, project.getCurrentSprint(), 1000, 500);
 		out.close();
 
 	}

@@ -31,9 +31,13 @@ import scrum.server.sprint.Task;
 public class TaskRangeChart extends Chart {
 
 	private static final Log LOG = Log.get(TaskRangeChart.class);
-	private int maxTaskNr = 30;
+	private int maxTaskNr = 35;
 
 	public TaskRangeChart() {}
+
+	public TaskRangeChart(int maxTaskNr) {
+		this.maxTaskNr = maxTaskNr;
+	}
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -41,12 +45,7 @@ public class TaskRangeChart extends Chart {
 		return out.toByteArray();
 	}
 
-	public void writeChart(OutputStream out, String sprintId, int width, int height) {
-		Sprint sprint = sprintDao.getById(sprintId);
-		if (sprint == null) throw new IllegalArgumentException("Sprint " + sprintId + " does not exist.");
-		writeChart(out, sprint, width, height);
-	}
-
+	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
 		TaskSeriesCollection dataset = new TaskSeriesCollection();
