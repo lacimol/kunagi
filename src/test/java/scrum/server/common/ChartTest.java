@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.testng.annotations.AfterSuite;
@@ -146,6 +148,15 @@ public class ChartTest extends ATest {
 
 	}
 
+	@Test
+	public void storyThemeChart() throws IOException {
+
+		BufferedOutputStream out = getOutputStream("/storyTheme.png");
+		new StoryThemeChart().writeChart(out, project.getCurrentSprint(), 800, 400);
+		out.close();
+
+	}
+
 	private void createFormerSprints() {
 		Set<Sprint> sprints = project.getSprints();
 		sprints.add(TestUtil.createSprint(project, Date.today().addDays(-20), Date.today().addDays(-14)));
@@ -184,12 +195,17 @@ public class ChartTest extends ATest {
 
 	private void createTasksForSprint(Sprint sprint) {
 		Requirement story;
+		List<String> themes = new ArrayList<String>();
+		String[] themeNames = { "BUG", "FEATURE", "TEST", "SUPPORT", "RELEASE" };
 		for (int i = 1; i <= 5; i++) {
 			story = TestUtil.createRequirement(project, i);
 			story.setSprint(sprint);
 			story.setProject(sprint.getProject());
 			story.setEstimatedWorkAsString(Utl.randomElement(scrum.client.project.Requirement.WORK_ESTIMATION_VALUES));
 			story.setDirty(false);
+			themes.clear();
+			themes.add(themeNames[Utl.randomInt(0, themeNames.length - 1)]);
+			story.setThemes(themes);
 			for (int j = 1; j <= 3; j++) {
 				TestUtil.createTask(story, j, 16);
 			}

@@ -15,20 +15,22 @@
 
 package scrum.client.statistics;
 
-import com.google.gwt.user.client.Window;
+import ilarkesto.gwt.client.TableBuilder;
+import scrum.client.common.AScrumWidget;
+import scrum.client.workspace.PagePanel;
 
-public class TaskRangeWidget extends ChartWidget {
+import com.google.gwt.user.client.ui.Widget;
+
+public class TaskStatisticsWidget extends AScrumWidget {
 
 	@Override
-	String getChartUrl(int width) {
-		return getCurrentSprint().getTaskRangeChartUrl(getChartWidth(), 750);
-	}
+	protected Widget onInitialization() {
 
-	@Override
-	public int getChartWidth() {
-		int width = Window.getClientWidth() - 280;
-		if (width < 100) width = 100;
-		return width;
+		PagePanel taskRange = new PagePanel();
+		taskRange.addHeader("Task range");
+		taskRange.addSection(new TaskRangeWidget());
+
+		return TableBuilder.row(5, taskRange);
 	}
 
 }

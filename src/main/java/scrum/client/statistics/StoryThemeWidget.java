@@ -15,20 +15,11 @@
 
 package scrum.client.statistics;
 
-import com.google.gwt.user.client.Window;
-
-public class TaskRangeWidget extends ChartWidget {
+public class StoryThemeWidget extends ChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getTaskRangeChartUrl(getChartWidth(), 750);
-	}
-
-	@Override
-	public int getChartWidth() {
-		int width = Window.getClientWidth() - 280;
-		if (width < 100) width = 100;
-		return width;
+		return getCurrentSprint().getStoryThemeChartUrl(width, 300);
 	}
 
 }

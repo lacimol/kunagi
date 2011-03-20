@@ -58,6 +58,7 @@ import scrum.client.sprint.Task;
 import scrum.client.statistics.MyStatisticsWidget;
 import scrum.client.statistics.ProjectStatisticsWidget;
 import scrum.client.statistics.SprintStatisticsWidget;
+import scrum.client.statistics.TaskStatisticsWidget;
 import scrum.client.statistics.UserStatisticsWidget;
 import scrum.client.tasks.WhiteboardWidget;
 
@@ -71,6 +72,7 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 	private MyStatisticsWidget myStatistics;
 	private ProjectStatisticsWidget projectStatistics;
 	private UserStatisticsWidget userStatistics;
+	private TaskStatisticsWidget taskStatistics;
 	private ProjectOverviewWidget projectOverview;
 	private WhiteboardWidget whiteboard;
 	private SprintBacklogWidget sprintBacklog;
@@ -131,6 +133,8 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 			if (!config.isSprintStatisticsDisabled()) {
 				sprintStatistics = new SprintStatisticsWidget();
 				pages.addPage(new Page(sprintStatistics, "Sprint Statistics", statisticsGroupKey));
+				taskStatistics = new TaskStatisticsWidget();
+				pages.addPage(new Page(taskStatistics, "Task Statistics", statisticsGroupKey));
 			}
 			if (!config.isUsersStatisticsDisabled()) {
 				userStatistics = new UserStatisticsWidget();

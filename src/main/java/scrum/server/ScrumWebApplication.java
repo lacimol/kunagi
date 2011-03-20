@@ -58,6 +58,7 @@ import scrum.server.common.BurndownChart;
 import scrum.server.common.EfficiencyChart;
 import scrum.server.common.SprintRangeChart;
 import scrum.server.common.SprintWorkChart;
+import scrum.server.common.StoryThemeChart;
 import scrum.server.common.TaskRangeChart;
 import scrum.server.common.UserBurndownChart;
 import scrum.server.common.VelocityChart;
@@ -77,6 +78,8 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private SprintWorkChart sprintWorkChart;
 	private SprintRangeChart sprintRangeChart;
 	private AccomplishChart accomplishChart;
+	private StoryThemeChart storyThemeChart;
+
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
 	private SystemMessage systemMessage;
@@ -160,6 +163,14 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		TaskRangeChart taskRangeChart = new TaskRangeChart();
 		taskRangeChart.setSprintDao(getSprintDao());
 		return taskRangeChart;
+	}
+
+	public StoryThemeChart getStoryThemeChart() {
+		if (storyThemeChart == null) {
+			storyThemeChart = new StoryThemeChart();
+			storyThemeChart.setSprintDao(getSprintDao());
+		}
+		return storyThemeChart;
 	}
 
 	public SystemConfig getSystemConfig() {

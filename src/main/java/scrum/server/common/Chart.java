@@ -45,21 +45,26 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.GanttRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.Range;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.Layer;
+import org.jfree.ui.RectangleEdge;
 
 import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
@@ -288,6 +293,38 @@ public abstract class Chart {
 		renderer.setSeriesPaint(0, COLOR_PROJECTION_LINE);
 		renderer.setSeriesPaint(1, COLOR_OPTIMUM_LINE);
 		plot.setRenderer(renderer);
+
+		return chart;
+	}
+
+	@SuppressWarnings("unchecked")
+	public JFreeChart createPieChart(final DefaultPieDataset dataset) {
+
+		final JFreeChart chart = ChartFactory.createPieChart("", dataset, false, true, false);
+		PiePlot plot = (PiePlot) chart.getPlot();
+		// plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
+		plot.setNoDataMessage("No data available");
+		// plot.setCircular(false);
+		plot.setLabelGap(0.02);
+		plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} = {1}"));
+		// 3d
+		// plot.setForegroundAlpha(0.40f);
+		// 2d
+		plot.setForegroundAlpha(0.90f);
+		// expode
+		List<String> keys = dataset.getKeys();
+		for (String key : keys) {
+			if ("Hibajavítás".equals(key) || "BUG".equals(key)) {
+				plot.setExplodePercent(key, 0.15);
+			} else {
+				plot.setExplodePercent(key, 0.03);
+			}
+		}
+
+		LegendTitle legend = new LegendTitle(plot);
+		legend.setPosition(RectangleEdge.RIGHT);
+		plot.setLegendLabelGenerator(new StandardPieSectionLabelGenerator("{0} = {1}"));
+		chart.addSubtitle(legend);
 
 		return chart;
 	}
