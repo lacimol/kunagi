@@ -848,7 +848,56 @@ public class Project extends GProject {
 		req.setDescription("This is still an epic. Nothing to see, really.");
 		reqOrder.add(req);
 
+		addRandomTestRequirements(reqOrder);
 		updateRequirementsOrder(reqOrder);
+	}
+
+	public void addRandomTestRequirements(List<Requirement> reqOrder) {
+
+		Requirement req = null;
+		// Random feature
+		req = requirementDao.postRequirement(this, "Random requirement", 2f);
+		req.addTheme("Dev");
+		req.setDescription("Changing project statistics output values.");
+		reqOrder.add(req);
+		req.setSprint(getCurrentSprint());
+
+		taskDao.postTask(req, "Creation", Utl.randomInt(5, 15));
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Modify", Utl.randomInt(5, 15));
+		}
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Deletion", Utl.randomInt(5, 15));
+		}
+
+		// Statistics
+		req = requirementDao.postRequirement(this, "Statistics", 3f);
+		req.addTheme("Dev");
+		req.setDescription("Creating statistics page.");
+		reqOrder.add(req);
+		req.setSprint(getCurrentSprint());
+		taskDao.postTask(req, "Project statistics", Utl.randomInt(5, 15));
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Sprint statistics", 10);
+		}
+		taskDao.postTask(req, "User statistics", Utl.randomInt(5, 15));
+		taskDao.postTask(req, "My statistics", 10);
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Task statistics", 10);
+		}
+
+		// Refactor
+		if (Utl.randomBoolean()) {
+			req = requirementDao.postRequirement(this, "Refactor", 3f);
+			req.addTheme("Dev");
+			req.addTheme("Refactor");
+			req.setDescription("Refactoring statistics page.");
+			reqOrder.add(req);
+			req.setSprint(getCurrentSprint());
+			taskDao.postTask(req, "Shared class creation", 5);
+			taskDao.postTask(req, "Task statistics average size", Utl.randomInt(5, 15));
+		}
+
 	}
 
 	public void addTestQualitys() {
@@ -863,6 +912,7 @@ public class Project extends GProject {
 	}
 
 	public void addTestSprints() {
+		sprintDao.createTestFormerSprints(this);
 		sprintDao.createTestSprint(this);
 	}
 

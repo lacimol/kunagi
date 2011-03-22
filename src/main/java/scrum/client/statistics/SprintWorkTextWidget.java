@@ -39,7 +39,7 @@ public class SprintWorkTextWidget extends AScrumWidget {
 		sb.append("<div class='SprintWorkTextWidget'>");
 
 		int count = 0;
-		for (Sprint sprint : project.getReverseFormerSprints()) {
+		for (Sprint sprint : project.getFormerSprints(12)) {
 
 			if (sprint.getVelocity() != null && sprint.getVelocity() > 0) {
 				sb.append("<div class='SprintWorkTextWidget-sprint'>");

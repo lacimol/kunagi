@@ -19,6 +19,7 @@ import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.gantt.TaskSeries;
@@ -53,7 +54,8 @@ public class SprintRangeChart extends Chart {
 		dataset.add(s1);
 
 		int currentSprintColumn = -1;
-		for (Sprint formerSprint : project.getFormerSprints(maxFormerSprintNr)) {
+		List<Sprint> formerSprints = project.getFormerSprints(maxFormerSprintNr);
+		for (Sprint formerSprint : formerSprints) {
 			if (formerSprint.getLengthInDays() > 0) {
 				if (sprint.getId().equals(formerSprint.getId())) {
 					currentSprintColumn = s1.getItemCount();
@@ -63,8 +65,8 @@ public class SprintRangeChart extends Chart {
 		}
 
 		final JFreeChart chart = createGanttChart(dataset, currentSprintColumn);
-		setDateAxis(s1, chart);
-		createPic(out, width, height, chart);
+		setDateAxis(dataset, chart);
+		createPic(out, width, Math.min(formerSprints.size() * 30, height), chart);
 	}
 
 }

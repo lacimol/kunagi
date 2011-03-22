@@ -703,9 +703,11 @@ public class Project extends GProject implements ForumSupport {
 		return freeDaysWeekdaySelectorModel;
 	}
 
-	public List<Sprint> getReverseFormerSprints() {
-		List<Sprint> sprints = getSprints();
-		Collections.sort(sprints, Sprint.REVERSE_END_DATE_COMPARATOR);
-		return sprints;
+	public List<Sprint> getFormerSprints(int toIndex) {
+		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
+		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		List<Sprint> reverseSprints = sprints.subList(0, Math.min(toIndex, sprints.size()));
+		Collections.sort(reverseSprints, Sprint.REVERSE_END_DATE_COMPARATOR);
+		return reverseSprints;
 	}
 }

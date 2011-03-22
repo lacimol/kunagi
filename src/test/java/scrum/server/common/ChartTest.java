@@ -134,7 +134,7 @@ public class ChartTest extends ATest {
 	public void taskRangeChart() throws IOException {
 
 		BufferedOutputStream out = getOutputStream("/taskRange.png");
-		new TaskRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 300);
+		new TaskRangeChart().writeChart(out, project.getCurrentSprint(), 1000, 600);
 		out.close();
 
 	}

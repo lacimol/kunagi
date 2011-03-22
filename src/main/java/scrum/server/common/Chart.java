@@ -302,19 +302,15 @@ public abstract class Chart {
 
 		final JFreeChart chart = ChartFactory.createPieChart("", dataset, false, true, false);
 		PiePlot plot = (PiePlot) chart.getPlot();
-		// plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
 		plot.setNoDataMessage("No data available");
-		// plot.setCircular(false);
 		plot.setLabelGap(0.02);
 		plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} = {1}"));
-		// 3d
-		// plot.setForegroundAlpha(0.40f);
-		// 2d
 		plot.setForegroundAlpha(0.90f);
 		// expode
 		List<String> keys = dataset.getKeys();
 		for (String key : keys) {
-			if ("Hibajavítás".equals(key) || "BUG".equals(key)) {
+			// raise bugs
+			if ("Bug".equals(key)) {
 				plot.setExplodePercent(key, 0.15);
 			} else {
 				plot.setExplodePercent(key, 0.03);
@@ -375,23 +371,29 @@ public abstract class Chart {
 		}
 	}
 
-	public void setDateAxis(final TaskSeries s1, final JFreeChart chart) {
+	public void setDateAxis(final TaskSeriesCollection dataset, final JFreeChart chart) {
 		DateAxis dateAx = (DateAxis) chart.getCategoryPlot().getRangeAxis();
 		dateAx.setUpperMargin(0.01);
 		dateAx.setLowerMargin(0.01);
-		if (s1.getItemCount() > 8) {
+		Date maximumDate = new Date(dateAx.getMaximumDate());
+		Date minimumDate = new Date(dateAx.getMinimumDate());
+		int count = Math.max(20, minimumDate.getPeriodTo(maximumDate).toDays());
+		if (count > 90) {
 			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.MONTH, 1, new SimpleDateFormat("MMM.yyyy")));
-		} else if (s1.getItemCount() > 4) {
-			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 7, new SimpleDateFormat("w")));
+		} else if (count > 50) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 7, new SimpleDateFormat("dd.MMM")));
+		} else if (count > 30) {
+			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 2, new SimpleDateFormat("dd")));
 		} else {
 			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 1, new SimpleDateFormat("dd")));
 		}
 	}
 
-	public void setDayDateAxis(final TaskSeries s1, final JFreeChart chart) {
+	public void setDayDateAxis(final TaskSeries s1, final JFreeChart chart, Sprint sprint) {
 		DateAxis dateAx = (DateAxis) chart.getCategoryPlot().getRangeAxis();
 		dateAx.setUpperMargin(0.01);
 		dateAx.setLowerMargin(0.01);
+		dateAx.setRange(sprint.getBegin().toJavaDate(), sprint.getEnd().toJavaDate());
 		if (s1.getItemCount() > 90) {
 			dateAx.setTickUnit(new DateTickUnit(DateTickUnit.DAY, 7, new SimpleDateFormat("MMM.yyyy")));
 		} else if (s1.getItemCount() > 30) {

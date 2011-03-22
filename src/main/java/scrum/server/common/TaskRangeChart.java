@@ -20,6 +20,7 @@ import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.Set;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.gantt.TaskSeries;
@@ -55,7 +56,8 @@ public class TaskRangeChart extends Chart {
 		int count = 0;
 		Date begin;
 		Date end;
-		for (Task task : sprint.getTasks()) {
+		Set<Task> tasks = sprint.getTasks();
+		for (Task task : tasks) {
 			begin = task.getBurnBegin(sprint);
 			end = task.getBurnEnd(sprint);
 			if (task.getOwner() != null && task.getBurnedWork() > 0) {
@@ -65,7 +67,7 @@ public class TaskRangeChart extends Chart {
 		}
 
 		final JFreeChart chart = createGanttChart(dataset, -1);
-		setDayDateAxis(s1, chart);
-		createPic(out, width, height, chart);
+		setDayDateAxis(s1, chart, sprint);
+		createPic(out, width, Math.min(count * 30, height), chart);
 	}
 }
