@@ -22,8 +22,17 @@ public interface GImageBundle
     @Resource(value="blgPublished.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype blgPublished();
 
+    @Resource(value="bug.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype bug();
+
     @Resource(value="bugfixRelease.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype bugfixRelease();
+
+    @Resource(value="dev.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype dev();
+
+    @Resource(value="doc.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype doc();
 
     @Resource(value="enumlist.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype enumlist();
@@ -70,8 +79,17 @@ public interface GImageBundle
     @Resource(value="majorRelease.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype majorRelease();
 
+    @Resource(value="meeting.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype meeting();
+
     @Resource(value="publicComment.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype publicComment();
+
+    @Resource(value="refactor.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype refactor();
+
+    @Resource(value="release.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype release();
 
     @Resource(value="reqClosed.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype reqClosed();
@@ -91,8 +109,14 @@ public interface GImageBundle
     @Resource(value="reqTasksClosed.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype reqTasksClosed();
 
+    @Resource(value="support.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype support();
+
     @Resource(value="table.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype table();
+
+    @Resource(value="test.png")
+    com.google.gwt.user.client.ui.AbstractImagePrototype test();
 
     @Resource(value="toc.png")
     com.google.gwt.user.client.ui.AbstractImagePrototype toc();

@@ -4,6 +4,7 @@ import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.BlockHeaderWidget;
 import scrum.client.common.BlockWidgetFactory;
+import scrum.client.common.ThemeSelector;
 import scrum.client.img.Img;
 import scrum.client.journal.ActivateChangeHistoryAction;
 import scrum.client.project.CloseRequirementAction;
@@ -44,7 +45,7 @@ public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 	protected void onUpdateHeader(BlockHeaderWidget header) {
 		Requirement requirement = getObject();
 		header.setDragHandle(requirement.getReference());
-		Image statusImage = null;
+		Image statusImage = new ThemeSelector(requirement).getStatusImage();
 		if (requirement.isRejected()) {
 			statusImage = Img.bundle.reqRejected().createImage();
 			statusImage.setTitle("Rejected.");
