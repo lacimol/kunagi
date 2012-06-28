@@ -6,7 +6,6 @@ import ilarkesto.gwt.client.AMultiSelectionViewEditWidget;
 import ilarkesto.gwt.client.HyperlinkWidget;
 import ilarkesto.gwt.client.MultiSelectionWidget;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,9 +17,12 @@ public class ThemesWidget extends AMultiSelectionViewEditWidget<String> {
 
 	private ThemesContainer model;
 
+	private ThemeSelector themeSelector;
+
 	public ThemesWidget(ThemesContainer model) {
 		super();
 		this.model = model;
+		themeSelector = new ThemeSelector(model);
 	}
 
 	@Override
@@ -30,7 +32,7 @@ public class ThemesWidget extends AMultiSelectionViewEditWidget<String> {
 
 	@Override
 	protected void onEditorUpdate() {
-		List<String> themes = new ArrayList<String>(model.getAvailableThemes());
+		List<String> themes = themeSelector.getBaseThemes();
 		Collections.sort(themes);
 		setEditorItems(themes);
 		setEditorSelectedItems(model.getThemes());

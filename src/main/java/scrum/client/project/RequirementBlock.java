@@ -6,6 +6,7 @@ import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
 import scrum.client.common.BlockHeaderWidget;
 import scrum.client.common.BlockWidgetFactory;
+import scrum.client.common.ThemeSelector;
 import scrum.client.dnd.TrashSupport;
 import scrum.client.img.Img;
 import scrum.client.journal.ActivateChangeHistoryAction;
@@ -44,7 +45,7 @@ public class RequirementBlock extends ABlockWidget<Requirement> implements Trash
 	protected void onUpdateHeader(BlockHeaderWidget header) {
 		Requirement requirement = getObject();
 		header.setDragHandle(requirement.getReference());
-		Image statusImage = null;
+		Image statusImage = new ThemeSelector(requirement).getStatusImage();
 		if (requirement.isWorkEstimationVotingActive()) {
 			statusImage = Img.bundle.reqPoker().createImage();
 			statusImage.setTitle("Estimation game \"Planning Poker\" active.");
