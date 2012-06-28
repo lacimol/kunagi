@@ -15,12 +15,14 @@
 
 package scrum.client.statistics;
 
+import com.google.gwt.user.client.Window;
 
-public class AccomplishWidget extends ChartWidget {
+public abstract class FullChartWidget extends ChartWidget {
 
 	@Override
-	String getChartUrl(int width) {
-		return getCurrentSprint().getAccomplishChartUrl(width, TEAM_CHART_HEIGHT);
+	public int getChartWidth() {
+		int width = Window.getClientWidth() - MENU_WIDTH;
+		if (width < MIN_CHART_WIDTH) width = MIN_CHART_WIDTH;
+		return width;
 	}
-
 }

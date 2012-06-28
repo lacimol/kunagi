@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -709,5 +710,19 @@ public class Project extends GProject implements ForumSupport {
 		List<Sprint> reverseSprints = sprints.subList(0, Math.min(toIndex, sprints.size()));
 		Collections.sort(reverseSprints, Sprint.REVERSE_END_DATE_COMPARATOR);
 		return reverseSprints;
+	}
+
+	public List<User> getTeamStartWithCurrent(User currentUser) {
+		List<User> team = new LinkedList<User>(this.getTeamMembers());
+		if (team.contains(currentUser)) {
+			team.remove(currentUser);
+			team.add(0, currentUser);
+		}
+		return team;
+	}
+
+	public boolean isFreeDay(Date date) {
+		WeekdaySelector freeDays = this.getFreeDaysWeekdaySelectorModel().getValue();
+		return freeDays.isFree(date.getWeekday() + 1);
 	}
 }

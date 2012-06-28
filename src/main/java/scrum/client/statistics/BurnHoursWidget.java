@@ -20,7 +20,6 @@ import ilarkesto.gwt.client.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +37,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class BurnHoursWidget extends AScrumWidget {
 
+	private static final int MIN_BURN_HOUR_PER_DAY = 6;
+
 	private HTML html;
 
 	@Override
@@ -50,14 +51,19 @@ public class BurnHoursWidget extends AScrumWidget {
 
 	private User user;
 
+	private boolean useDateAtView;
+
 	/**
 	 * All users, every day
 	 */
-	public BurnHoursWidget() {}
+	public BurnHoursWidget() {
+		this.useDateAtView = true;
+	}
 
 	public BurnHoursWidget(Date date, User user) {
 		this.date = date;
 		this.user = user;
+		this.useDateAtView = false;
 	}
 
 	@Override
@@ -67,15 +73,12 @@ public class BurnHoursWidget extends AScrumWidget {
 		sb.append("<div class='BurnHoursWidget'>");
 
 		List<User> lazyUsers = new ArrayList<User>();
-		List<User> team = new LinkedList<User>(project.getTeamMembers());
-		if (user != null && team.contains(user)) {
-			team.remove(user);
-			team.add(0, user);
-		}
+		List<User> team = project.getTeamStartWithCurrent(user);
 		for (User user : team) {
 			List<Task> tasks = project.getUserTasks(user);
 			List<Issue> issues = project.getUserBugs(user);
 
+			// user has no task
 			if (tasks.isEmpty() && issues.isEmpty()) {
 				lazyUsers.add(user);
 				continue;
@@ -86,40 +89,53 @@ public class BurnHoursWidget extends AScrumWidget {
 				List<BurnHours> taskDaySnapshots = getAllTaskSnapshotsByUser(user, tasks, issues);
 				int burnedHours = getBurnedHours(taskDaySnapshots);
 				// write
-				sb.append("<div class='BurnHoursWidget-user'>");
-				sb.append("<span style='color: ").append(project.getUserConfig(user).getColor()).append(";'>");
-				sb.append(user.getName());
 				if (burnedHours > 0) {
-					sb.append("</span> has burned " + burnedHours + " hours on ");
-					sb.append("<ul>");
+					String color = project.getUserConfig(user).getColor();
+					String userName = user.getName().toUpperCase();
+					sb.append("<div class='BurnHoursWidget-user'>");
+					sb.append("<span style='color: ").append(color).append("; font-weight:bold;'>");
+					sb.append(userName);
+					sb.append("</span> has burned <span style='");
+					if (burnedHours < MIN_BURN_HOUR_PER_DAY) {
+						sb.append("color: red; ");
+					}
+					sb.append("font-weight:bold;'>");
+					sb.append(burnedHours);
+					sb.append("</span> hours on <ul>");
 
 					for (BurnHours taskDaySnapshot : taskDaySnapshots) {
-						if (taskDaySnapshot.getBurnedWork() > 0) {
+						int burnedWork = taskDaySnapshot.getBurnedWork();
+						if (burnedWork > 0) {
 							boolean remained = taskDaySnapshot.getRemainingWork() > 0;
 							Task task = taskDaySnapshot.getTask();
-							sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>")
-									.append(taskDaySnapshot.getDate() + ", ").append(task.toHtml()).append(" (")
-									.append(ScrumGwt.createHtmlReference(task.getRequirement())).append("), burned: ")
-									.append(taskDaySnapshot.getBurnedWork())
-									.append(", remained " + taskDaySnapshot.getRemainingWork() + " hours</li>");
+							String dateStr = useDateAtView ? (taskDaySnapshot.getDate() + ", ") : "";
+							String requirement = ScrumGwt.createHtmlReference(task.getRequirement());
+							String remainedStr = remained ? ", remained " + taskDaySnapshot.getRemainingWork()
+									+ " hours" : "";
+							sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>").append(dateStr)
+									.append(task.toHtml()).append(" (").append(requirement).append("), burned: ")
+									.append(burnedWork).append(remainedStr).append("</li>");
 						}
 					}
 
 					sb.append("</ul></div>");
 				} else {
-					sb.append("</span> has burned <span style='color: red;'>nothing</span>");
+					// user has no burn
+					lazyUsers.add(user);
+					continue;
 				}
 			}
 		}
 
-		for (User user : lazyUsers) {
-			if (this.user == null || this.user.equals(user)) {
-				sb.append("<div class='BurnHoursWidget-user'>");
-				sb.append("<span style='color: ").append(project.getUserConfig(user).getColor()).append(";'>");
-				sb.append(user.getName());
-				sb.append("</span> has burned <span style='color: red;'>nothing</span></div>");
-			}
-		}
+		// for (User user : lazyUsers) {
+		// if (this.user == null || this.user.equals(user)) {
+		// String color = project.getUserConfig(user).getColor();
+		// sb.append("<div class='BurnHoursWidget-user'>");
+		// sb.append("<span style='color: ").append(color).append(";font-weight:bold;'>");
+		// sb.append(user.getName().toUpperCase());
+		// sb.append("</span> has burned <span style='color: red;'>nothing</span></div>");
+		// }
+		// }
 
 		sb.append("</div>");
 		html.setHTML(sb.toString());

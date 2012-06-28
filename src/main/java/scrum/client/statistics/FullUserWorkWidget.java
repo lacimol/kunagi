@@ -15,12 +15,19 @@
 
 package scrum.client.statistics;
 
+public class FullUserWorkWidget extends FullChartWidget {
 
-public class AccomplishWidget extends ChartWidget {
+	private String userName;
+
+	public FullUserWorkWidget() {}
+
+	public FullUserWorkWidget(String userName) {
+		this.userName = userName;
+	}
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getAccomplishChartUrl(width, TEAM_CHART_HEIGHT);
+		return getCurrentSprint().getUserChartUrl(width, TEAM_CHART_HEIGHT, userName);
 	}
 
 }

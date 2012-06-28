@@ -23,14 +23,18 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class ChartWidget extends AScrumWidget {
 
-	public static final int CHART_WIDTH = 800;
-	public static final int CHART_HEIGHT = 170;
+	public static final int TEAM_CHART_HEIGHT = 200;
+	public static final int USER_CHART_HEIGHT = 120;
+
+	public static final int DEFAULT_CHART_WIDTH = 200;
+	public static final int MIN_CHART_WIDTH = 100;
+	public static final int MENU_WIDTH = 280;
 
 	private Image sprintChart;
 
 	@Override
 	protected Widget onInitialization() {
-		sprintChart = new Image(getChartUrl(200));
+		sprintChart = new Image(getChartUrl(DEFAULT_CHART_WIDTH));
 		return sprintChart;
 	}
 
@@ -44,9 +48,9 @@ public abstract class ChartWidget extends AScrumWidget {
 	abstract String getChartUrl(int width);
 
 	public int getChartWidth() {
-		int width = Window.getClientWidth() - 280;
+		int width = Window.getClientWidth() - MENU_WIDTH;
 		width = width / 2;
-		if (width < 100) width = 100;
+		if (width < MIN_CHART_WIDTH) width = MIN_CHART_WIDTH;
 		return width;
 	}
 }

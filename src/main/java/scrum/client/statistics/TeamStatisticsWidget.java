@@ -22,33 +22,24 @@ import scrum.client.workspace.PagePanel;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class SprintStatisticsWidget extends TeamBurnHoursWidget {
+public class TeamStatisticsWidget extends TeamBurnHoursWidget {
 
 	@Override
 	protected Widget onInitialization() {
 
-		PagePanel efficiency = new PagePanel();
-		efficiency.addHeader("Team efficiency");
-		efficiency.addSection(new EfficiencyWidget());
+		PagePanel teamBurndown = new PagePanel();
+		teamBurndown.addHeader("Team burndown");
+		teamBurndown.addSection(new FullUserWorkWidget());
 
-		PagePanel accomplish = new PagePanel();
-		accomplish.addHeader("Team accomplishment");
-		accomplish.addSection(new AccomplishWidget());
-
-		PagePanel storyTheme = new PagePanel();
-		storyTheme.addHeader("Story themes");
-		storyTheme.addSection(new StoryThemeWidget());
-
-		// burned hours
 		Project project = getCurrentProject();
+		// burned hours
 		Date yesterday = project.getCurrentSprint().getLastWorkDay();
 		PagePanel yesterdayTeamBurnHours = createBurnHoursPanel(project, yesterday);
 		PagePanel todayTeamBurnHours = createBurnHoursPanel(project, Date.today());
 
-		Widget left = TableBuilder.column(5, efficiency, accomplish, storyTheme);
-		Widget right = TableBuilder.column(5, todayTeamBurnHours, yesterdayTeamBurnHours);
+		Widget middle = TableBuilder.column(5, teamBurndown, yesterdayTeamBurnHours, todayTeamBurnHours);
 
-		return TableBuilder.row(5, left, right);
+		return TableBuilder.row(5, middle);
 	}
 
 }
