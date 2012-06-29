@@ -20,7 +20,6 @@ import ilarkesto.gwt.client.HyperlinkWidget;
 import ilarkesto.gwt.client.SwitchingNavigatorWidget;
 import ilarkesto.gwt.client.TableBuilder;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import scrum.client.admin.User;
@@ -41,15 +40,11 @@ public class UserStatisticsWidget extends AScrumWidget {
 
 		PagePanel usersBurndown = new PagePanel();
 		Project project = getCurrentProject();
-		List<User> team = new LinkedList<User>(project.getTeamMembers());
 		User currentUser = getCurrentUser();
-		if (team.contains(currentUser)) {
-			team.remove(currentUser);
-			team.add(0, currentUser);
-		}
+		List<User> team = project.getTeamStartWithCurrent(currentUser);
 		for (User user : team) {
-			usersBurndown.addHeader(user.getName() + "'s burndown", new HyperlinkWidget(nav.createSwitchAction(widgets
-					.getSprintBacklog())));
+			usersBurndown.addHeader(user.getName() + "'s burndown",
+				new HyperlinkWidget(nav.createSwitchAction(widgets.getSprintBacklog())));
 			usersBurndown.addSection(new UserWorkWidget(user.getName()));
 		}
 

@@ -88,8 +88,11 @@ public class BurnHoursWidget extends AScrumWidget {
 				// collect
 				List<BurnHours> taskDaySnapshots = getAllTaskSnapshotsByUser(user, tasks, issues);
 				int burnedHours = getBurnedHours(taskDaySnapshots);
+				List<Task> currentTasks = project.getClaimedTasks(user);
+
 				// write
-				if (burnedHours > 0) {
+				boolean hasClaimedTaskToday = !currentTasks.isEmpty() && Date.today().equals(date);
+				if (burnedHours > 0 || hasClaimedTaskToday) {
 					String color = project.getUserConfig(user).getColor();
 					String userName = user.getName().toUpperCase();
 					sb.append("<div class='BurnHoursWidget-user'>");
@@ -106,23 +109,24 @@ public class BurnHoursWidget extends AScrumWidget {
 					for (BurnHours taskDaySnapshot : taskDaySnapshots) {
 						int burnedWork = taskDaySnapshot.getBurnedWork();
 						if (burnedWork > 0) {
-							boolean remained = taskDaySnapshot.getRemainingWork() > 0;
-							Task task = taskDaySnapshot.getTask();
-							String dateStr = useDateAtView ? (taskDaySnapshot.getDate() + ", ") : "";
-							String requirement = ScrumGwt.createHtmlReference(task.getRequirement());
-							String remainedStr = remained ? ", remained " + taskDaySnapshot.getRemainingWork()
-									+ " hours" : "";
-							sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>").append(dateStr)
-									.append(task.toHtml()).append(" (").append(requirement).append("), burned: ")
-									.append(burnedWork).append(remainedStr).append("</li>");
+							sb.append(createTaskListElement(taskDaySnapshot, burnedWork));
 						}
+					}
+
+					// current work
+					for (Task currentTask : currentTasks) {
+
+						boolean isInBurnList = isInSnapshots(taskDaySnapshots, currentTask);
+						if (!isInBurnList && Date.today().equals(date)) {
+							sb.append("<li>").append(currentTask.toHtml()).append("</li>");
+						}
+
 					}
 
 					sb.append("</ul></div>");
 				} else {
 					// user has no burn
 					lazyUsers.add(user);
-					continue;
 				}
 			}
 		}
@@ -141,6 +145,33 @@ public class BurnHoursWidget extends AScrumWidget {
 		html.setHTML(sb.toString());
 	}
 
+	private String createTaskListElement(BurnHours taskDaySnapshot, int burnedWork) {
+
+		StringBuilder sb = new StringBuilder();
+		boolean remained = taskDaySnapshot.getRemainingWork() > 0;
+		Task task = taskDaySnapshot.getTask();
+		String dateStr = useDateAtView ? (taskDaySnapshot.getDate() + ", ") : "";
+		String remainedStr = remained ? ", remained " + taskDaySnapshot.getRemainingWork() + " hours" : "";
+		String requirement = ScrumGwt.createHtmlReference(task.getRequirement());
+		sb.append(remained ? "<li style='font-weight: bold;'>" : "<li>").append(dateStr).append(task.toHtml())
+				.append(" (").append(requirement).append("), burned: ").append(burnedWork).append(remainedStr)
+				.append("</li>");
+		return sb.toString();
+	}
+
+	private boolean isInSnapshots(List<BurnHours> taskDaySnapshots, Task currentTask) {
+		boolean isInBurnList = false;
+		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
+			int burnedWork = taskDaySnapshot.getBurnedWork();
+			if (burnedWork > 0) {
+				if (taskDaySnapshot.getTask().equals(currentTask)) {
+					isInBurnList = true;
+				}
+			}
+		}
+		return isInBurnList;
+	}
+
 	private List<BurnHours> getAllTaskSnapshotsByUser(User user, List<Task> tasks, List<Issue> issues) {
 		List<BurnHours> taskDaySnapshots = new ArrayList<BurnHours>();
 
@@ -153,8 +184,11 @@ public class BurnHoursWidget extends AScrumWidget {
 		for (Requirement req : requirements) {
 			taskDaySnapshots.addAll(getTaskSnapshotsByUserAt(user, req));
 		}
-		Collections.sort(taskDaySnapshots, BurnHours.DATE_COMPARATOR);
-		return taskDaySnapshots;
+
+		List<BurnHours> result = getBurnedSnapshots(taskDaySnapshots);
+
+		Collections.sort(result, BurnHours.DATE_COMPARATOR);
+		return result;
 	}
 
 	private int getBurnedHours(List<BurnHours> taskDaySnapshots) {
@@ -163,6 +197,15 @@ public class BurnHoursWidget extends AScrumWidget {
 			burnedHours += taskDaySnapshot.getBurnedWork();
 		}
 		return burnedHours;
+	}
+
+	private List<BurnHours> getBurnedSnapshots(List<BurnHours> taskDaySnapshots) {
+
+		List<BurnHours> result = new ArrayList<BurnHours>();
+		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
+			result.add(taskDaySnapshot);
+		}
+		return result;
 	}
 
 	private List<BurnHours> getTaskSnapshotsByUserAt(User user, Requirement req) {
