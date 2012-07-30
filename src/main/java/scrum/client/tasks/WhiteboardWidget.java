@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.tasks;
 
 import ilarkesto.core.scope.Scope;
@@ -52,6 +66,8 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 	private UserGuideWidget userGuide;
 
 	private Sprint sprint;
+	private ButtonWidget pullNextButton;
+	private ButtonWidget hideShowButton;
 
 	@Override
 	protected Widget onInitialization() {
@@ -81,15 +97,20 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		grid.setCellPadding(0);
 		grid.setCellSpacing(0);
 
+		pullNextButton = new ButtonWidget(new PullNextRequirementAction(getCurrentSprint()));
+
 		PagePanel page = new PagePanel();
+
 		whiteboardWrapper = new SimplePanel();
-		whiteboardWrapper.setVisible(sprint.getProject().isTeamMember(getCurrentUser()));
+		whiteboardWrapper.setVisible(getCurrentProject().isTeamMember(getCurrentUser()));
+		// hideShowButton = new ButtonWidget(new HideMyWhiteboardAction());
+		// whiteboardWrapper.setWidget(hideShowButton);
 		whiteboardHeader = new HTML();
-		page.addHeader(whiteboardHeader, new ButtonWidget(new PullNextRequirementAction(getCurrentSprint())),
-			whiteboardWrapper);
+
+		page.addHeader(whiteboardHeader, pullNextButton, whiteboardWrapper);
 		page.addSection(grid);
-		userGuide = new UserGuideWidget(getLocalizer().views().whiteboard(), getCurrentProject().getCurrentSprint()
-				.getRequirements().size() < 3, getCurrentUser().getHideUserGuideWhiteboardModel());
+		userGuide = new UserGuideWidget(getLocalizer().views().whiteboard(), sprint.getRequirements().size() < 3,
+				getCurrentUser().getHideUserGuideWhiteboardModel());
 		page.addSection(userGuide);
 		return page;
 	}
@@ -100,11 +121,11 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 
 	@Override
 	protected void onUpdate() {
-
+		Sprint sprint = getCurrentProject().getCurrentSprint();
 		whiteboardHeader.setHTML(getPageHeader());
-		whiteboardWrapper.setWidget(new ButtonWidget(
-				whiteboardManager.isMyRequirementsVisible() ? new HideMyWhiteboardAction()
-						: new ShowMyWhiteboardAction()));
+		hideShowButton = new ButtonWidget(whiteboardManager.isMyRequirementsVisible() ? new HideMyWhiteboardAction()
+				: new ShowMyWhiteboardAction());
+		whiteboardWrapper.setWidget(hideShowButton);
 
 		openLabel.setHTML("<strong>Free Tasks</strong> (" + hours(sprint.getRemainingWorkInUnclaimedTasks())
 				+ " to do)");
@@ -124,13 +145,13 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			return;
 		}
 		knownRequirements = requirements;
+
 		selectionManager = new BlockListSelectionManager();
+
 		grid.resize((requirements.size() * 2) + 1, 3);
+
 		updateTasks(requirements);
 		setLabels();
-		// grid.getColumnFormatter().setWidth(0, "1*");
-		// grid.getColumnFormatter().setWidth(1, "1*");
-		// grid.getColumnFormatter().setWidth(2, "1*");
 
 		int row = 1;
 		for (Requirement requirement : requirements) {
@@ -142,9 +163,12 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			updateTaskLists(requirement);
 			setWidgets(row, requirement);
 			row++;
+
 		}
 
 		userGuide.update();
+		pullNextButton.update();
+		hideShowButton.update();
 		super.onUpdate();
 	}
 
@@ -212,6 +236,7 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			closedTasks.put(requirement, new TaskListWidget(requirement, this, new CloseTaskDropAction(requirement),
 					false));
 		}
+
 	}
 
 	private BlockListWidget<Requirement> getRequirementList(Requirement requirement) {
@@ -225,7 +250,9 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 
 	private BlockListWidget<Requirement> createRequirementList(Requirement requirement) {
 		BlockListWidget<Requirement> list = new BlockListWidget<Requirement>(RequirementInWhiteboardBlock.FACTORY);
+		list.setSelectionManager(getSelectionManager());
 		list.addAdditionalStyleName("WhiteboardWidget-requirement-list");
+		list.setDnd(false);
 		list.setDndSorting(false);
 		list.setObjects(requirement);
 		return list;
@@ -235,11 +262,20 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 	}
 
 	private void updateTaskLists(Requirement requirement) {
+		if (requirement == null) return;
+
+		TaskListWidget openTasksList = openTasks.get(requirement);
+		TaskListWidget ownedTasksList = ownedTasks.get(requirement);
+		TaskListWidget closedTasksList = closedTasks.get(requirement);
+
+		Task selectedTaskInOpen = openTasksList.getSelectedTask();
+		Task selectedTaskInOwned = ownedTasksList.getSelectedTask();
+		Task selectedTaskInClosed = closedTasksList.getSelectedTask();
 
 		List<Task> openTaskList = new ArrayList<Task>();
 		List<Task> ownedTaskList = new ArrayList<Task>();
 		List<Task> closedTaskList = new ArrayList<Task>();
-		for (Task task : requirement.getTasks()) {
+		for (Task task : requirement.getTasksInSprint()) {
 			if (isTaskListable(task)) {
 				if (task.isClosed()) {
 					closedTaskList.add(task);
@@ -251,10 +287,16 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 			}
 		}
 
-		openTasks.get(requirement).setTasks(openTaskList);
-		ownedTasks.get(requirement).setTasks(ownedTaskList);
-		closedTasks.get(requirement).setTasks(closedTaskList);
+		openTasksList.setTasks(openTaskList);
+		ownedTasksList.setTasks(ownedTaskList);
+		closedTasksList.setTasks(closedTaskList);
 
+		if (selectedTaskInOpen != null && !openTaskList.contains(selectedTaskInOpen))
+			selectionManager.select(selectedTaskInOpen);
+		if (selectedTaskInOwned != null && !ownedTaskList.contains(selectedTaskInOwned))
+			selectionManager.select(selectedTaskInOwned);
+		if (selectedTaskInClosed != null && !closedTaskList.contains(selectedTaskInClosed))
+			selectionManager.select(selectedTaskInClosed);
 	}
 
 	private void updateHighlighting() {
@@ -325,11 +367,6 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		return false;
 	}
 
-	@Override
-	public boolean isWideMode() {
-		return false;
-	}
-
 	private String hours(Integer i) {
 		return Gwt.formatHours(i);
 	}
@@ -346,18 +383,6 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		public boolean contains(Task element) {
 			return element.getOwner() != null && element.getOwner().equals(user);
 		}
-	}
-
-	public HTML getOpenLabel() {
-		return openLabel;
-	}
-
-	public HTML getOwnedLabel() {
-		return ownedLabel;
-	}
-
-	public HTML getDoneLabel() {
-		return doneLabel;
 	}
 
 }

@@ -133,7 +133,7 @@ public abstract class GSubject
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -169,7 +169,7 @@ public abstract class GSubject
     }
 
     protected java.lang.String prepareText(java.lang.String text) {
-        text = Str.removeUnreadableChars(text);
+        // text = Str.removeUnreadableChars(text);
         return text;
     }
 

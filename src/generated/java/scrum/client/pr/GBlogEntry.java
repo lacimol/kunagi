@@ -178,6 +178,7 @@ public abstract class GBlogEntry
 
     public final BlogEntry setTitle(java.lang.String title) {
         if (isTitle(title)) return (BlogEntry)this;
+        if (ilarkesto.core.base.Str.isBlank(title)) throw new RuntimeException("Field is mandatory.");
         this.title = title ;
         propertyChanged("title", this.title);
         return (BlogEntry)this;
@@ -286,20 +287,20 @@ public abstract class GBlogEntry
 
     // --- dateAndTime ---
 
-    private ilarkesto.gwt.client.DateAndTime dateAndTime ;
+    private ilarkesto.core.time.DateAndTime dateAndTime ;
 
-    public final ilarkesto.gwt.client.DateAndTime getDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getDateAndTime() {
         return this.dateAndTime ;
     }
 
-    public final BlogEntry setDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final BlogEntry setDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         if (isDateAndTime(dateAndTime)) return (BlogEntry)this;
         this.dateAndTime = dateAndTime ;
         propertyChanged("dateAndTime", this.dateAndTime);
         return (BlogEntry)this;
     }
 
-    public final boolean isDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final boolean isDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return equals(this.dateAndTime, dateAndTime);
     }
 
@@ -320,19 +321,19 @@ public abstract class GBlogEntry
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getDateAndTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setDateAndTime(value);
         }
         @Override
         public String getTooltip() { return "The time that indicates when the blog entry was released."; }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -434,7 +435,7 @@ public abstract class GBlogEntry
         title  = (java.lang.String) props.get("title");
         text  = (java.lang.String) props.get("text");
         String dateAndTimeAsString = (String) props.get("dateAndTime");
-        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(dateAndTimeAsString);
+        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.core.time.DateAndTime(dateAndTimeAsString);
         releasesIds = (Set<String>) props.get("releasesIds");
         published  = (Boolean) props.get("published");
         updateLocalModificationTime();

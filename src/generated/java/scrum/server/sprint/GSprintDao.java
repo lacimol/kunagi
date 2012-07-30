@@ -56,8 +56,6 @@ public abstract class GSprintDao
         endsCache = null;
         sprintsByVelocityCache.clear();
         velocitysCache = null;
-        sprintsByCompletedRequirementLabelsCache.clear();
-        completedRequirementLabelssCache = null;
         sprintsByCompletedRequirementsDataCache.clear();
         completedRequirementsDatasCache = null;
         sprintsByIncompletedRequirementsDataCache.clear();
@@ -106,7 +104,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByNumber(int number) {
-        return sprintsByNumberCache.get(number);
+        return new HashSet<Sprint>(sprintsByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -146,7 +144,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByProject(scrum.server.project.Project project) {
-        return sprintsByProjectCache.get(project);
+        return new HashSet<Sprint>(sprintsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -186,7 +184,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByLabel(java.lang.String label) {
-        return sprintsByLabelCache.get(label);
+        return new HashSet<Sprint>(sprintsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -226,7 +224,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByGoal(java.lang.String goal) {
-        return sprintsByGoalCache.get(goal);
+        return new HashSet<Sprint>(sprintsByGoalCache.get(goal));
     }
     private Set<java.lang.String> goalsCache;
 
@@ -266,7 +264,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByBegin(ilarkesto.base.time.Date begin) {
-        return sprintsByBeginCache.get(begin);
+        return new HashSet<Sprint>(sprintsByBeginCache.get(begin));
     }
     private Set<ilarkesto.base.time.Date> beginsCache;
 
@@ -306,7 +304,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByEnd(ilarkesto.base.time.Date end) {
-        return sprintsByEndCache.get(end);
+        return new HashSet<Sprint>(sprintsByEndCache.get(end));
     }
     private Set<ilarkesto.base.time.Date> endsCache;
 
@@ -346,7 +344,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByVelocity(java.lang.Float velocity) {
-        return sprintsByVelocityCache.get(velocity);
+        return new HashSet<Sprint>(sprintsByVelocityCache.get(velocity));
     }
     private Set<java.lang.Float> velocitysCache;
 
@@ -375,46 +373,6 @@ public abstract class GSprintDao
     }
 
     // -----------------------------------------------------------
-    // - completedRequirementLabels
-    // -----------------------------------------------------------
-
-    private final Cache<java.lang.String,Set<Sprint>> sprintsByCompletedRequirementLabelsCache = new Cache<java.lang.String,Set<Sprint>>(
-            new Cache.Factory<java.lang.String,Set<Sprint>>() {
-                public Set<Sprint> create(java.lang.String completedRequirementLabels) {
-                    return getEntities(new IsCompletedRequirementLabels(completedRequirementLabels));
-                }
-            });
-
-    public final Set<Sprint> getSprintsByCompletedRequirementLabels(java.lang.String completedRequirementLabels) {
-        return sprintsByCompletedRequirementLabelsCache.get(completedRequirementLabels);
-    }
-    private Set<java.lang.String> completedRequirementLabelssCache;
-
-    public final Set<java.lang.String> getCompletedRequirementLabelss() {
-        if (completedRequirementLabelssCache == null) {
-            completedRequirementLabelssCache = new HashSet<java.lang.String>();
-            for (Sprint e : getEntities()) {
-                if (e.isCompletedRequirementLabelsSet()) completedRequirementLabelssCache.add(e.getCompletedRequirementLabels());
-            }
-        }
-        return completedRequirementLabelssCache;
-    }
-
-    private static class IsCompletedRequirementLabels implements Predicate<Sprint> {
-
-        private java.lang.String value;
-
-        public IsCompletedRequirementLabels(java.lang.String value) {
-            this.value = value;
-        }
-
-        public boolean test(Sprint e) {
-            return e.isCompletedRequirementLabels(value);
-        }
-
-    }
-
-    // -----------------------------------------------------------
     // - completedRequirementsData
     // -----------------------------------------------------------
 
@@ -426,7 +384,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByCompletedRequirementsData(java.lang.String completedRequirementsData) {
-        return sprintsByCompletedRequirementsDataCache.get(completedRequirementsData);
+        return new HashSet<Sprint>(sprintsByCompletedRequirementsDataCache.get(completedRequirementsData));
     }
     private Set<java.lang.String> completedRequirementsDatasCache;
 
@@ -466,7 +424,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByIncompletedRequirementsData(java.lang.String incompletedRequirementsData) {
-        return sprintsByIncompletedRequirementsDataCache.get(incompletedRequirementsData);
+        return new HashSet<Sprint>(sprintsByIncompletedRequirementsDataCache.get(incompletedRequirementsData));
     }
     private Set<java.lang.String> incompletedRequirementsDatasCache;
 
@@ -506,7 +464,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByPlanningNote(java.lang.String planningNote) {
-        return sprintsByPlanningNoteCache.get(planningNote);
+        return new HashSet<Sprint>(sprintsByPlanningNoteCache.get(planningNote));
     }
     private Set<java.lang.String> planningNotesCache;
 
@@ -546,7 +504,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByReviewNote(java.lang.String reviewNote) {
-        return sprintsByReviewNoteCache.get(reviewNote);
+        return new HashSet<Sprint>(sprintsByReviewNoteCache.get(reviewNote));
     }
     private Set<java.lang.String> reviewNotesCache;
 
@@ -586,7 +544,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByRetrospectiveNote(java.lang.String retrospectiveNote) {
-        return sprintsByRetrospectiveNoteCache.get(retrospectiveNote);
+        return new HashSet<Sprint>(sprintsByRetrospectiveNoteCache.get(retrospectiveNote));
     }
     private Set<java.lang.String> retrospectiveNotesCache;
 
@@ -626,7 +584,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByRequirementsOrderId(java.lang.String requirementsOrderId) {
-        return sprintsByRequirementsOrderIdCache.get(requirementsOrderId);
+        return new HashSet<Sprint>(sprintsByRequirementsOrderIdCache.get(requirementsOrderId));
     }
     private Set<java.lang.String> requirementsOrderIdsCache;
 
@@ -666,7 +624,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByProductOwner(scrum.server.admin.User productOwner) {
-        return sprintsByProductOwnerCache.get(productOwner);
+        return new HashSet<Sprint>(sprintsByProductOwnerCache.get(productOwner));
     }
     private Set<scrum.server.admin.User> productOwnersCache;
 
@@ -706,7 +664,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByScrumMaster(scrum.server.admin.User scrumMaster) {
-        return sprintsByScrumMasterCache.get(scrumMaster);
+        return new HashSet<Sprint>(sprintsByScrumMasterCache.get(scrumMaster));
     }
     private Set<scrum.server.admin.User> scrumMastersCache;
 
@@ -746,7 +704,7 @@ public abstract class GSprintDao
             });
 
     public final Set<Sprint> getSprintsByTeamMember(scrum.server.admin.User teamMember) {
-        return sprintsByTeamMemberCache.get(teamMember);
+        return new HashSet<Sprint>(sprintsByTeamMemberCache.get(teamMember));
     }
     private Set<scrum.server.admin.User> teamMembersCache;
 

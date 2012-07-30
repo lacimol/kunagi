@@ -38,6 +38,7 @@ public abstract class GUser
         super.storeProperties(properties);
         properties.put("name", this.name);
         properties.put("publicName", this.publicName);
+        properties.put("fullName", this.fullName);
         properties.put("admin", this.admin);
         properties.put("emailVerified", this.emailVerified);
         properties.put("email", this.email);
@@ -69,6 +70,54 @@ public abstract class GUser
         return toString().toLowerCase().compareTo(other.toString().toLowerCase());
     }
 
+    public final java.util.Set<scrum.server.project.Project> getProjects() {
+        return projectDao.getProjectsByParticipant((User)this);
+    }
+
+    public final java.util.Set<scrum.server.sprint.Sprint> getSprints() {
+        return sprintDao.getSprintsByProductOwner((User)this);
+    }
+
+    public final java.util.Set<scrum.server.collaboration.Emoticon> getEmoticons() {
+        return emoticonDao.getEmoticonsByOwner((User)this);
+    }
+
+    public final java.util.Set<scrum.server.admin.ProjectUserConfig> getProjectUserConfigs() {
+        return projectUserConfigDao.getProjectUserConfigsByUser((User)this);
+    }
+
+    public final java.util.Set<scrum.server.issues.Issue> getIssues() {
+        return issueDao.getIssuesByCreator((User)this);
+    }
+
+    public final java.util.Set<scrum.server.sprint.Task> getTasks() {
+        return taskDao.getTasksByOwner((User)this);
+    }
+
+    public final java.util.Set<scrum.server.journal.Change> getChanges() {
+        return changeDao.getChangesByUser((User)this);
+    }
+
+    public final java.util.Set<scrum.server.collaboration.Comment> getComments() {
+        return commentDao.getCommentsByAuthor((User)this);
+    }
+
+    public final java.util.Set<scrum.server.collaboration.ChatMessage> getChatMessages() {
+        return chatMessageDao.getChatMessagesByAuthor((User)this);
+    }
+
+    public final java.util.Set<scrum.server.task.TaskDaySnapshot> getTaskDaySnapshots() {
+        return taskDaySnapshotDao.getTaskDaySnapshotsByOwner((User)this);
+    }
+
+    public final java.util.Set<scrum.server.pr.BlogEntry> getBlogEntrys() {
+        return blogEntryDao.getBlogEntrysByAuthor((User)this);
+    }
+
+    public final java.util.Set<scrum.server.estimation.RequirementEstimationVote> getRequirementEstimationVotes() {
+        return requirementEstimationVoteDao.getRequirementEstimationVotesByUser((User)this);
+    }
+
     private static final ilarkesto.core.logging.Log LOG = ilarkesto.core.logging.Log.get(GUser.class);
 
     public static final String TYPE = "user";
@@ -82,6 +131,7 @@ public abstract class GUser
         if (super.matchesKey(key)) return true;
         if (matchesKey(getName(), key)) return true;
         if (matchesKey(getPublicName(), key)) return true;
+        if (matchesKey(getFullName(), key)) return true;
         if (matchesKey(getEmail(), key)) return true;
         return false;
     }
@@ -106,7 +156,7 @@ public abstract class GUser
     }
 
     protected java.lang.String prepareName(java.lang.String name) {
-        name = Str.removeUnreadableChars(name);
+        // name = Str.removeUnreadableChars(name);
         return name;
     }
 
@@ -142,7 +192,7 @@ public abstract class GUser
     }
 
     protected java.lang.String preparePublicName(java.lang.String publicName) {
-        publicName = Str.removeUnreadableChars(publicName);
+        // publicName = Str.removeUnreadableChars(publicName);
         return publicName;
     }
 
@@ -157,6 +207,42 @@ public abstract class GUser
 
     protected final void updatePublicName(Object value) {
         setPublicName((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
+    // - fullName
+    // -----------------------------------------------------------
+
+    private java.lang.String fullName;
+
+    public final java.lang.String getFullName() {
+        return fullName;
+    }
+
+    public final void setFullName(java.lang.String fullName) {
+        fullName = prepareFullName(fullName);
+        if (isFullName(fullName)) return;
+        this.fullName = fullName;
+        updateLastModified();
+        fireModified("fullName="+fullName);
+    }
+
+    protected java.lang.String prepareFullName(java.lang.String fullName) {
+        // fullName = Str.removeUnreadableChars(fullName);
+        return fullName;
+    }
+
+    public final boolean isFullNameSet() {
+        return this.fullName != null;
+    }
+
+    public final boolean isFullName(java.lang.String fullName) {
+        if (this.fullName == null && fullName == null) return true;
+        return this.fullName != null && this.fullName.equals(fullName);
+    }
+
+    protected final void updateFullName(Object value) {
+        setFullName((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -239,7 +325,7 @@ public abstract class GUser
     }
 
     protected java.lang.String prepareEmail(java.lang.String email) {
-        email = Str.removeUnreadableChars(email);
+        // email = Str.removeUnreadableChars(email);
         return email;
     }
 
@@ -327,7 +413,7 @@ public abstract class GUser
     }
 
     protected java.lang.String prepareColor(java.lang.String color) {
-        color = Str.removeUnreadableChars(color);
+        // color = Str.removeUnreadableChars(color);
         return color;
     }
 
@@ -916,7 +1002,7 @@ public abstract class GUser
     }
 
     protected java.lang.String prepareLoginToken(java.lang.String loginToken) {
-        loginToken = Str.removeUnreadableChars(loginToken);
+        // loginToken = Str.removeUnreadableChars(loginToken);
         return loginToken;
     }
 
@@ -953,7 +1039,7 @@ public abstract class GUser
     }
 
     protected java.lang.String prepareOpenId(java.lang.String openId) {
-        openId = Str.removeUnreadableChars(openId);
+        // openId = Str.removeUnreadableChars(openId);
         return openId;
     }
 
@@ -977,6 +1063,7 @@ public abstract class GUser
             Object value = entry.getValue();
             if (property.equals("name")) updateName(value);
             if (property.equals("publicName")) updatePublicName(value);
+            if (property.equals("fullName")) updateFullName(value);
             if (property.equals("admin")) updateAdmin(value);
             if (property.equals("emailVerified")) updateEmailVerified(value);
             if (property.equals("email")) updateEmail(value);
@@ -1037,6 +1124,72 @@ public abstract class GUser
 
     public static final void setUserDao(scrum.server.admin.UserDao userDao) {
         GUser.userDao = userDao;
+    }
+
+    static scrum.server.sprint.SprintDao sprintDao;
+
+    public static final void setSprintDao(scrum.server.sprint.SprintDao sprintDao) {
+        GUser.sprintDao = sprintDao;
+    }
+
+    static scrum.server.collaboration.EmoticonDao emoticonDao;
+
+    public static final void setEmoticonDao(scrum.server.collaboration.EmoticonDao emoticonDao) {
+        GUser.emoticonDao = emoticonDao;
+    }
+
+    static scrum.server.admin.ProjectUserConfigDao projectUserConfigDao;
+
+    public static final void setProjectUserConfigDao(scrum.server.admin.ProjectUserConfigDao projectUserConfigDao) {
+        GUser.projectUserConfigDao = projectUserConfigDao;
+    }
+
+    static scrum.server.issues.IssueDao issueDao;
+
+    public static final void setIssueDao(scrum.server.issues.IssueDao issueDao) {
+        GUser.issueDao = issueDao;
+    }
+
+    static scrum.server.sprint.TaskDao taskDao;
+
+    public static final void setTaskDao(scrum.server.sprint.TaskDao taskDao) {
+        GUser.taskDao = taskDao;
+    }
+
+    static scrum.server.journal.ChangeDao changeDao;
+
+    public static final void setChangeDao(scrum.server.journal.ChangeDao changeDao) {
+        GUser.changeDao = changeDao;
+    }
+
+    static scrum.server.collaboration.CommentDao commentDao;
+
+    public static final void setCommentDao(scrum.server.collaboration.CommentDao commentDao) {
+        GUser.commentDao = commentDao;
+    }
+
+    static scrum.server.collaboration.ChatMessageDao chatMessageDao;
+
+    public static final void setChatMessageDao(scrum.server.collaboration.ChatMessageDao chatMessageDao) {
+        GUser.chatMessageDao = chatMessageDao;
+    }
+
+    static scrum.server.task.TaskDaySnapshotDao taskDaySnapshotDao;
+
+    public static final void setTaskDaySnapshotDao(scrum.server.task.TaskDaySnapshotDao taskDaySnapshotDao) {
+        GUser.taskDaySnapshotDao = taskDaySnapshotDao;
+    }
+
+    static scrum.server.pr.BlogEntryDao blogEntryDao;
+
+    public static final void setBlogEntryDao(scrum.server.pr.BlogEntryDao blogEntryDao) {
+        GUser.blogEntryDao = blogEntryDao;
+    }
+
+    static scrum.server.estimation.RequirementEstimationVoteDao requirementEstimationVoteDao;
+
+    public static final void setRequirementEstimationVoteDao(scrum.server.estimation.RequirementEstimationVoteDao requirementEstimationVoteDao) {
+        GUser.requirementEstimationVoteDao = requirementEstimationVoteDao;
     }
 
 }

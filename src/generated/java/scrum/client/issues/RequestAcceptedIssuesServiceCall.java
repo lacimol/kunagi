@@ -8,8 +8,8 @@ public class RequestAcceptedIssuesServiceCall extends scrum.client.core.AService
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestAcceptedIssues(serviceCaller.getConversationNumber(), new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestAcceptedIssues(serviceCaller.getConversationNumber(), new DefaultCallback(this, returnHandler));
     }
 
     @Override

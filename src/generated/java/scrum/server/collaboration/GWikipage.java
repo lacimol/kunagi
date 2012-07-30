@@ -132,7 +132,7 @@ public abstract class GWikipage
     }
 
     protected java.lang.String prepareName(java.lang.String name) {
-        name = Str.removeUnreadableChars(name);
+        // name = Str.removeUnreadableChars(name);
         return name;
     }
 
@@ -168,7 +168,7 @@ public abstract class GWikipage
     }
 
     protected java.lang.String prepareText(java.lang.String text) {
-        text = Str.removeUnreadableChars(text);
+        // text = Str.removeUnreadableChars(text);
         return text;
     }
 

@@ -7,3 +7,4 @@ tomcat
 *.log
 velocity.log*
 
+/data

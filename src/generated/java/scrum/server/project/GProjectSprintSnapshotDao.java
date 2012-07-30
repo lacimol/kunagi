@@ -110,7 +110,7 @@ public abstract class GProjectSprintSnapshotDao
             });
 
     public final Set<ProjectSprintSnapshot> getProjectSprintSnapshotsByRemainingWork(int remainingWork) {
-        return projectSprintSnapshotsByRemainingWorkCache.get(remainingWork);
+        return new HashSet<ProjectSprintSnapshot>(projectSprintSnapshotsByRemainingWorkCache.get(remainingWork));
     }
     private Set<Integer> remainingWorksCache;
 
@@ -150,7 +150,7 @@ public abstract class GProjectSprintSnapshotDao
             });
 
     public final Set<ProjectSprintSnapshot> getProjectSprintSnapshotsByBurnedWork(int burnedWork) {
-        return projectSprintSnapshotsByBurnedWorkCache.get(burnedWork);
+        return new HashSet<ProjectSprintSnapshot>(projectSprintSnapshotsByBurnedWorkCache.get(burnedWork));
     }
     private Set<Integer> burnedWorksCache;
 

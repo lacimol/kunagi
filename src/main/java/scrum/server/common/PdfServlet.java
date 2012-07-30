@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.common;
 
 import ilarkesto.base.PermissionDeniedException;
@@ -15,7 +29,12 @@ import scrum.server.calendar.CalendarPdfCreator;
 import scrum.server.collaboration.Wikipage;
 import scrum.server.collaboration.WikipagePdfCreator;
 import scrum.server.impediments.ImpedimentListPdfCreator;
+import scrum.server.issues.BugListPdfCreator;
+import scrum.server.issues.IdeaListPdfCreator;
 import scrum.server.project.ProductBacklogPdfCreator;
+import scrum.server.project.QualityBacklogPdfCreator;
+import scrum.server.release.ReleaseHistoryPdfCreator;
+import scrum.server.release.ReleasePlanPdfCreator;
 import scrum.server.risks.RiskListPdfCreator;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.SprintBacklogPdfCreator;
@@ -28,9 +47,14 @@ public class PdfServlet extends AHttpServlet {
 		if (pdfId.equals("wikipage")) return createWikipage(req, session);
 		if (pdfId.equals("productBacklog")) return createProductBacklog(req, session);
 		if (pdfId.equals("sprintBacklog")) return createSprintBacklog(req, session);
+		if (pdfId.equals("qualityBacklog")) return createQualityBacklog(req, session);
 		if (pdfId.equals("impedimentList")) return createImpedimentList(req, session);
 		if (pdfId.equals("riskList")) return createRiskList(req, session);
 		if (pdfId.equals("calendar")) return createCalendar(req, session);
+		if (pdfId.equals("bugList")) return createBugList(req, session);
+		if (pdfId.equals("ideaList")) return createIdeaList(req, session);
+		if (pdfId.equals("releasePlan")) return createReleasePlan(req, session);
+		if (pdfId.equals("releaseHistory")) return createReleaseHistory(req, session);
 		throw new RuntimeException("Unknown pdfId: " + pdfId);
 	}
 
@@ -38,6 +62,14 @@ public class PdfServlet extends AHttpServlet {
 		Date from = new Date(req.getParameter("from"));
 		Date to = new Date(req.getParameter("to"));
 		return new CalendarPdfCreator(getProject(session, req), from, to);
+	}
+
+	private APdfCreator createReleasePlan(HttpServletRequest req, WebSession session) {
+		return new ReleasePlanPdfCreator(getProject(session, req));
+	}
+
+	private APdfCreator createReleaseHistory(HttpServletRequest req, WebSession session) {
+		return new ReleaseHistoryPdfCreator(getProject(session, req));
 	}
 
 	private APdfCreator createRiskList(HttpServletRequest req, WebSession session) {
@@ -52,8 +84,20 @@ public class PdfServlet extends AHttpServlet {
 		return new SprintBacklogPdfCreator(getProject(session, req));
 	}
 
+	private APdfCreator createQualityBacklog(HttpServletRequest req, WebSession session) {
+		return new QualityBacklogPdfCreator(getProject(session, req));
+	}
+
 	private APdfCreator createProductBacklog(HttpServletRequest req, WebSession session) {
 		return new ProductBacklogPdfCreator(getProject(session, req));
+	}
+
+	private APdfCreator createBugList(HttpServletRequest req, WebSession session) {
+		return new BugListPdfCreator(getProject(session, req));
+	}
+
+	private APdfCreator createIdeaList(HttpServletRequest req, WebSession session) {
+		return new IdeaListPdfCreator(getProject(session, req));
 	}
 
 	private APdfCreator createWikipage(HttpServletRequest req, WebSession session) {

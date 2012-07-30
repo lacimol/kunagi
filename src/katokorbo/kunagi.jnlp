@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://kunagi.org/webstart" href="kunagi.jnlp">
+    <information>
+        <title>Kunagi</title>
+        <vendor>Kunagi Team</vendor>
+        <homepage href="http://kunagi.org"/>
+        <description>SCRUM Tool</description>
+        <description kind="short">SCRUM Tool</description>
+        <icon href="kunagi-k-64.png"/>
+        <icon kind="splash" href="kunagi-300x300.png"/>
+        <offline-allowed/>
+        <shortcut online="false">
+            <desktop/>
+            <menu/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="katokorbo.jar" main="true" />
+    </resources>
+    <application-desc name="Kunagi" main-class="katokorbo.Katokorbo">
+      <argument>--title</argument>
+      <argument>Kunagi</argument>
+      <argument>--port</argument>
+      <argument>9061</argument>
+      <argument>http://kunagi.org/katokorbo.properties</argument>
+    </application-desc>
+    <update check="always"/>
+</jnlp>

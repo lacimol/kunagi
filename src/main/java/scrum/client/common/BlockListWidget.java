@@ -1,6 +1,19 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.common;
 
-import ilarkesto.core.logging.Log;
 import ilarkesto.core.scope.Scope;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.ObjectMappedFlowPanel;
@@ -14,6 +27,7 @@ import java.util.List;
 
 import scrum.client.dnd.BlockDndMarkerWidget;
 import scrum.client.dnd.BlockListDropAction;
+import scrum.client.dnd.ScrumDragController;
 import scrum.client.workspace.DndManager;
 import scrum.client.workspace.Navigator;
 
@@ -30,6 +44,7 @@ public final class BlockListWidget<O> extends AScrumWidget {
 	DndManager dndManager;
 
 	private ObjectMappedFlowPanel<O, ABlockWidget<O>> list;
+	private boolean dnd = true;
 	private boolean dndSorting = true;
 	private Comparator<O> autoSorter;
 	private BlockWidgetFactory<O> blockWidgetFactory;
@@ -45,6 +60,18 @@ public final class BlockListWidget<O> extends AScrumWidget {
 		this.blockWidgetFactory = blockWidgetFactory;
 
 		dndMarkerBottom = new BlockDndMarkerWidget();
+	}
+
+	public ABlockWidget<O> getExtendedBlock() {
+		for (ABlockWidget<O> block : getBlocks()) {
+			if (block.isExtended()) return block;
+		}
+		return null;
+	}
+
+	public O getExtendedObject() {
+		ABlockWidget<O> block = getExtendedBlock();
+		return block == null ? null : block.getObject();
 	}
 
 	public void setMinHeight(int height) {
@@ -63,7 +90,7 @@ public final class BlockListWidget<O> extends AScrumWidget {
 
 	@Override
 	protected Widget onInitialization() {
-		dndManager = Scope.get().getComponent(DndManager.class);
+		if (dnd) dndManager = Scope.get().getComponent(DndManager.class);
 
 		list = new ObjectMappedFlowPanel<O, ABlockWidget<O>>(
 				new ObjectMappedFlowPanel.WidgetFactory<O, ABlockWidget<O>>() {
@@ -94,6 +121,7 @@ public final class BlockListWidget<O> extends AScrumWidget {
 
 	@Override
 	protected void onUpdate() {
+		if (ScrumDragController.isDragging()) return;
 		super.onUpdate();
 	}
 
@@ -130,6 +158,10 @@ public final class BlockListWidget<O> extends AScrumWidget {
 		if (autoSorter != null) setDndSorting(false);
 	}
 
+	public void setDnd(boolean dnd) {
+		this.dnd = dnd;
+	}
+
 	public final boolean isDndSorting() {
 		if (dndManager == null) return false;
 		return dndSorting;
@@ -148,6 +180,10 @@ public final class BlockListWidget<O> extends AScrumWidget {
 		setObjects(Gwt.toList(objects));
 	}
 
+	public final void setObjects(Collection<O> newObjects) {
+		setObjects(new ArrayList<O>(newObjects));
+	}
+
 	public final void setObjects(List<O> newObjects) {
 		initialize();
 		if (autoSorter != null) {
@@ -156,18 +192,14 @@ public final class BlockListWidget<O> extends AScrumWidget {
 		list.set(newObjects);
 	}
 
-	public final void setObjects(Collection<O> newObjects) {
-		setObjects(new ArrayList<O>(newObjects));
-	}
-
 	public final void drop(ABlockWidget<O> block, int toIndex) {
-		Log.DEBUG("Dropping to index", toIndex, "->", block);
 		assert block != null;
+		O object = block.getObject();
 		if (block.getList() == this) {
-			list.move(toIndex, block.getObject(), true, moveObserver);
+			list.move(toIndex, object, true, moveObserver);
 			return;
 		}
-		dropAction.onDrop(block.getObject());
+		if (dropAction.isDroppable(object)) dropAction.onDrop(object);
 	}
 
 	public final int size() {
@@ -234,10 +266,7 @@ public final class BlockListWidget<O> extends AScrumWidget {
 
 	public final boolean extendObject(O object, boolean exclusive) {
 		int idx = indexOfObject(object);
-		if (idx < 0) {
-			Log.DEBUG("Extending block failed. Object does not exist:", object);
-			return false;
-		}
+		if (idx < 0) { return false; }
 		extendRow(idx, exclusive);
 		assert isExtended(object);
 		return true;
@@ -333,10 +362,15 @@ public final class BlockListWidget<O> extends AScrumWidget {
 		return list.getObjects();
 	}
 
+	public Collection<ABlockWidget<O>> getBlocks() {
+		return list.getWidgets();
+	}
+
 	public boolean acceptsDrop(ABlockWidget<O> block) {
 		if (this == block.getList()) return true;
 		if (dummy == null) dummy = blockWidgetFactory.createBlock();
-		return dummy.getClass().getName().equals(block.getClass().getName());
+		if (!dummy.getClass().getName().equals(block.getClass().getName())) return false;
+		return dropAction.isDroppable(block.getObject());
 	}
 
 	private ABlockWidget<O> dummy = null;
@@ -344,12 +378,12 @@ public final class BlockListWidget<O> extends AScrumWidget {
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		if (dndManager != null) dndManager.registerDropTarget(this);
+		if (dnd && dndManager != null) dndManager.registerDropTarget(this);
 	}
 
 	@Override
 	protected void onUnload() {
-		if (dndManager != null) dndManager.unregisterDropTarget(this);
+		if (dnd && dndManager != null) dndManager.unregisterDropTarget(this);
 		super.onUnload();
 	}
 

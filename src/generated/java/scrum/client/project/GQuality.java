@@ -144,6 +144,7 @@ public abstract class GQuality
 
     public final Quality setLabel(java.lang.String label) {
         if (isLabel(label)) return (Quality)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Quality)this;
@@ -338,12 +339,12 @@ public abstract class GQuality
         properties.put("testDescription", this.testDescription);
     }
 
-    public final java.util.List<scrum.client.project.Requirement> getRequirements() {
-        return getDao().getRequirementsByQuality((Quality)this);
-    }
-
     public final java.util.List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigs() {
         return getDao().getProjectUserConfigsByPblFilterQuality((Quality)this);
+    }
+
+    public final java.util.List<scrum.client.project.Requirement> getRequirements() {
+        return getDao().getRequirementsByQuality((Quality)this);
     }
 
     @Override

@@ -15,7 +15,7 @@
 
 package scrum.client.statistics;
 
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
 
 import java.util.ArrayList;
 import java.util.Collections;

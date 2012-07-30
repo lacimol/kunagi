@@ -52,14 +52,13 @@
             <arg value="scrum.ScrumGwtApplication" />
 			<arg value="-localWorkers" />
 			<arg value="2" />
-			<arg value="-draftCompile" />
+			<!--arg value="-draftCompile" /-->
             <classpath location="src/main/java" />
             <classpath location="src/generated/java" />
             <classpath location="${ilarkesto.dir}/src/main/java" />
-            <classpath location="${ilarkesto.dir}/lib/gwtupload-0.6.1.jar" />
-            <classpath location="${ilarkesto.dir}/lib/gwt-dnd.jar" />
-            <classpath location="${ilarkesto.dir}/lib/gwt-user.jar" />
-            <classpath location="${ilarkesto.dir}/lib/gwt-dev.jar" />
+        	<classpath>
+        		   <fileset dir="${ilarkesto.dir}/lib" includes="gwt*.jar,validation-api-*.jar" />
+        	</classpath>
         </java>
 
     </target>
@@ -114,9 +113,10 @@
                 <exclude name="**/gdata-*.jar" />
                 <exclude name="**/jaudiotagger-*.jar" />
                 <exclude name="**/jcip-annotations.jar" />
+            	  <exclude name="**/mysql-*.jar" />
             </fileset>
         </copy>
-        <!--war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp" /-->
+        <war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp" />
     </target>
 
     <target name="package" depends="webapp">
@@ -126,7 +126,7 @@
             <fileset file="README" />
             <fileset dir="." includes="license.*" />
         </copy>
-        <zip destfile="${build.dir}/kunagi.zip" basedir="${build.dir}/package-content" />
+        <!--zip destfile="${build.dir}/kunagi.zip" basedir="${build.dir}/package-content" /-->
         <!--exec executable="tar" failonerror="false" dir="${build.dir}/package-content">
             <arg line="cjf ../kunagi.tar.bz2 kunagi" />
         </exec-->
@@ -156,7 +156,7 @@
 	</target>
 
 	<target name="installScripts">
-		<copy file="etc/kunagi-release.py" tofile="/home/cad/bin/kunagi-release" preservelastmodified="true" />
+		<copy file="etc/kunagi-release.py" tofile="/home/scrum/bin/kunagi-release" preservelastmodified="true" />
 	</target>
 	
     <target name="continousIntegrationBuild" depends="clean,test,package,publishPackages,releaseHomepage,installScripts,deployToLatest" />

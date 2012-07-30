@@ -78,7 +78,7 @@ public abstract class GEmoticonDao
             });
 
     public final Set<Emoticon> getEmoticonsByParent(ilarkesto.persistence.AEntity parent) {
-        return emoticonsByParentCache.get(parent);
+        return new HashSet<Emoticon>(emoticonsByParentCache.get(parent));
     }
     private Set<ilarkesto.persistence.AEntity> parentsCache;
 
@@ -118,7 +118,7 @@ public abstract class GEmoticonDao
             });
 
     public final Set<Emoticon> getEmoticonsByOwner(scrum.server.admin.User owner) {
-        return emoticonsByOwnerCache.get(owner);
+        return new HashSet<Emoticon>(emoticonsByOwnerCache.get(owner));
     }
     private Set<scrum.server.admin.User> ownersCache;
 
@@ -158,7 +158,7 @@ public abstract class GEmoticonDao
             });
 
     public final Set<Emoticon> getEmoticonsByEmotion(java.lang.String emotion) {
-        return emoticonsByEmotionCache.get(emotion);
+        return new HashSet<Emoticon>(emoticonsByEmotionCache.get(emotion));
     }
     private Set<java.lang.String> emotionsCache;
 

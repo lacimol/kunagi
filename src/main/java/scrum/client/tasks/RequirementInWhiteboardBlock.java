@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.tasks;
 
 import scrum.client.collaboration.EmoticonsWidget;
@@ -15,6 +29,7 @@ import scrum.client.project.ReopenRequirementAction;
 import scrum.client.project.Requirement;
 import scrum.client.project.RequirementWidget;
 import scrum.client.sprint.CreateTaskAction;
+import scrum.client.sprint.RequirementWorkIndicatorBarWidget;
 
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -32,6 +47,7 @@ public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 		header.addText(requirement.getThemesAsStringModel(), true, false);
 		header.addText(requirement.getTaskStatusLabelModel(), true);
 		header.appendCell(new EmoticonsWidget(requirement), null, true);
+		header.appendCell(new RequirementWorkIndicatorBarWidget(requirement), "150px", true);
 		header.addMenuAction(new RejectRequirementAction(requirement));
 		header.addMenuAction(new FixRequirementAction(requirement));
 		header.addMenuAction(new CloseRequirementAction(requirement));
@@ -55,6 +71,9 @@ public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 		} else if (requirement.isTasksClosed()) {
 			statusImage = Img.bundle.reqTasksClosed().createImage();
 			statusImage.setTitle("All tasks done.");
+		} else if (requirement.isBlocked()) {
+			statusImage = Img.bundle.tskBlocked().createImage();
+			statusImage.setTitle("Blocked by " + requirement.getImpediment().getReferenceAndLabel() + ".");
 		}
 		statusIcon.setWidget(statusImage);
 	}

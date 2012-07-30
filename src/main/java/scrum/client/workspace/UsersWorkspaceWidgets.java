@@ -1,7 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.workspace;
 
+import ilarkesto.gwt.client.AWidget;
 import ilarkesto.gwt.client.Gwt;
-import ilarkesto.gwt.client.SwitchingNavigatorWidget;
 import scrum.client.admin.ProjectSelectorWidget;
 import scrum.client.admin.SystemConfigWidget;
 import scrum.client.admin.SystemMessageManagerWidget;
@@ -15,7 +29,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 public class UsersWorkspaceWidgets extends GUsersWorkspaceWidgets {
 
 	private FlowPanel sidebar;
-	private SwitchingNavigatorWidget navigator;
+	private ScrumNavigatorWidget navigator;
 	private ProjectSelectorWidget projectSelector;
 	private UserConfigWidget userConfig;
 	private UserListWidget userList;
@@ -29,7 +43,7 @@ public class UsersWorkspaceWidgets extends GUsersWorkspaceWidgets {
 		messageManager = new SystemMessageManagerWidget();
 		systemConfig = new SystemConfigWidget();
 
-		navigator = new SwitchingNavigatorWidget(ui.getWorkspace().getWorkarea());
+		navigator = new ScrumNavigatorWidget();
 		navigator.addItem("Projects", projectSelector);
 		navigator.addItem("Personal Preferences", userConfig);
 		if (auth.getUser().isAdmin()) {
@@ -47,8 +61,15 @@ public class UsersWorkspaceWidgets extends GUsersWorkspaceWidgets {
 		sidebar.add(navigator);
 	}
 
-	public void activate() {
-		ui.show(sidebar, projectSelector);
+	public void activate(String page) {
+		AWidget widget = projectSelector;
+		if (page != null) {
+			if (page.equals(Page.getPageName(userConfig))) widget = userConfig;
+			if (page.equals(Page.getPageName(messageManager))) widget = messageManager;
+			if (page.equals(Page.getPageName(userList))) widget = userList;
+			if (page.equals(Page.getPageName(systemConfig))) widget = systemConfig;
+		}
+		ui.show(sidebar, widget);
 	}
 
 	public UserListWidget getUserList() {

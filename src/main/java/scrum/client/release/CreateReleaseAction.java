@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.release;
 
 import ilarkesto.core.scope.Scope;
@@ -12,13 +26,9 @@ public class CreateReleaseAction extends GCreateReleaseAction {
 	}
 
 	@Override
-	public String getTooltip() {
-		TooltipBuilder tb = new TooltipBuilder("Create new major Release.");
-
-		if (!getCurrentProject().isScrumTeamMember(getCurrentUser()))
-			tb.addRemark(TooltipBuilder.NOT_SCRUMTEAM);
-
-		return tb.getTooltip();
+	protected void updateTooltip(TooltipBuilder tb) {
+		tb.setText("Create new major Release.");
+		if (!getCurrentProject().isScrumTeamMember(getCurrentUser())) tb.addRemark(TooltipBuilder.NOT_SCRUMTEAM);
 	}
 
 	@Override
@@ -35,7 +45,7 @@ public class CreateReleaseAction extends GCreateReleaseAction {
 	@Override
 	protected void onExecute() {
 		Release release = getCurrentProject().createNewRelease(null);
-		Scope.get().getComponent(ProjectWorkspaceWidgets.class).showRelease(release);
+		Scope.get().getComponent(ProjectWorkspaceWidgets.class).showEntity(release);
 	}
 
 }

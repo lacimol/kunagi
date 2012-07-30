@@ -364,7 +364,8 @@ public abstract class Chart {
 
 	public void createPic(OutputStream out, int width, int height, JFreeChart chart) {
 		try {
-			ChartUtilities.writeScaledChartAsPNG(out, chart, width, height, 1, 1);
+			// XXX New Sprint, empty tasklist: Width (1383) and height (0) cannot be <= 0
+			ChartUtilities.writeScaledChartAsPNG(out, chart, width, Math.max(height, 1), 1, 1);
 			out.flush();
 		} catch (IOException e) {
 			throw new RuntimeException(e);

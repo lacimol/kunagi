@@ -80,7 +80,7 @@ public abstract class GSubjectDao
             });
 
     public final Set<Subject> getSubjectsByProject(scrum.server.project.Project project) {
-        return subjectsByProjectCache.get(project);
+        return new HashSet<Subject>(subjectsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -120,7 +120,7 @@ public abstract class GSubjectDao
             });
 
     public final Set<Subject> getSubjectsByLabel(java.lang.String label) {
-        return subjectsByLabelCache.get(label);
+        return new HashSet<Subject>(subjectsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -160,7 +160,7 @@ public abstract class GSubjectDao
             });
 
     public final Set<Subject> getSubjectsByText(java.lang.String text) {
-        return subjectsByTextCache.get(text);
+        return new HashSet<Subject>(subjectsByTextCache.get(text));
     }
     private Set<java.lang.String> textsCache;
 
@@ -200,7 +200,7 @@ public abstract class GSubjectDao
             });
 
     public final Set<Subject> getSubjectsByNumber(int number) {
-        return subjectsByNumberCache.get(number);
+        return new HashSet<Subject>(subjectsByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 

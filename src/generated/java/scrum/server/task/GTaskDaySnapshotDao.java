@@ -82,7 +82,7 @@ public abstract class GTaskDaySnapshotDao
             });
 
     public final Set<TaskDaySnapshot> getTaskDaySnapshotsByTask(scrum.server.sprint.Task task) {
-        return taskDaySnapshotsByTaskCache.get(task);
+        return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByTaskCache.get(task));
     }
     private Set<scrum.server.sprint.Task> tasksCache;
 
@@ -122,7 +122,7 @@ public abstract class GTaskDaySnapshotDao
             });
 
     public final Set<TaskDaySnapshot> getTaskDaySnapshotsByDate(ilarkesto.base.time.Date date) {
-        return taskDaySnapshotsByDateCache.get(date);
+        return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByDateCache.get(date));
     }
     private Set<ilarkesto.base.time.Date> datesCache;
 
@@ -162,7 +162,7 @@ public abstract class GTaskDaySnapshotDao
             });
 
     public final Set<TaskDaySnapshot> getTaskDaySnapshotsByRemainingWork(int remainingWork) {
-        return taskDaySnapshotsByRemainingWorkCache.get(remainingWork);
+        return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByRemainingWorkCache.get(remainingWork));
     }
     private Set<Integer> remainingWorksCache;
 
@@ -202,7 +202,7 @@ public abstract class GTaskDaySnapshotDao
             });
 
     public final Set<TaskDaySnapshot> getTaskDaySnapshotsByBurnedWork(int burnedWork) {
-        return taskDaySnapshotsByBurnedWorkCache.get(burnedWork);
+        return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByBurnedWorkCache.get(burnedWork));
     }
     private Set<Integer> burnedWorksCache;
 
@@ -242,7 +242,7 @@ public abstract class GTaskDaySnapshotDao
             });
 
     public final Set<TaskDaySnapshot> getTaskDaySnapshotsByOwner(scrum.server.admin.User owner) {
-        return taskDaySnapshotsByOwnerCache.get(owner);
+        return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByOwnerCache.get(owner));
     }
     private Set<scrum.server.admin.User> ownersCache;
 

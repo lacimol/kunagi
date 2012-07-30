@@ -21,12 +21,12 @@ import ilarkesto.auth.OpenId;
 import ilarkesto.base.Sys;
 import ilarkesto.base.Tm;
 import ilarkesto.base.Url;
+import ilarkesto.base.Utl;
 import ilarkesto.base.time.DateAndTime;
 import ilarkesto.concurrent.TaskManager;
 import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
 import ilarkesto.di.app.WebApplicationStarter;
-import ilarkesto.email.Eml;
 import ilarkesto.gwt.server.AGwtConversation;
 import ilarkesto.io.IO;
 import ilarkesto.persistence.AEntity;
@@ -39,8 +39,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,13 +60,16 @@ import scrum.server.common.StoryThemeChart;
 import scrum.server.common.TaskRangeChart;
 import scrum.server.common.UserBurndownChart;
 import scrum.server.common.VelocityChart;
+import scrum.server.journal.ProjectEvent;
+import scrum.server.pr.EmailSender;
+import scrum.server.pr.SubscriptionService;
 import scrum.server.project.DeleteOldProjectsTask;
 import scrum.server.project.HomepageUpdaterTask;
 import scrum.server.project.Project;
 
 public class ScrumWebApplication extends GScrumWebApplication {
 
-	private static final int DATA_VERSION = 23;
+	private static final int DATA_VERSION = 33;
 
 	private static final Log log = Log.get(ScrumWebApplication.class);
 
@@ -79,7 +80,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private SprintRangeChart sprintRangeChart;
 	private AccomplishChart accomplishChart;
 	private StoryThemeChart storyThemeChart;
-
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
 	private SystemMessage systemMessage;
@@ -191,13 +191,14 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	}
 
 	public ApplicationInfo getApplicationInfo() {
-		User admin = getUserDao().getUserByName("admin");
-		boolean defaultAdminPassword = false;
-		if (admin != null && admin.matchesPassword(scrum.client.admin.User.INITIAL_PASSWORD)) {
-			defaultAdminPassword = true;
-		}
-		return new ApplicationInfo("Kunagi", getReleaseLabel(), getBuild(), defaultAdminPassword, getCurrentRelease(),
-				getApplicationDataDir());
+		boolean defaultAdminPassword = isAdminPasswordDefault();
+		return new ApplicationInfo(getApplicationLabel(), getReleaseLabel(), getBuild(), defaultAdminPassword,
+				getCurrentRelease(), getApplicationDataDir());
+	}
+
+	@Override
+	public String getApplicationLabel() {
+		return "Kunagi";
 	}
 
 	private String currentRelease;
@@ -240,7 +241,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		if (!Str.isBlank(url)) getSystemConfig().setUrl(url);
 
 		if (getUserDao().getEntities().isEmpty()) {
-			String password = getConfig().getInitialPassword();
+			String password = getSystemConfig().getDefaultUserPassword();
 			log.warn("No users. Creating initial user <admin> with password <" + password + ">");
 			User admin = getUserDao().postUserWithDefaultPassword("admin");
 			admin.setPassword(password);
@@ -248,6 +249,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 			getTransactionService().commit();
 		}
 
+		getReleaseDao().resetScripts();
 		getProjectDao().scanFiles();
 		getTransactionService().commit();
 
@@ -270,13 +272,23 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public String createUrl(String relativePath) {
 		if (relativePath == null) relativePath = "";
 		String prefix = getBaseUrl();
+
+		// return relative path if base is not defined
 		if (Str.isBlank(prefix)) return relativePath;
+
+		// concat base and relative and return
 		if (prefix.endsWith("/")) {
-			if (relativePath.startsWith("/")) return prefix.substring(0, prefix.length() - 1) + relativePath;
+			if (relativePath.startsWith("/")) return Str.removeSuffix(prefix, "/") + relativePath;
 			return prefix + relativePath;
 		}
 		if (relativePath.startsWith("/")) return prefix + relativePath;
 		return prefix + "/" + relativePath;
+	}
+
+	public String createUrl(Project project, AEntity entity) {
+		String hashtag = "#project=" + project.getId();
+		if (entity != null) hashtag += "|entity=" + entity.getId();
+		return createUrl(hashtag);
 	}
 
 	private void createTestData() {
@@ -297,13 +309,14 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	protected void scheduleTasks(TaskManager tm) {
 		tm.scheduleWithFixedDelay(autowire(new DestroyTimeoutedSessionsTask()), Tm.MINUTE);
 		tm.scheduleWithFixedDelay(autowire(new HomepageUpdaterTask()), Tm.HOUR);
+		tm.scheduleWithFixedDelay(autowire(getSubscriptionService().new Task()), Tm.MINUTE);
 
 		if (getConfig().isDisableUsersWithUnverifiedEmails())
-			tm.scheduleWithFixedDelay(autowire(new DisableUsersWithUnverifiedEmailsTask()), Tm.HOUR);
+			tm.scheduleWithFixedDelay(autowire(new DisableUsersWithUnverifiedEmailsTask()), Tm.SECOND * 10, Tm.HOUR);
 		if (getConfig().isDisableInactiveUsers())
-			tm.scheduleWithFixedDelay(autowire(new DisableInactiveUsersTask()), Tm.HOUR);
+			tm.scheduleWithFixedDelay(autowire(new DisableInactiveUsersTask()), Tm.SECOND * 20, Tm.HOUR);
 		if (getConfig().isDeleteOldProjects())
-			tm.scheduleWithFixedDelay(autowire(new DeleteOldProjectsTask()), Tm.SECOND, Tm.HOUR * 25);
+			tm.scheduleWithFixedDelay(autowire(new DeleteOldProjectsTask()), Tm.SECOND * 30, Tm.HOUR * 25);
 		if (getConfig().isDeleteDisabledUsers())
 			tm.scheduleWithFixedDelay(autowire(new DeleteDisabledUsersTask()), Tm.MINUTE * 3, Tm.HOUR * 26);
 	}
@@ -314,16 +327,19 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	}
 
 	@Override
-	protected void onShutdownWebApplication() {}
+	protected void onShutdownWebApplication() {
+		getSubscriptionService().flush();
+		getTransactionService().commit();
+	}
 
 	@Override
 	public Url getHomeUrl() {
 		return new Url("index.html");
 	}
 
-	public String getBaseUrl() {
+	private String getBaseUrl() {
 		String url = getSystemConfig().getUrl();
-		return url == null ? "http://localhost:8080/kunagi/" : url;
+		return url == null ? "http://localhost:8888/kunagi/" : url;
 	}
 
 	private UserDao userDao;
@@ -339,7 +355,18 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public boolean isAdminPasswordDefault() {
 		User admin = userDao.getUserByName("admin");
 		if (admin == null) return false;
-		return admin.matchesPassword(scrum.client.admin.User.INITIAL_PASSWORD);
+		return admin.matchesPassword(getSystemConfig().getDefaultUserPassword());
+	}
+
+	public synchronized void postProjectEvent(Project project, String message, AEntity subject) {
+		ProjectEvent event = getProjectEventDao().postEvent(project, message, subject);
+		sendToConversationsByProject(project, event);
+		sendToConversationsByProject(project, event.postChatMessage());
+		Utl.sleep(100);
+	}
+
+	public void sendToConversationsByProject(GwtConversation conversation, AEntity entity) {
+		sendToConversationsByProject(conversation.getProject(), entity);
 	}
 
 	public void sendToOtherConversationsByProject(GwtConversation conversation, AEntity entity) {
@@ -410,7 +437,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 
 	public void triggerRegisterNotification(User user, String host) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Kunagi URL: ").append(getBaseUrl()).append("\n");
+		sb.append("Kunagi URL: ").append(createUrl(null)).append("\n");
 		sb.append("Name: ").append(user.getName()).append("\n");
 		sb.append("Email: ").append(user.getEmail()).append("\n");
 		sb.append("OpenID: ").append(user.getOpenId()).append("\n");
@@ -418,45 +445,24 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		sb.append("Host: ").append(host).append("\n");
 		String subject = user.getLabel() + " registered on " + getBaseUrl();
 		try {
-			sendEmail(null, null, subject, sb.toString());
+			getEmailSender().sendEmail((String) null, null, subject, sb.toString());
 		} catch (Throwable ex) {
 			log.error("Sending notification email failed:", subject, ex);
 		}
 	}
 
-	public void sendEmail(String from, String to, String subject, String text) {
-		Session session = createSmtpSession();
-		if (session == null) return;
-		SystemConfig config = getSystemConfig();
+	private EmailSender emailSender;
 
-		if (Str.isBlank(from)) from = config.getSmtpFrom();
-		if (Str.isBlank(from)) {
-			log.error("Missing configuration: smtpFrom");
-			return;
-		}
-
-		if (Str.isBlank(to)) to = config.getAdminEmail();
-		if (Str.isBlank(to)) {
-			log.error("Missing configuration: adminEmail");
-			return;
-		}
-
-		if (Str.isBlank(subject)) subject = "Kunagi";
-
-		MimeMessage message = Eml.createTextMessage(session, subject, text, from, to);
-		Eml.sendSmtpMessage(session, message);
+	public EmailSender getEmailSender() {
+		if (emailSender == null) emailSender = autowire(new EmailSender());
+		return emailSender;
 	}
 
-	public Session createSmtpSession() {
-		SystemConfig config = getSystemConfig();
-		String smtpServer = config.getSmtpServer();
-		Integer smtpPort = config.getSmtpPort();
-		boolean smtpTls = config.isSmtpTls();
-		if (smtpServer == null) {
-			log.error("Missing configuration: smtpServer");
-			return null;
-		}
-		return Eml.createSmtpSession(smtpServer, smtpPort, smtpTls, config.getSmtpUser(), config.getSmtpPassword());
+	private SubscriptionService subscriptionService;
+
+	public SubscriptionService getSubscriptionService() {
+		if (subscriptionService == null) subscriptionService = autowire(new SubscriptionService());
+		return subscriptionService;
 	}
 
 }

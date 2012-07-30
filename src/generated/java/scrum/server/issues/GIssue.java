@@ -238,7 +238,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareType(java.lang.String type) {
-        type = Str.removeUnreadableChars(type);
+        // type = Str.removeUnreadableChars(type);
         return type;
     }
 
@@ -362,7 +362,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -398,7 +398,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareDescription(java.lang.String description) {
-        description = Str.removeUnreadableChars(description);
+        // description = Str.removeUnreadableChars(description);
         return description;
     }
 
@@ -434,7 +434,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareStatement(java.lang.String statement) {
-        statement = Str.removeUnreadableChars(statement);
+        // statement = Str.removeUnreadableChars(statement);
         return statement;
     }
 
@@ -470,7 +470,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareIssuerName(java.lang.String issuerName) {
-        issuerName = Str.removeUnreadableChars(issuerName);
+        // issuerName = Str.removeUnreadableChars(issuerName);
         return issuerName;
     }
 
@@ -506,7 +506,7 @@ public abstract class GIssue
     }
 
     protected java.lang.String prepareIssuerEmail(java.lang.String issuerEmail) {
-        issuerEmail = Str.removeUnreadableChars(issuerEmail);
+        // issuerEmail = Str.removeUnreadableChars(issuerEmail);
         return issuerEmail;
     }
 

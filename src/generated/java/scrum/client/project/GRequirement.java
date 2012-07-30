@@ -227,6 +227,7 @@ public abstract class GRequirement
 
     public final Requirement setLabel(java.lang.String label) {
         if (isLabel(label)) return (Requirement)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Requirement)this;
@@ -457,20 +458,20 @@ public abstract class GRequirement
 
     // --- rejectDate ---
 
-    private ilarkesto.gwt.client.Date rejectDate ;
+    private ilarkesto.core.time.Date rejectDate ;
 
-    public final ilarkesto.gwt.client.Date getRejectDate() {
+    public final ilarkesto.core.time.Date getRejectDate() {
         return this.rejectDate ;
     }
 
-    public final Requirement setRejectDate(ilarkesto.gwt.client.Date rejectDate) {
+    public final Requirement setRejectDate(ilarkesto.core.time.Date rejectDate) {
         if (isRejectDate(rejectDate)) return (Requirement)this;
         this.rejectDate = rejectDate ;
         propertyChanged("rejectDate", this.rejectDate);
         return (Requirement)this;
     }
 
-    public final boolean isRejectDate(ilarkesto.gwt.client.Date rejectDate) {
+    public final boolean isRejectDate(ilarkesto.core.time.Date rejectDate) {
         return equals(this.rejectDate, rejectDate);
     }
 
@@ -491,17 +492,17 @@ public abstract class GRequirement
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getRejectDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setRejectDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -760,6 +761,31 @@ public abstract class GRequirement
     }
 
 
+    // --- epic ---
+
+    private String epicId;
+
+    public final scrum.client.project.Requirement getEpic() {
+        if (epicId == null) return null;
+        return getDao().getRequirement(this.epicId);
+    }
+
+    public final boolean isEpicSet() {
+        return epicId != null;
+    }
+
+    public final Requirement setEpic(scrum.client.project.Requirement epic) {
+        String id = epic == null ? null : epic.getId();
+        if (equals(this.epicId, id)) return (Requirement) this;
+        this.epicId = id;
+        propertyChanged("epicId", this.epicId);
+        return (Requirement)this;
+    }
+
+    public final boolean isEpic(scrum.client.project.Requirement epic) {
+        return equals(this.epicId, epic);
+    }
+
     // --- update properties by map ---
 
     public void updateProperties(Map props) {
@@ -773,13 +799,14 @@ public abstract class GRequirement
         testDescription  = (java.lang.String) props.get("testDescription");
         estimatedWork  = (java.lang.Float) props.get("estimatedWork");
         String rejectDateAsString = (String) props.get("rejectDate");
-        rejectDate  =  rejectDateAsString == null ? null : new ilarkesto.gwt.client.Date(rejectDateAsString);
+        rejectDate  =  rejectDateAsString == null ? null : new ilarkesto.core.time.Date(rejectDateAsString);
         closed  = (Boolean) props.get("closed");
         dirty  = (Boolean) props.get("dirty");
         workEstimationVotingActive  = (Boolean) props.get("workEstimationVotingActive");
         workEstimationVotingShowoff  = (Boolean) props.get("workEstimationVotingShowoff");
         tasksOrderIds  = (java.util.List<java.lang.String>) props.get("tasksOrderIds");
         themes  = (java.util.List<java.lang.String>) props.get("themes");
+        epicId = (String) props.get("epicId");
         updateLocalModificationTime();
     }
 
@@ -802,10 +829,19 @@ public abstract class GRequirement
         properties.put("workEstimationVotingShowoff", this.workEstimationVotingShowoff);
         properties.put("tasksOrderIds", this.tasksOrderIds);
         properties.put("themes", this.themes);
+        properties.put("epicId", this.epicId);
     }
 
     public final java.util.List<scrum.client.issues.Issue> getIssues() {
         return getDao().getIssuesByStory((Requirement)this);
+    }
+
+    public final java.util.List<scrum.client.project.Requirement> getRequirements() {
+        return getDao().getRequirementsByEpic((Requirement)this);
+    }
+
+    public final java.util.List<scrum.client.sprint.SprintReport> getSprintReports() {
+        return getDao().getSprintReportsByCompletedRequirement((Requirement)this);
     }
 
     public final java.util.List<scrum.client.sprint.Task> getTasks() {

@@ -207,7 +207,7 @@ public class ChartTest extends ATest {
 			themes.add(themeNames[Utl.randomInt(0, themeNames.length - 1)]);
 			story.setThemes(themes);
 			for (int j = 1; j <= 3; j++) {
-				TestUtil.createTask(story, j, 16);
+				TestUtil.createTask(story, j, 16, Utl.randomInt(0, 15));
 			}
 		}
 		for (int i = 6; i <= 10; i++) {

@@ -142,6 +142,7 @@ public abstract class GImpediment
 
     public final Impediment setLabel(java.lang.String label) {
         if (isLabel(label)) return (Impediment)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Impediment)this;
@@ -192,20 +193,21 @@ public abstract class GImpediment
 
     // --- date ---
 
-    private ilarkesto.gwt.client.Date date ;
+    private ilarkesto.core.time.Date date ;
 
-    public final ilarkesto.gwt.client.Date getDate() {
+    public final ilarkesto.core.time.Date getDate() {
         return this.date ;
     }
 
-    public final Impediment setDate(ilarkesto.gwt.client.Date date) {
+    public final Impediment setDate(ilarkesto.core.time.Date date) {
         if (isDate(date)) return (Impediment)this;
+        if (date == null) throw new RuntimeException("Field is mandatory.");
         this.date = date ;
         propertyChanged("date", this.date);
         return (Impediment)this;
     }
 
-    public final boolean isDate(ilarkesto.gwt.client.Date date) {
+    public final boolean isDate(ilarkesto.core.time.Date date) {
         return equals(this.date, date);
     }
 
@@ -226,12 +228,12 @@ public abstract class GImpediment
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setDate(value);
         }
 
@@ -241,7 +243,7 @@ public abstract class GImpediment
         public String getTooltip() { return "The date the Impediment came up."; }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -424,7 +426,7 @@ public abstract class GImpediment
         number  = (Integer) props.get("number");
         label  = (java.lang.String) props.get("label");
         String dateAsString = (String) props.get("date");
-        date  =  dateAsString == null ? null : new ilarkesto.gwt.client.Date(dateAsString);
+        date  =  dateAsString == null ? null : new ilarkesto.core.time.Date(dateAsString);
         description  = (java.lang.String) props.get("description");
         solution  = (java.lang.String) props.get("solution");
         closed  = (Boolean) props.get("closed");

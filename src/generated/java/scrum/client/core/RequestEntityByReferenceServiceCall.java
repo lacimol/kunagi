@@ -11,8 +11,8 @@ public class RequestEntityByReferenceServiceCall extends scrum.client.core.AServ
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestEntityByReference(serviceCaller.getConversationNumber(), reference, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestEntityByReference(serviceCaller.getConversationNumber(), reference, new DefaultCallback(this, returnHandler));
     }
 
     @Override

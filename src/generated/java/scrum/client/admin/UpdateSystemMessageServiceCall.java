@@ -11,8 +11,8 @@ public class UpdateSystemMessageServiceCall extends scrum.client.core.AServiceCa
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().updateSystemMessage(serviceCaller.getConversationNumber(), systemMessage, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().updateSystemMessage(serviceCaller.getConversationNumber(), systemMessage, new DefaultCallback(this, returnHandler));
     }
 
     @Override

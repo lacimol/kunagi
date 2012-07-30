@@ -56,6 +56,7 @@ public abstract class GProject
 
     public final Project setLabel(java.lang.String label) {
         if (isLabel(label)) return (Project)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         if (label != null && getDao().getProjectByLabel(label) != null) throw new RuntimeException("\"" + label + "\" already exists.");
         this.label = label ;
         propertyChanged("label", this.label);
@@ -391,20 +392,20 @@ public abstract class GProject
 
     // --- begin ---
 
-    private ilarkesto.gwt.client.Date begin ;
+    private ilarkesto.core.time.Date begin ;
 
-    public final ilarkesto.gwt.client.Date getBegin() {
+    public final ilarkesto.core.time.Date getBegin() {
         return this.begin ;
     }
 
-    public final Project setBegin(ilarkesto.gwt.client.Date begin) {
+    public final Project setBegin(ilarkesto.core.time.Date begin) {
         if (isBegin(begin)) return (Project)this;
         this.begin = begin ;
         propertyChanged("begin", this.begin);
         return (Project)this;
     }
 
-    public final boolean isBegin(ilarkesto.gwt.client.Date begin) {
+    public final boolean isBegin(ilarkesto.core.time.Date begin) {
         return equals(this.begin, begin);
     }
 
@@ -425,17 +426,17 @@ public abstract class GProject
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getBegin();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setBegin(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -444,20 +445,20 @@ public abstract class GProject
 
     // --- end ---
 
-    private ilarkesto.gwt.client.Date end ;
+    private ilarkesto.core.time.Date end ;
 
-    public final ilarkesto.gwt.client.Date getEnd() {
+    public final ilarkesto.core.time.Date getEnd() {
         return this.end ;
     }
 
-    public final Project setEnd(ilarkesto.gwt.client.Date end) {
+    public final Project setEnd(ilarkesto.core.time.Date end) {
         if (isEnd(end)) return (Project)this;
         this.end = end ;
         propertyChanged("end", this.end);
         return (Project)this;
     }
 
-    public final boolean isEnd(ilarkesto.gwt.client.Date end) {
+    public final boolean isEnd(ilarkesto.core.time.Date end) {
         return equals(this.end, end);
     }
 
@@ -478,17 +479,17 @@ public abstract class GProject
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getEnd();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setEnd(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -1852,6 +1853,61 @@ public abstract class GProject
 
     }
 
+    // --- releaseScriptPath ---
+
+    private java.lang.String releaseScriptPath ;
+
+    public final java.lang.String getReleaseScriptPath() {
+        return this.releaseScriptPath ;
+    }
+
+    public final Project setReleaseScriptPath(java.lang.String releaseScriptPath) {
+        if (isReleaseScriptPath(releaseScriptPath)) return (Project)this;
+        this.releaseScriptPath = releaseScriptPath ;
+        propertyChanged("releaseScriptPath", this.releaseScriptPath);
+        return (Project)this;
+    }
+
+    public final boolean isReleaseScriptPath(java.lang.String releaseScriptPath) {
+        return equals(this.releaseScriptPath, releaseScriptPath);
+    }
+
+    private transient ReleaseScriptPathModel releaseScriptPathModel;
+
+    public ReleaseScriptPathModel getReleaseScriptPathModel() {
+        if (releaseScriptPathModel == null) releaseScriptPathModel = createReleaseScriptPathModel();
+        return releaseScriptPathModel;
+    }
+
+    protected ReleaseScriptPathModel createReleaseScriptPathModel() { return new ReleaseScriptPathModel(); }
+
+    protected class ReleaseScriptPathModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "Project_releaseScriptPath";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getReleaseScriptPath();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setReleaseScriptPath(value);
+        }
+        @Override
+        public String getTooltip() { return "Full path to the script, which needs to be executed when publishing a release. The Script recives the release label as the first argument."; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- supportEmail ---
 
     private java.lang.String supportEmail ;
@@ -1965,22 +2021,80 @@ public abstract class GProject
 
     }
 
+    // --- subscriberNotificationTemplate ---
+
+    private java.lang.String subscriberNotificationTemplate ;
+
+    public final java.lang.String getSubscriberNotificationTemplate() {
+        return this.subscriberNotificationTemplate ;
+    }
+
+    public final Project setSubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        if (isSubscriberNotificationTemplate(subscriberNotificationTemplate)) return (Project)this;
+        this.subscriberNotificationTemplate = subscriberNotificationTemplate ;
+        propertyChanged("subscriberNotificationTemplate", this.subscriberNotificationTemplate);
+        return (Project)this;
+    }
+
+    public final boolean isSubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        return equals(this.subscriberNotificationTemplate, subscriberNotificationTemplate);
+    }
+
+    private transient SubscriberNotificationTemplateModel subscriberNotificationTemplateModel;
+
+    public SubscriberNotificationTemplateModel getSubscriberNotificationTemplateModel() {
+        if (subscriberNotificationTemplateModel == null) subscriberNotificationTemplateModel = createSubscriberNotificationTemplateModel();
+        return subscriberNotificationTemplateModel;
+    }
+
+    protected SubscriberNotificationTemplateModel createSubscriberNotificationTemplateModel() { return new SubscriberNotificationTemplateModel(); }
+
+    protected class SubscriberNotificationTemplateModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "Project_subscriberNotificationTemplate";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getSubscriberNotificationTemplate();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setSubscriberNotificationTemplate(value);
+        }
+
+        @Override
+        public boolean isRichtext() { return true; }
+        @Override
+        public String getTooltip() { return "Text template, which to use when sending change notifications to subscribers.<br><br>The following variables can be used: ${entity.reference} ${entity.label} ${change.message} ${unsubscribe.url} ${unsubscribeall.url} ${homepage.url} ${product.label} ${project.label} ${project.id} ${kunagi.instance} ${kunagi.url}"; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- lastOpenedDateAndTime ---
 
-    private ilarkesto.gwt.client.DateAndTime lastOpenedDateAndTime ;
+    private ilarkesto.core.time.DateAndTime lastOpenedDateAndTime ;
 
-    public final ilarkesto.gwt.client.DateAndTime getLastOpenedDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getLastOpenedDateAndTime() {
         return this.lastOpenedDateAndTime ;
     }
 
-    public final Project setLastOpenedDateAndTime(ilarkesto.gwt.client.DateAndTime lastOpenedDateAndTime) {
+    public final Project setLastOpenedDateAndTime(ilarkesto.core.time.DateAndTime lastOpenedDateAndTime) {
         if (isLastOpenedDateAndTime(lastOpenedDateAndTime)) return (Project)this;
         this.lastOpenedDateAndTime = lastOpenedDateAndTime ;
         propertyChanged("lastOpenedDateAndTime", this.lastOpenedDateAndTime);
         return (Project)this;
     }
 
-    public final boolean isLastOpenedDateAndTime(ilarkesto.gwt.client.DateAndTime lastOpenedDateAndTime) {
+    public final boolean isLastOpenedDateAndTime(ilarkesto.core.time.DateAndTime lastOpenedDateAndTime) {
         return equals(this.lastOpenedDateAndTime, lastOpenedDateAndTime);
     }
 
@@ -2001,17 +2115,17 @@ public abstract class GProject
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getLastOpenedDateAndTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setLastOpenedDateAndTime(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -2083,6 +2197,64 @@ public abstract class GProject
 
     }
 
+    // --- releasingInfo ---
+
+    private java.lang.String releasingInfo ;
+
+    public final java.lang.String getReleasingInfo() {
+        return this.releasingInfo ;
+    }
+
+    public final Project setReleasingInfo(java.lang.String releasingInfo) {
+        if (isReleasingInfo(releasingInfo)) return (Project)this;
+        this.releasingInfo = releasingInfo ;
+        propertyChanged("releasingInfo", this.releasingInfo);
+        return (Project)this;
+    }
+
+    public final boolean isReleasingInfo(java.lang.String releasingInfo) {
+        return equals(this.releasingInfo, releasingInfo);
+    }
+
+    private transient ReleasingInfoModel releasingInfoModel;
+
+    public ReleasingInfoModel getReleasingInfoModel() {
+        if (releasingInfoModel == null) releasingInfoModel = createReleasingInfoModel();
+        return releasingInfoModel;
+    }
+
+    protected ReleasingInfoModel createReleasingInfoModel() { return new ReleasingInfoModel(); }
+
+    protected class ReleasingInfoModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "Project_releasingInfo";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getReleasingInfo();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setReleasingInfo(value);
+        }
+
+        @Override
+        public boolean isRichtext() { return true; }
+        @Override
+        public String getTooltip() { return "Custom info text for the releases page. Could be used for a release checklist."; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- update properties by map ---
 
     public void updateProperties(Map props) {
@@ -2093,9 +2265,9 @@ public abstract class GProject
         description  = (java.lang.String) props.get("description");
         longDescription  = (java.lang.String) props.get("longDescription");
         String beginAsString = (String) props.get("begin");
-        begin  =  beginAsString == null ? null : new ilarkesto.gwt.client.Date(beginAsString);
+        begin  =  beginAsString == null ? null : new ilarkesto.core.time.Date(beginAsString);
         String endAsString = (String) props.get("end");
-        end  =  endAsString == null ? null : new ilarkesto.gwt.client.Date(endAsString);
+        end  =  endAsString == null ? null : new ilarkesto.core.time.Date(endAsString);
         participantsIds = (Set<String>) props.get("participantsIds");
         adminsIds = (Set<String>) props.get("adminsIds");
         productOwnersIds = (Set<String>) props.get("productOwnersIds");
@@ -2123,11 +2295,14 @@ public abstract class GProject
         homepageDir  = (java.lang.String) props.get("homepageDir");
         homepageUrl  = (java.lang.String) props.get("homepageUrl");
         autoUpdateHomepage  = (Boolean) props.get("autoUpdateHomepage");
+        releaseScriptPath  = (java.lang.String) props.get("releaseScriptPath");
         supportEmail  = (java.lang.String) props.get("supportEmail");
         issueReplyTemplate  = (java.lang.String) props.get("issueReplyTemplate");
+        subscriberNotificationTemplate  = (java.lang.String) props.get("subscriberNotificationTemplate");
         String lastOpenedDateAndTimeAsString = (String) props.get("lastOpenedDateAndTime");
-        lastOpenedDateAndTime  =  lastOpenedDateAndTimeAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(lastOpenedDateAndTimeAsString);
+        lastOpenedDateAndTime  =  lastOpenedDateAndTimeAsString == null ? null : new ilarkesto.core.time.DateAndTime(lastOpenedDateAndTimeAsString);
         freeDays  = (Integer) props.get("freeDays");
+        releasingInfo  = (java.lang.String) props.get("releasingInfo");
         updateLocalModificationTime();
     }
 
@@ -2169,14 +2344,29 @@ public abstract class GProject
         properties.put("homepageDir", this.homepageDir);
         properties.put("homepageUrl", this.homepageUrl);
         properties.put("autoUpdateHomepage", this.autoUpdateHomepage);
+        properties.put("releaseScriptPath", this.releaseScriptPath);
         properties.put("supportEmail", this.supportEmail);
         properties.put("issueReplyTemplate", this.issueReplyTemplate);
+        properties.put("subscriberNotificationTemplate", this.subscriberNotificationTemplate);
         properties.put("lastOpenedDateAndTime", this.lastOpenedDateAndTime == null ? null : this.lastOpenedDateAndTime.toString());
         properties.put("freeDays", this.freeDays);
+        properties.put("releasingInfo", this.releasingInfo);
     }
 
     public final java.util.List<scrum.client.sprint.Sprint> getSprints() {
         return getDao().getSprintsByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigs() {
+        return getDao().getProjectUserConfigsByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.project.Quality> getQualitys() {
+        return getDao().getQualitysByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.impediments.Impediment> getImpediments() {
+        return getDao().getImpedimentsByProject((Project)this);
     }
 
     public final java.util.List<scrum.client.project.Requirement> getRequirements() {
@@ -2189,30 +2379,6 @@ public abstract class GProject
 
     public final java.util.List<scrum.client.release.Release> getReleases() {
         return getDao().getReleasesByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.project.Quality> getQualitys() {
-        return getDao().getQualitysByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.impediments.Impediment> getImpediments() {
-        return getDao().getImpedimentsByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigs() {
-        return getDao().getProjectUserConfigsByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.pr.BlogEntry> getBlogEntrys() {
-        return getDao().getBlogEntrysByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.risks.Risk> getRisks() {
-        return getDao().getRisksByProject((Project)this);
-    }
-
-    public final java.util.List<scrum.client.collaboration.Wikipage> getWikipages() {
-        return getDao().getWikipagesByProject((Project)this);
     }
 
     public final java.util.List<scrum.client.journal.ProjectEvent> getProjectEvents() {
@@ -2229,6 +2395,18 @@ public abstract class GProject
 
     public final java.util.List<scrum.client.collaboration.ChatMessage> getChatMessages() {
         return getDao().getChatMessagesByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.pr.BlogEntry> getBlogEntrys() {
+        return getDao().getBlogEntrysByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.risks.Risk> getRisks() {
+        return getDao().getRisksByProject((Project)this);
+    }
+
+    public final java.util.List<scrum.client.collaboration.Wikipage> getWikipages() {
+        return getDao().getWikipagesByProject((Project)this);
     }
 
     public final java.util.List<scrum.client.files.File> getFiles() {

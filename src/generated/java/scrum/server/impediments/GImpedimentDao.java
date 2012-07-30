@@ -85,7 +85,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByProject(scrum.server.project.Project project) {
-        return impedimentsByProjectCache.get(project);
+        return new HashSet<Impediment>(impedimentsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -125,7 +125,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByNumber(int number) {
-        return impedimentsByNumberCache.get(number);
+        return new HashSet<Impediment>(impedimentsByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -165,7 +165,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByLabel(java.lang.String label) {
-        return impedimentsByLabelCache.get(label);
+        return new HashSet<Impediment>(impedimentsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -205,7 +205,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByDate(ilarkesto.base.time.Date date) {
-        return impedimentsByDateCache.get(date);
+        return new HashSet<Impediment>(impedimentsByDateCache.get(date));
     }
     private Set<ilarkesto.base.time.Date> datesCache;
 
@@ -245,7 +245,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByDescription(java.lang.String description) {
-        return impedimentsByDescriptionCache.get(description);
+        return new HashSet<Impediment>(impedimentsByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -285,7 +285,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsBySolution(java.lang.String solution) {
-        return impedimentsBySolutionCache.get(solution);
+        return new HashSet<Impediment>(impedimentsBySolutionCache.get(solution));
     }
     private Set<java.lang.String> solutionsCache;
 
@@ -325,7 +325,7 @@ public abstract class GImpedimentDao
             });
 
     public final Set<Impediment> getImpedimentsByClosed(boolean closed) {
-        return impedimentsByClosedCache.get(closed);
+        return new HashSet<Impediment>(impedimentsByClosedCache.get(closed));
     }
 
     private static class IsClosed implements Predicate<Impediment> {

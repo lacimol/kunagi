@@ -11,8 +11,8 @@ public class RequestRequirementEstimationVotesServiceCall extends scrum.client.c
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestRequirementEstimationVotes(serviceCaller.getConversationNumber(), requirementId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestRequirementEstimationVotes(serviceCaller.getConversationNumber(), requirementId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

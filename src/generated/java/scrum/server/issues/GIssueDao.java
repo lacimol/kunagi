@@ -114,7 +114,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByProject(scrum.server.project.Project project) {
-        return issuesByProjectCache.get(project);
+        return new HashSet<Issue>(issuesByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -154,7 +154,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByStory(scrum.server.project.Requirement story) {
-        return issuesByStoryCache.get(story);
+        return new HashSet<Issue>(issuesByStoryCache.get(story));
     }
     private Set<scrum.server.project.Requirement> storysCache;
 
@@ -194,7 +194,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByNumber(int number) {
-        return issuesByNumberCache.get(number);
+        return new HashSet<Issue>(issuesByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -234,7 +234,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByType(java.lang.String type) {
-        return issuesByTypeCache.get(type);
+        return new HashSet<Issue>(issuesByTypeCache.get(type));
     }
     private Set<java.lang.String> typesCache;
 
@@ -274,7 +274,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByDate(ilarkesto.base.time.DateAndTime date) {
-        return issuesByDateCache.get(date);
+        return new HashSet<Issue>(issuesByDateCache.get(date));
     }
     private Set<ilarkesto.base.time.DateAndTime> datesCache;
 
@@ -314,7 +314,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByCreator(scrum.server.admin.User creator) {
-        return issuesByCreatorCache.get(creator);
+        return new HashSet<Issue>(issuesByCreatorCache.get(creator));
     }
     private Set<scrum.server.admin.User> creatorsCache;
 
@@ -354,7 +354,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByLabel(java.lang.String label) {
-        return issuesByLabelCache.get(label);
+        return new HashSet<Issue>(issuesByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -394,7 +394,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByDescription(java.lang.String description) {
-        return issuesByDescriptionCache.get(description);
+        return new HashSet<Issue>(issuesByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -434,7 +434,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByStatement(java.lang.String statement) {
-        return issuesByStatementCache.get(statement);
+        return new HashSet<Issue>(issuesByStatementCache.get(statement));
     }
     private Set<java.lang.String> statementsCache;
 
@@ -474,7 +474,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByIssuerName(java.lang.String issuerName) {
-        return issuesByIssuerNameCache.get(issuerName);
+        return new HashSet<Issue>(issuesByIssuerNameCache.get(issuerName));
     }
     private Set<java.lang.String> issuerNamesCache;
 
@@ -514,7 +514,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByIssuerEmail(java.lang.String issuerEmail) {
-        return issuesByIssuerEmailCache.get(issuerEmail);
+        return new HashSet<Issue>(issuesByIssuerEmailCache.get(issuerEmail));
     }
     private Set<java.lang.String> issuerEmailsCache;
 
@@ -554,7 +554,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByAcceptDate(ilarkesto.base.time.Date acceptDate) {
-        return issuesByAcceptDateCache.get(acceptDate);
+        return new HashSet<Issue>(issuesByAcceptDateCache.get(acceptDate));
     }
     private Set<ilarkesto.base.time.Date> acceptDatesCache;
 
@@ -594,7 +594,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByUrgent(boolean urgent) {
-        return issuesByUrgentCache.get(urgent);
+        return new HashSet<Issue>(issuesByUrgentCache.get(urgent));
     }
 
     private static class IsUrgent implements Predicate<Issue> {
@@ -623,7 +623,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesBySeverity(int severity) {
-        return issuesBySeverityCache.get(severity);
+        return new HashSet<Issue>(issuesBySeverityCache.get(severity));
     }
     private Set<Integer> severitysCache;
 
@@ -663,7 +663,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByOwner(scrum.server.admin.User owner) {
-        return issuesByOwnerCache.get(owner);
+        return new HashSet<Issue>(issuesByOwnerCache.get(owner));
     }
     private Set<scrum.server.admin.User> ownersCache;
 
@@ -703,7 +703,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByFixDate(ilarkesto.base.time.Date fixDate) {
-        return issuesByFixDateCache.get(fixDate);
+        return new HashSet<Issue>(issuesByFixDateCache.get(fixDate));
     }
     private Set<ilarkesto.base.time.Date> fixDatesCache;
 
@@ -743,7 +743,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByCloseDate(ilarkesto.base.time.Date closeDate) {
-        return issuesByCloseDateCache.get(closeDate);
+        return new HashSet<Issue>(issuesByCloseDateCache.get(closeDate));
     }
     private Set<ilarkesto.base.time.Date> closeDatesCache;
 
@@ -783,7 +783,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesBySuspendedUntilDate(ilarkesto.base.time.Date suspendedUntilDate) {
-        return issuesBySuspendedUntilDateCache.get(suspendedUntilDate);
+        return new HashSet<Issue>(issuesBySuspendedUntilDateCache.get(suspendedUntilDate));
     }
     private Set<ilarkesto.base.time.Date> suspendedUntilDatesCache;
 
@@ -823,7 +823,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByAffectedRelease(scrum.server.release.Release affectedRelease) {
-        return issuesByAffectedReleaseCache.get(affectedRelease);
+        return new HashSet<Issue>(issuesByAffectedReleaseCache.get(affectedRelease));
     }
     private Set<scrum.server.release.Release> affectedReleasesCache;
 
@@ -863,7 +863,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByFixRelease(scrum.server.release.Release fixRelease) {
-        return issuesByFixReleaseCache.get(fixRelease);
+        return new HashSet<Issue>(issuesByFixReleaseCache.get(fixRelease));
     }
     private Set<scrum.server.release.Release> fixReleasesCache;
 
@@ -903,7 +903,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByPublished(boolean published) {
-        return issuesByPublishedCache.get(published);
+        return new HashSet<Issue>(issuesByPublishedCache.get(published));
     }
 
     private static class IsPublished implements Predicate<Issue> {
@@ -932,7 +932,7 @@ public abstract class GIssueDao
             });
 
     public final Set<Issue> getIssuesByTheme(java.lang.String theme) {
-        return issuesByThemeCache.get(theme);
+        return new HashSet<Issue>(issuesByThemeCache.get(theme));
     }
     private Set<java.lang.String> themesCache;
 

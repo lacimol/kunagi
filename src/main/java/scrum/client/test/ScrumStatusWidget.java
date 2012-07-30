@@ -1,10 +1,26 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.test;
 
+import ilarkesto.core.base.Str;
 import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.gwt.client.ButtonWidget;
-import ilarkesto.gwt.client.DateAndTime;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.TableBuilder;
+import ilarkesto.gwt.client.animation.AnimatingFlowPanel;
 
 import java.util.Map;
 
@@ -14,6 +30,7 @@ import scrum.client.ScrumGwtApplication;
 import scrum.client.collaboration.Comment;
 import scrum.client.common.AScrumAction;
 import scrum.client.common.AScrumWidget;
+import scrum.client.core.DeleteEntityServiceCall;
 import scrum.client.core.ServiceCaller;
 import scrum.client.issues.Issue;
 import scrum.client.project.Requirement;
@@ -61,6 +78,9 @@ public class ScrumStatusWidget extends AScrumWidget {
 		TableBuilder tb = new TableBuilder();
 		tb.setWidth(null);
 		tb.setCellPadding(5);
+		tb.addRow(new ButtonWidget(new ToggleListAnimationsAction()));
+		tb.addRow(new ButtonWidget(new ThrowExceptionAction()));
+		tb.addRow(new ButtonWidget(new ThrowServerExceptionAction()));
 		tb.addRow(new ButtonWidget(new ShowWidgetsTesterAction()));
 		tb.addRow(new ButtonWidget(new GenerateRequirementsAction()));
 		tb.addRow(new ButtonWidget(new GenerateIssuesAction()));
@@ -84,11 +104,51 @@ public class ScrumStatusWidget extends AScrumWidget {
 
 	private Widget createStateInformation() {
 		TableBuilder tb = ScrumGwt.createFieldTable();
-		tb.addFieldRow("activeServiceCallCount", new Label(String.valueOf(serviceCaller.getActiveServiceCallCount())));
+		tb.addFieldRow("activeServiceCallCount",
+			new Label(String.valueOf(Str.concat(serviceCaller.getActiveServiceCalls(), ", "))));
 		tb.addFieldRow("conversationNumber", new Label(String.valueOf(serviceCaller.getConversationNumber())));
 		tb.addFieldRow("entityIdBase", new Label(dao.getEntityIdBase()));
 		tb.addFieldRow("entityIdCounter", new Label(String.valueOf(dao.getEntityIdCounter())));
 		return tb.createTable();
+	}
+
+	class ToggleListAnimationsAction extends AScrumAction {
+
+		@Override
+		public String getLabel() {
+			return AnimatingFlowPanel.animationsDisabled ? "Enable list animations" : "Disable list animations";
+		}
+
+		@Override
+		protected void onExecute() {
+			AnimatingFlowPanel.animationsDisabled = !AnimatingFlowPanel.animationsDisabled;
+		}
+	}
+
+	class ThrowExceptionAction extends AScrumAction {
+
+		@Override
+		public String getLabel() {
+			return "Throw Client Exception";
+		}
+
+		@Override
+		protected void onExecute() {
+			throw new RuntimeException("User initiated exception.<br>:-D");
+		}
+	}
+
+	class ThrowServerExceptionAction extends AScrumAction {
+
+		@Override
+		public String getLabel() {
+			return "Throw Server Exception";
+		}
+
+		@Override
+		protected void onExecute() {
+			new DeleteEntityServiceCall("bad-entity-id").execute();
+		}
 	}
 
 	class ShowWidgetsTesterAction extends AScrumAction {

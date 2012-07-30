@@ -23,8 +23,8 @@ public class SendIssueReplyEmailServiceCall extends scrum.client.core.AServiceCa
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().sendIssueReplyEmail(serviceCaller.getConversationNumber(), issueId, from, to, subject, text, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().sendIssueReplyEmail(serviceCaller.getConversationNumber(), issueId, from, to, subject, text, new DefaultCallback(this, returnHandler));
     }
 
     @Override

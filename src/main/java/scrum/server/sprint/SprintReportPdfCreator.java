@@ -1,5 +1,20 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.sprint;
 
+import ilarkesto.base.time.Date;
 import ilarkesto.pdf.ACell;
 import ilarkesto.pdf.AParagraph;
 import ilarkesto.pdf.APdfContainerElement;
@@ -11,22 +26,21 @@ import ilarkesto.pdf.FontStyle;
 import java.awt.Color;
 import java.util.List;
 
+import scrum.client.sprint.SprintHistoryHelper;
+import scrum.client.sprint.SprintHistoryHelper.StoryInfo;
+import scrum.client.sprint.SprintHistoryHelper.TaskInfo;
 import scrum.server.common.APdfCreator;
-import scrum.server.common.AccomplishChart;
 import scrum.server.common.BurndownChart;
-import scrum.server.common.EfficiencyChart;
 import scrum.server.common.ScrumPdfContext;
-import scrum.server.common.UserBurndownChart;
 import scrum.server.common.WikiToPdfConverter;
-import scrum.server.sprint.SprintReportHelper.StoryInfo;
-import scrum.server.sprint.SprintReportHelper.TaskInfo;
+import scrum.server.project.Requirement;
 
 public class SprintReportPdfCreator extends APdfCreator {
 
 	private Sprint sprint;
 
 	public SprintReportPdfCreator(Sprint sprint) {
-		super();
+		super(sprint.getProject());
 		this.sprint = sprint;
 	}
 
@@ -34,71 +48,54 @@ public class SprintReportPdfCreator extends APdfCreator {
 	protected void build(APdfContainerElement pdf) {
 		reportHeader(pdf, "Sprint Report", sprint.getProject().getLabel());
 
+		SprintReport report = sprint.getSprintReport();
+
 		pdf.nl();
 		FieldList fields = pdf.fieldList().setLabelFontStyle(fieldLabelFont);
-		fields.field("Sprint").text(sprint.getLabel());
+		fields.field("Sprint").paragraph().text(sprint.getReference() + " ", referenceFont).text(sprint.getLabel());
 		fields.field("Period").text(
-			sprint.getBegin() + " - " + sprint.getEnd() + " / " + sprint.getLengthInDays() + " days");
-		fields.field("Velocity").text(sprint.getVelocity() == null ? 0 : sprint.getVelocity() + " StoryPoints");
-		fields.field("Burned work").text(
-			getBurnedWork(sprint.getCompletedRequirementsData())
-					+ getBurnedWork(sprint.getIncompletedRequirementsData()) + " hours");
+			sprint.getBegin().toString(Date.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY) + "  -  "
+					+ sprint.getEnd().toString(Date.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY) + "   ("
+					+ sprint.getLengthInDays() + " days)");
+		fields.field("Velocity").text(sprint.getVelocity() + " StoryPoints");
+		int burnedWork = report == null ? getBurnedWork(sprint.getIncompletedRequirementsData())
+				+ getBurnedWork(sprint.getCompletedRequirementsData()) : report.getBurnedWork();
+		fields.field("Burned work").text(burnedWork + " hours");
 		fields.field("Product Owner").text(sprint.getProductOwnersAsString());
 		fields.field("Scrum Master").text(sprint.getScrumMastersAsString());
 		fields.field("Team").text(sprint.getTeamMembersAsString());
 
-		buildCharts(pdf);
+		pdf.nl();
+		pdf.image(BurndownChart.createBurndownChartAsByteArray(sprint, 1000, 500)).setScaleByWidth(150f);
 
+		ScrumPdfContext pdfContext = new ScrumPdfContext(sprint.getProject());
 		if (sprint.isGoalSet()) {
 			sectionHeader(pdf, "Goal");
-			WikiToPdfConverter.buildPdf(pdf, sprint.getGoal(), new ScrumPdfContext());
+			WikiToPdfConverter.buildPdf(pdf, sprint.getGoal(), pdfContext);
 		}
 
-		if (sprint.isCompletedRequirementLabelsSet()) {
-			sectionHeader(pdf, "Completed stories");
-			WikiToPdfConverter.buildPdf(pdf, sprint.getCompletedRequirementLabels(), new ScrumPdfContext());
+		if (report == null) {
+			requirements(pdf, "Completed stories", sprint.getCompletedRequirementsData());
+			requirements(pdf, "Rejected stories", sprint.getIncompletedRequirementsData());
+		} else {
+			requirements(pdf, "Completed stories", report.getCompletedRequirementsAsList(), report);
+			requirements(pdf, "Rejected stories", report.getRejectedRequirementsAsList(), report);
 		}
-
-		requirements(pdf, "Completed stories", sprint.getCompletedRequirementsData());
-		requirements(pdf, "Rejected stories", sprint.getIncompletedRequirementsData());
 
 		if (sprint.isReviewNoteSet()) {
 			sectionHeader(pdf, "Review notes");
-			WikiToPdfConverter.buildPdf(pdf, sprint.getReviewNote(), new ScrumPdfContext());
+			WikiToPdfConverter.buildPdf(pdf, sprint.getReviewNote(), pdfContext);
 		}
 
 		if (sprint.isRetrospectiveNoteSet()) {
 			sectionHeader(pdf, "Retrospecitve notes");
-			WikiToPdfConverter.buildPdf(pdf, sprint.getRetrospectiveNote(), new ScrumPdfContext());
+			WikiToPdfConverter.buildPdf(pdf, sprint.getRetrospectiveNote(), pdfContext);
 		}
 
 	}
 
-	private void buildCharts(APdfContainerElement pdf) {
-		pdf.nl();
-		pdf.text("BurndownChart").image(BurndownChart.createBurndownChartAsByteArray(sprint, 1000, 500))
-				.setScaleByWidth(150f);
-		pdf.nl();
-		pdf.text("EfficiencyChart").image(EfficiencyChart.createBurndownChartAsByteArray(sprint, 1000, 300))
-				.setScaleByWidth(150f);
-		pdf.nl();
-		pdf.text("AccomplishChart").image(AccomplishChart.createBurndownChartAsByteArray(sprint, 1000, 300))
-				.setScaleByWidth(150f);
-		pdf.nl();
-		pdf.text("TeamChart").image(UserBurndownChart.createBurndownChartAsByteArray(sprint, 1000, 300, null))
-				.setScaleByWidth(150f);
-		// XXX later
-		// for (User user : sprint.getProject().getTeamMembers()) {
-		// pdf.nl();
-		// pdf.text(user.getName())
-		// .image(UserBurndownChart.createBurndownChartAsByteArray(sprint, 800, 150, user.getName()))
-		// .setScaleByWidth(150f);
-		// }
-	}
-
 	private int getBurnedWork(String requirementsData) {
-		if (requirementsData == null) return 0;
-		List<StoryInfo> requirements = SprintReportHelper.parseRequirementsAndTasks(requirementsData);
+		List<StoryInfo> requirements = SprintHistoryHelper.parseRequirementsAndTasks(requirementsData);
 		if (requirements.isEmpty()) return 0;
 		int sum = 0;
 		for (StoryInfo req : requirements) {
@@ -107,8 +104,18 @@ public class SprintReportPdfCreator extends APdfCreator {
 		return sum;
 	}
 
+	private void requirements(APdfContainerElement pdf, String title, List<Requirement> requirements,
+			SprintReport report) {
+		if (requirements.isEmpty()) return;
+		sectionHeader(pdf, title);
+		for (Requirement req : requirements) {
+			requirement(pdf, req, report.getOpenTasks(req), report.getClosedTasks(req));
+		}
+	}
+
+	@Deprecated
 	private void requirements(APdfContainerElement pdf, String title, String requirementsData) {
-		List<StoryInfo> requirements = SprintReportHelper.parseRequirementsAndTasks(requirementsData);
+		List<StoryInfo> requirements = SprintHistoryHelper.parseRequirementsAndTasks(requirementsData);
 		if (requirements.isEmpty()) return;
 		sectionHeader(pdf, title);
 		for (StoryInfo req : requirements) {
@@ -116,6 +123,7 @@ public class SprintReportPdfCreator extends APdfCreator {
 		}
 	}
 
+	@Deprecated
 	private void requirement(APdfContainerElement pdf, StoryInfo req) {
 		pdf.nl();
 
@@ -145,7 +153,7 @@ public class SprintReportPdfCreator extends APdfCreator {
 
 	@Override
 	protected String getFilename() {
-		return "sprint";
+		return "report-" + sprint.getReference();
 	}
 
 }

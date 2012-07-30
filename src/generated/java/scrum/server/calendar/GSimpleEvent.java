@@ -140,7 +140,7 @@ public abstract class GSimpleEvent
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -278,7 +278,7 @@ public abstract class GSimpleEvent
     }
 
     protected java.lang.String prepareLocation(java.lang.String location) {
-        location = Str.removeUnreadableChars(location);
+        // location = Str.removeUnreadableChars(location);
         return location;
     }
 
@@ -349,7 +349,7 @@ public abstract class GSimpleEvent
     }
 
     protected java.lang.String prepareAgenda(java.lang.String agenda) {
-        agenda = Str.removeUnreadableChars(agenda);
+        // agenda = Str.removeUnreadableChars(agenda);
         return agenda;
     }
 
@@ -385,7 +385,7 @@ public abstract class GSimpleEvent
     }
 
     protected java.lang.String prepareNote(java.lang.String note) {
-        note = Str.removeUnreadableChars(note);
+        // note = Str.removeUnreadableChars(note);
         return note;
     }
 

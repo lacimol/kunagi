@@ -11,8 +11,8 @@ public class ConvertIssueToStoryServiceCall extends scrum.client.core.AServiceCa
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().convertIssueToStory(serviceCaller.getConversationNumber(), issueId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().convertIssueToStory(serviceCaller.getConversationNumber(), issueId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

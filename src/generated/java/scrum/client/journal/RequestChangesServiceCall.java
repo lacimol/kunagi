@@ -11,8 +11,8 @@ public class RequestChangesServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestChanges(serviceCaller.getConversationNumber(), parentId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestChanges(serviceCaller.getConversationNumber(), parentId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

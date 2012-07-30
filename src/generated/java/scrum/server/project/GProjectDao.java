@@ -110,14 +110,20 @@ public abstract class GProjectDao
         projectsByHomepageUrlCache.clear();
         homepageUrlsCache = null;
         projectsByAutoUpdateHomepageCache.clear();
+        projectsByReleaseScriptPathCache.clear();
+        releaseScriptPathsCache = null;
         projectsBySupportEmailCache.clear();
         supportEmailsCache = null;
         projectsByIssueReplyTemplateCache.clear();
         issueReplyTemplatesCache = null;
+        projectsBySubscriberNotificationTemplateCache.clear();
+        subscriberNotificationTemplatesCache = null;
         projectsByLastOpenedDateAndTimeCache.clear();
         lastOpenedDateAndTimesCache = null;
         projectsByFreeDaysCache.clear();
         freeDayssCache = null;
+        projectsByReleasingInfoCache.clear();
+        releasingInfosCache = null;
     }
 
     @Override
@@ -181,7 +187,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByVision(java.lang.String vision) {
-        return projectsByVisionCache.get(vision);
+        return new HashSet<Project>(projectsByVisionCache.get(vision));
     }
     private Set<java.lang.String> visionsCache;
 
@@ -221,7 +227,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByProductLabel(java.lang.String productLabel) {
-        return projectsByProductLabelCache.get(productLabel);
+        return new HashSet<Project>(projectsByProductLabelCache.get(productLabel));
     }
     private Set<java.lang.String> productLabelsCache;
 
@@ -261,7 +267,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByShortDescription(java.lang.String shortDescription) {
-        return projectsByShortDescriptionCache.get(shortDescription);
+        return new HashSet<Project>(projectsByShortDescriptionCache.get(shortDescription));
     }
     private Set<java.lang.String> shortDescriptionsCache;
 
@@ -301,7 +307,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByDescription(java.lang.String description) {
-        return projectsByDescriptionCache.get(description);
+        return new HashSet<Project>(projectsByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -341,7 +347,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLongDescription(java.lang.String longDescription) {
-        return projectsByLongDescriptionCache.get(longDescription);
+        return new HashSet<Project>(projectsByLongDescriptionCache.get(longDescription));
     }
     private Set<java.lang.String> longDescriptionsCache;
 
@@ -381,7 +387,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByBegin(ilarkesto.base.time.Date begin) {
-        return projectsByBeginCache.get(begin);
+        return new HashSet<Project>(projectsByBeginCache.get(begin));
     }
     private Set<ilarkesto.base.time.Date> beginsCache;
 
@@ -421,7 +427,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByEnd(ilarkesto.base.time.Date end) {
-        return projectsByEndCache.get(end);
+        return new HashSet<Project>(projectsByEndCache.get(end));
     }
     private Set<ilarkesto.base.time.Date> endsCache;
 
@@ -461,7 +467,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByParticipant(scrum.server.admin.User participant) {
-        return projectsByParticipantCache.get(participant);
+        return new HashSet<Project>(projectsByParticipantCache.get(participant));
     }
     private Set<scrum.server.admin.User> participantsCache;
 
@@ -501,7 +507,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByAdmin(scrum.server.admin.User admin) {
-        return projectsByAdminCache.get(admin);
+        return new HashSet<Project>(projectsByAdminCache.get(admin));
     }
     private Set<scrum.server.admin.User> adminsCache;
 
@@ -541,7 +547,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByProductOwner(scrum.server.admin.User productOwner) {
-        return projectsByProductOwnerCache.get(productOwner);
+        return new HashSet<Project>(projectsByProductOwnerCache.get(productOwner));
     }
     private Set<scrum.server.admin.User> productOwnersCache;
 
@@ -581,7 +587,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByScrumMaster(scrum.server.admin.User scrumMaster) {
-        return projectsByScrumMasterCache.get(scrumMaster);
+        return new HashSet<Project>(projectsByScrumMasterCache.get(scrumMaster));
     }
     private Set<scrum.server.admin.User> scrumMastersCache;
 
@@ -621,7 +627,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByTeamMember(scrum.server.admin.User teamMember) {
-        return projectsByTeamMemberCache.get(teamMember);
+        return new HashSet<Project>(projectsByTeamMemberCache.get(teamMember));
     }
     private Set<scrum.server.admin.User> teamMembersCache;
 
@@ -661,7 +667,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByCurrentSprint(scrum.server.sprint.Sprint currentSprint) {
-        return projectsByCurrentSprintCache.get(currentSprint);
+        return new HashSet<Project>(projectsByCurrentSprintCache.get(currentSprint));
     }
     private Set<scrum.server.sprint.Sprint> currentSprintsCache;
 
@@ -701,7 +707,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByNextSprint(scrum.server.sprint.Sprint nextSprint) {
-        return projectsByNextSprintCache.get(nextSprint);
+        return new HashSet<Project>(projectsByNextSprintCache.get(nextSprint));
     }
     private Set<scrum.server.sprint.Sprint> nextSprintsCache;
 
@@ -741,7 +747,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByVelocity(java.lang.Integer velocity) {
-        return projectsByVelocityCache.get(velocity);
+        return new HashSet<Project>(projectsByVelocityCache.get(velocity));
     }
     private Set<java.lang.Integer> velocitysCache;
 
@@ -781,7 +787,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByRequirementsOrderId(java.lang.String requirementsOrderId) {
-        return projectsByRequirementsOrderIdCache.get(requirementsOrderId);
+        return new HashSet<Project>(projectsByRequirementsOrderIdCache.get(requirementsOrderId));
     }
     private Set<java.lang.String> requirementsOrderIdsCache;
 
@@ -821,7 +827,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByUrgentIssuesOrderId(java.lang.String urgentIssuesOrderId) {
-        return projectsByUrgentIssuesOrderIdCache.get(urgentIssuesOrderId);
+        return new HashSet<Project>(projectsByUrgentIssuesOrderIdCache.get(urgentIssuesOrderId));
     }
     private Set<java.lang.String> urgentIssuesOrderIdsCache;
 
@@ -861,7 +867,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastSprintNumber(int lastSprintNumber) {
-        return projectsByLastSprintNumberCache.get(lastSprintNumber);
+        return new HashSet<Project>(projectsByLastSprintNumberCache.get(lastSprintNumber));
     }
     private Set<Integer> lastSprintNumbersCache;
 
@@ -901,7 +907,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastTaskNumber(int lastTaskNumber) {
-        return projectsByLastTaskNumberCache.get(lastTaskNumber);
+        return new HashSet<Project>(projectsByLastTaskNumberCache.get(lastTaskNumber));
     }
     private Set<Integer> lastTaskNumbersCache;
 
@@ -941,7 +947,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastRequirementNumber(int lastRequirementNumber) {
-        return projectsByLastRequirementNumberCache.get(lastRequirementNumber);
+        return new HashSet<Project>(projectsByLastRequirementNumberCache.get(lastRequirementNumber));
     }
     private Set<Integer> lastRequirementNumbersCache;
 
@@ -981,7 +987,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastQualityNumber(int lastQualityNumber) {
-        return projectsByLastQualityNumberCache.get(lastQualityNumber);
+        return new HashSet<Project>(projectsByLastQualityNumberCache.get(lastQualityNumber));
     }
     private Set<Integer> lastQualityNumbersCache;
 
@@ -1021,7 +1027,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastRiskNumber(int lastRiskNumber) {
-        return projectsByLastRiskNumberCache.get(lastRiskNumber);
+        return new HashSet<Project>(projectsByLastRiskNumberCache.get(lastRiskNumber));
     }
     private Set<Integer> lastRiskNumbersCache;
 
@@ -1061,7 +1067,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastIssueNumber(int lastIssueNumber) {
-        return projectsByLastIssueNumberCache.get(lastIssueNumber);
+        return new HashSet<Project>(projectsByLastIssueNumberCache.get(lastIssueNumber));
     }
     private Set<Integer> lastIssueNumbersCache;
 
@@ -1101,7 +1107,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastImpedimentNumber(int lastImpedimentNumber) {
-        return projectsByLastImpedimentNumberCache.get(lastImpedimentNumber);
+        return new HashSet<Project>(projectsByLastImpedimentNumberCache.get(lastImpedimentNumber));
     }
     private Set<Integer> lastImpedimentNumbersCache;
 
@@ -1141,7 +1147,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastFileNumber(int lastFileNumber) {
-        return projectsByLastFileNumberCache.get(lastFileNumber);
+        return new HashSet<Project>(projectsByLastFileNumberCache.get(lastFileNumber));
     }
     private Set<Integer> lastFileNumbersCache;
 
@@ -1181,7 +1187,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastSubjectNumber(int lastSubjectNumber) {
-        return projectsByLastSubjectNumberCache.get(lastSubjectNumber);
+        return new HashSet<Project>(projectsByLastSubjectNumberCache.get(lastSubjectNumber));
     }
     private Set<Integer> lastSubjectNumbersCache;
 
@@ -1221,7 +1227,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastEventNumber(int lastEventNumber) {
-        return projectsByLastEventNumberCache.get(lastEventNumber);
+        return new HashSet<Project>(projectsByLastEventNumberCache.get(lastEventNumber));
     }
     private Set<Integer> lastEventNumbersCache;
 
@@ -1261,7 +1267,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastReleaseNumber(int lastReleaseNumber) {
-        return projectsByLastReleaseNumberCache.get(lastReleaseNumber);
+        return new HashSet<Project>(projectsByLastReleaseNumberCache.get(lastReleaseNumber));
     }
     private Set<Integer> lastReleaseNumbersCache;
 
@@ -1301,7 +1307,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastBlogEntryNumber(int lastBlogEntryNumber) {
-        return projectsByLastBlogEntryNumberCache.get(lastBlogEntryNumber);
+        return new HashSet<Project>(projectsByLastBlogEntryNumberCache.get(lastBlogEntryNumber));
     }
     private Set<Integer> lastBlogEntryNumbersCache;
 
@@ -1341,7 +1347,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByPunishmentUnit(java.lang.String punishmentUnit) {
-        return projectsByPunishmentUnitCache.get(punishmentUnit);
+        return new HashSet<Project>(projectsByPunishmentUnitCache.get(punishmentUnit));
     }
     private Set<java.lang.String> punishmentUnitsCache;
 
@@ -1381,7 +1387,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByPunishmentFactor(int punishmentFactor) {
-        return projectsByPunishmentFactorCache.get(punishmentFactor);
+        return new HashSet<Project>(projectsByPunishmentFactorCache.get(punishmentFactor));
     }
     private Set<Integer> punishmentFactorsCache;
 
@@ -1421,7 +1427,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByHomepageDir(java.lang.String homepageDir) {
-        return projectsByHomepageDirCache.get(homepageDir);
+        return new HashSet<Project>(projectsByHomepageDirCache.get(homepageDir));
     }
     private Set<java.lang.String> homepageDirsCache;
 
@@ -1461,7 +1467,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByHomepageUrl(java.lang.String homepageUrl) {
-        return projectsByHomepageUrlCache.get(homepageUrl);
+        return new HashSet<Project>(projectsByHomepageUrlCache.get(homepageUrl));
     }
     private Set<java.lang.String> homepageUrlsCache;
 
@@ -1501,7 +1507,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByAutoUpdateHomepage(boolean autoUpdateHomepage) {
-        return projectsByAutoUpdateHomepageCache.get(autoUpdateHomepage);
+        return new HashSet<Project>(projectsByAutoUpdateHomepageCache.get(autoUpdateHomepage));
     }
 
     private static class IsAutoUpdateHomepage implements Predicate<Project> {
@@ -1519,6 +1525,46 @@ public abstract class GProjectDao
     }
 
     // -----------------------------------------------------------
+    // - releaseScriptPath
+    // -----------------------------------------------------------
+
+    private final Cache<java.lang.String,Set<Project>> projectsByReleaseScriptPathCache = new Cache<java.lang.String,Set<Project>>(
+            new Cache.Factory<java.lang.String,Set<Project>>() {
+                public Set<Project> create(java.lang.String releaseScriptPath) {
+                    return getEntities(new IsReleaseScriptPath(releaseScriptPath));
+                }
+            });
+
+    public final Set<Project> getProjectsByReleaseScriptPath(java.lang.String releaseScriptPath) {
+        return new HashSet<Project>(projectsByReleaseScriptPathCache.get(releaseScriptPath));
+    }
+    private Set<java.lang.String> releaseScriptPathsCache;
+
+    public final Set<java.lang.String> getReleaseScriptPaths() {
+        if (releaseScriptPathsCache == null) {
+            releaseScriptPathsCache = new HashSet<java.lang.String>();
+            for (Project e : getEntities()) {
+                if (e.isReleaseScriptPathSet()) releaseScriptPathsCache.add(e.getReleaseScriptPath());
+            }
+        }
+        return releaseScriptPathsCache;
+    }
+
+    private static class IsReleaseScriptPath implements Predicate<Project> {
+
+        private java.lang.String value;
+
+        public IsReleaseScriptPath(java.lang.String value) {
+            this.value = value;
+        }
+
+        public boolean test(Project e) {
+            return e.isReleaseScriptPath(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
     // - supportEmail
     // -----------------------------------------------------------
 
@@ -1530,7 +1576,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsBySupportEmail(java.lang.String supportEmail) {
-        return projectsBySupportEmailCache.get(supportEmail);
+        return new HashSet<Project>(projectsBySupportEmailCache.get(supportEmail));
     }
     private Set<java.lang.String> supportEmailsCache;
 
@@ -1570,7 +1616,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByIssueReplyTemplate(java.lang.String issueReplyTemplate) {
-        return projectsByIssueReplyTemplateCache.get(issueReplyTemplate);
+        return new HashSet<Project>(projectsByIssueReplyTemplateCache.get(issueReplyTemplate));
     }
     private Set<java.lang.String> issueReplyTemplatesCache;
 
@@ -1599,6 +1645,46 @@ public abstract class GProjectDao
     }
 
     // -----------------------------------------------------------
+    // - subscriberNotificationTemplate
+    // -----------------------------------------------------------
+
+    private final Cache<java.lang.String,Set<Project>> projectsBySubscriberNotificationTemplateCache = new Cache<java.lang.String,Set<Project>>(
+            new Cache.Factory<java.lang.String,Set<Project>>() {
+                public Set<Project> create(java.lang.String subscriberNotificationTemplate) {
+                    return getEntities(new IsSubscriberNotificationTemplate(subscriberNotificationTemplate));
+                }
+            });
+
+    public final Set<Project> getProjectsBySubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        return new HashSet<Project>(projectsBySubscriberNotificationTemplateCache.get(subscriberNotificationTemplate));
+    }
+    private Set<java.lang.String> subscriberNotificationTemplatesCache;
+
+    public final Set<java.lang.String> getSubscriberNotificationTemplates() {
+        if (subscriberNotificationTemplatesCache == null) {
+            subscriberNotificationTemplatesCache = new HashSet<java.lang.String>();
+            for (Project e : getEntities()) {
+                if (e.isSubscriberNotificationTemplateSet()) subscriberNotificationTemplatesCache.add(e.getSubscriberNotificationTemplate());
+            }
+        }
+        return subscriberNotificationTemplatesCache;
+    }
+
+    private static class IsSubscriberNotificationTemplate implements Predicate<Project> {
+
+        private java.lang.String value;
+
+        public IsSubscriberNotificationTemplate(java.lang.String value) {
+            this.value = value;
+        }
+
+        public boolean test(Project e) {
+            return e.isSubscriberNotificationTemplate(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
     // - lastOpenedDateAndTime
     // -----------------------------------------------------------
 
@@ -1610,7 +1696,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByLastOpenedDateAndTime(ilarkesto.base.time.DateAndTime lastOpenedDateAndTime) {
-        return projectsByLastOpenedDateAndTimeCache.get(lastOpenedDateAndTime);
+        return new HashSet<Project>(projectsByLastOpenedDateAndTimeCache.get(lastOpenedDateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> lastOpenedDateAndTimesCache;
 
@@ -1650,7 +1736,7 @@ public abstract class GProjectDao
             });
 
     public final Set<Project> getProjectsByFreeDays(int freeDays) {
-        return projectsByFreeDaysCache.get(freeDays);
+        return new HashSet<Project>(projectsByFreeDaysCache.get(freeDays));
     }
     private Set<Integer> freeDayssCache;
 
@@ -1674,6 +1760,46 @@ public abstract class GProjectDao
 
         public boolean test(Project e) {
             return e.isFreeDays(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - releasingInfo
+    // -----------------------------------------------------------
+
+    private final Cache<java.lang.String,Set<Project>> projectsByReleasingInfoCache = new Cache<java.lang.String,Set<Project>>(
+            new Cache.Factory<java.lang.String,Set<Project>>() {
+                public Set<Project> create(java.lang.String releasingInfo) {
+                    return getEntities(new IsReleasingInfo(releasingInfo));
+                }
+            });
+
+    public final Set<Project> getProjectsByReleasingInfo(java.lang.String releasingInfo) {
+        return new HashSet<Project>(projectsByReleasingInfoCache.get(releasingInfo));
+    }
+    private Set<java.lang.String> releasingInfosCache;
+
+    public final Set<java.lang.String> getReleasingInfos() {
+        if (releasingInfosCache == null) {
+            releasingInfosCache = new HashSet<java.lang.String>();
+            for (Project e : getEntities()) {
+                if (e.isReleasingInfoSet()) releasingInfosCache.add(e.getReleasingInfo());
+            }
+        }
+        return releasingInfosCache;
+    }
+
+    private static class IsReleasingInfo implements Predicate<Project> {
+
+        private java.lang.String value;
+
+        public IsReleasingInfo(java.lang.String value) {
+            this.value = value;
+        }
+
+        public boolean test(Project e) {
+            return e.isReleasingInfo(value);
         }
 
     }

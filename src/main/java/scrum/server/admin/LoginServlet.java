@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.admin;
 
 import ilarkesto.auth.AuthenticationFailedException;
@@ -14,30 +28,21 @@ import ilarkesto.webapp.Servlet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.openid4java.consumer.VerificationResult;
 
-import scrum.client.ApplicationInfo;
 import scrum.client.ScrumGwtApplication;
-import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
 import scrum.server.common.AHttpServlet;
 
 public class LoginServlet extends AHttpServlet {
 
-	private static final int LOGIN_TOKEN_COOKIE_MAXAGE = 259200; // 3days
 	private static final long serialVersionUID = 1;
 
 	private static Log log = Log.get(LoginServlet.class);
-
-	private static ScrumWebApplication webApplication;
-	private ApplicationInfo applicationInfo;
-	private UserDao userDao;
-	private SystemConfig systemConfig;
 
 	@Override
 	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
@@ -48,17 +53,9 @@ public class LoginServlet extends AHttpServlet {
 			return;
 		}
 
-		String loginToken = Servlet.getCookieValue(req, ScrumGwtApplication.LOGIN_TOKEN_COOKIE);
-		if (!Str.isBlank(loginToken)) {
-			User user = userDao.getUserByLoginToken(loginToken);
-			if (user != null) {
-				user.setLastLoginDateAndTime(DateAndTime.now());
-				session.setUser(user);
-				Servlet.setCookie(resp, ScrumGwtApplication.LOGIN_TOKEN_COOKIE, user.getLoginToken(),
-					LOGIN_TOKEN_COOKIE_MAXAGE);
-				resp.sendRedirect(getStartPage(historyToken));
-				return;
-			}
+		if (tokenLogin(req, resp, session)) {
+			resp.sendRedirect(getStartPage(historyToken));
+			return;
 		}
 
 		if (OpenId.isOpenIdCallback(req)) {
@@ -188,6 +185,7 @@ public class LoginServlet extends AHttpServlet {
 		User user = userDao.postUser(email, username, password);
 		user.setLastLoginDateAndTime(DateAndTime.now());
 		user.triggerEmailVerification();
+		webApplication.getTransactionService().commit();
 		webApplication.triggerRegisterNotification(user, req.getRemoteHost());
 		webApplication.sendToClients(user);
 
@@ -196,7 +194,7 @@ public class LoginServlet extends AHttpServlet {
 	}
 
 	private String getStartPage(String historyToken) {
-		String url = webApplication.isDevelopmentMode() ? "index.html?gwt.codesvr=127.0.0.1:9997" : "";
+		String url = getDefaultStartPage();
 		if (historyToken != null) url += "#" + historyToken;
 		url = webApplication.createUrl(url);
 		return url;
@@ -225,8 +223,7 @@ public class LoginServlet extends AHttpServlet {
 
 		String email = OpenId.getEmail(openIdResult);
 		String nickname = OpenId.getNickname(openIdResult);
-
-		log.info("User authenticated by OpenID:", openId);
+		String fullName = OpenId.getFullname(openIdResult);
 
 		User user = userDao.getUserByOpenId(openId);
 
@@ -237,10 +234,11 @@ public class LoginServlet extends AHttpServlet {
 				return;
 			}
 
-			if (userDao.getUserByOpenId(openId) != null) {
-				renderLoginPage(resp, null, null, historyToken, "Creating account failed. OpenID '" + openId
-						+ "' is already used.", false, false);
-				log.warn("Registration failed. OpenID already exists:", openId);
+			if (!webApplication.getSystemConfig().isOpenIdDomainAllowed(openId)) {
+				renderLoginPage(resp, null, null, historyToken, "Registration failed. OpenID domains are limited to: "
+						+ webApplication.getSystemConfig().getOpenIdDomains(), false, false);
+				log.warn("Registration failed. OpenID domains are limited to:", webApplication.getSystemConfig()
+						.getOpenIdDomains());
 				return;
 			}
 
@@ -260,9 +258,12 @@ public class LoginServlet extends AHttpServlet {
 				return;
 			}
 
-			user = userDao.postUserWithOpenId(openId, nickname, email);
+			user = userDao.postUserWithOpenId(openId, nickname, fullName, email);
+			webApplication.getTransactionService().commit();
 			webApplication.triggerRegisterNotification(user, request.getRemoteHost());
 		}
+
+		log.info("User authenticated by OpenID:", openId, "->", user);
 
 		if (user.isDisabled()) {
 			renderLoginPage(resp, null, null, historyToken, "User is disabled.", false, false);
@@ -338,12 +339,19 @@ public class LoginServlet extends AHttpServlet {
 				return;
 			}
 
-			if (user == null) {
+			if (authenticated && user == null) {
 				if (webApplication.getSystemConfig().isRegistrationDisabled()) {
 					renderLoginPage(resp, null, null, historyToken, "There is no user " + username
 							+ " and creating new users is disabled.", false, false);
 					return;
 				}
+
+				if (userDao.getUserByEmail(email) != null) {
+					renderLoginPage(resp, null, null, historyToken, "User with email " + email + " already exists: "
+							+ email, false, false);
+					return;
+				}
+
 				user = userDao.postUser(email, username, Str.generatePassword(23));
 				if (Str.isEmail(email)) user.setEmail(email);
 				webApplication.triggerRegisterNotification(user, request.getRemoteHost());
@@ -386,6 +394,7 @@ public class LoginServlet extends AHttpServlet {
 
 		String title = "Kunagi Login";
 		if (webApplication.getConfig().isShowRelease()) title += " " + applicationInfo.getRelease();
+		if (systemConfig.isInstanceNameSet()) title += " @ " + systemConfig.getInstanceName();
 		html.startHEAD(title, "EN");
 		html.META("X-UA-Compatible", "chrome=1");
 		html.LINKfavicon();
@@ -443,7 +452,7 @@ public class LoginServlet extends AHttpServlet {
 			html.DIV("separator", null);
 			html.startDIV("configMessage");
 			html.html("<h2>Warning!</h2>The administrator user <code>admin</code> has the default password <code>"
-					+ scrum.client.admin.User.INITIAL_PASSWORD + "</code>. Please change it.");
+					+ systemConfig.getDefaultUserPassword() + "</code>. Please change it.");
 			html.endDIV();
 		}
 
@@ -480,7 +489,7 @@ public class LoginServlet extends AHttpServlet {
 
 		html.startTR();
 		html.startTD();
-		html.INPUTcheckbox("keepmeloggedin", "keepmeloggedin", false);
+		html.INPUTcheckbox("keepmeloggedin", "keepmeloggedin", true);
 		html.LABEL("keepmeloggedin", "Keep me logged in");
 		html.endTD();
 		html.startTD().setAlignRight();
@@ -525,7 +534,7 @@ public class LoginServlet extends AHttpServlet {
 
 		html.startTR();
 		html.startTD();
-		html.INPUTcheckbox("keepmeloggedinOpenId", "keepmeloggedin", false);
+		html.INPUTcheckbox("keepmeloggedinOpenId", "keepmeloggedin", true);
 		html.LABEL("keepmeloggedinOpenId", "Keep me logged in");
 		html.endTD();
 		html.startTD().setAlignRight();
@@ -643,15 +652,6 @@ public class LoginServlet extends AHttpServlet {
 		html.text(message);
 		html.endDIV();
 		html.DIV("separator", null);
-	}
-
-	@Override
-	protected void onInit(ServletConfig servletConfig) {
-		super.onInit(servletConfig);
-		webApplication = ScrumWebApplication.get();
-		userDao = webApplication.getUserDao();
-		applicationInfo = webApplication.getApplicationInfo();
-		systemConfig = webApplication.getSystemConfig();
 	}
 
 }

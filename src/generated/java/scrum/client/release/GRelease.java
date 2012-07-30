@@ -203,6 +203,7 @@ public abstract class GRelease
 
     public final Release setLabel(java.lang.String label) {
         if (isLabel(label)) return (Release)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Release)this;
@@ -311,20 +312,20 @@ public abstract class GRelease
 
     // --- releaseDate ---
 
-    private ilarkesto.gwt.client.Date releaseDate ;
+    private ilarkesto.core.time.Date releaseDate ;
 
-    public final ilarkesto.gwt.client.Date getReleaseDate() {
+    public final ilarkesto.core.time.Date getReleaseDate() {
         return this.releaseDate ;
     }
 
-    public final Release setReleaseDate(ilarkesto.gwt.client.Date releaseDate) {
+    public final Release setReleaseDate(ilarkesto.core.time.Date releaseDate) {
         if (isReleaseDate(releaseDate)) return (Release)this;
         this.releaseDate = releaseDate ;
         propertyChanged("releaseDate", this.releaseDate);
         return (Release)this;
     }
 
-    public final boolean isReleaseDate(ilarkesto.gwt.client.Date releaseDate) {
+    public final boolean isReleaseDate(ilarkesto.core.time.Date releaseDate) {
         return equals(this.releaseDate, releaseDate);
     }
 
@@ -345,19 +346,19 @@ public abstract class GRelease
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getReleaseDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setReleaseDate(value);
         }
         @Override
         public String getTooltip() { return "The intended or actual release date for planned and finished releases, respectively."; }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -530,6 +531,112 @@ public abstract class GRelease
 
     }
 
+    // --- scriptRunning ---
+
+    private boolean scriptRunning ;
+
+    public final boolean isScriptRunning() {
+        return this.scriptRunning ;
+    }
+
+    public final Release setScriptRunning(boolean scriptRunning) {
+        if (isScriptRunning(scriptRunning)) return (Release)this;
+        this.scriptRunning = scriptRunning ;
+        propertyChanged("scriptRunning", this.scriptRunning);
+        return (Release)this;
+    }
+
+    public final boolean isScriptRunning(boolean scriptRunning) {
+        return equals(this.scriptRunning, scriptRunning);
+    }
+
+    private transient ScriptRunningModel scriptRunningModel;
+
+    public ScriptRunningModel getScriptRunningModel() {
+        if (scriptRunningModel == null) scriptRunningModel = createScriptRunningModel();
+        return scriptRunningModel;
+    }
+
+    protected ScriptRunningModel createScriptRunningModel() { return new ScriptRunningModel(); }
+
+    protected class ScriptRunningModel extends ilarkesto.gwt.client.editor.ABooleanEditorModel {
+
+        @Override
+        public String getId() {
+            return "Release_scriptRunning";
+        }
+
+        @Override
+        public java.lang.Boolean getValue() {
+            return isScriptRunning();
+        }
+
+        @Override
+        public void setValue(java.lang.Boolean value) {
+            setScriptRunning(value);
+        }
+
+        @Override
+        protected void onChangeValue(java.lang.Boolean oldValue, java.lang.Boolean newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
+    // --- scriptOutput ---
+
+    private java.lang.String scriptOutput ;
+
+    public final java.lang.String getScriptOutput() {
+        return this.scriptOutput ;
+    }
+
+    public final Release setScriptOutput(java.lang.String scriptOutput) {
+        if (isScriptOutput(scriptOutput)) return (Release)this;
+        this.scriptOutput = scriptOutput ;
+        propertyChanged("scriptOutput", this.scriptOutput);
+        return (Release)this;
+    }
+
+    public final boolean isScriptOutput(java.lang.String scriptOutput) {
+        return equals(this.scriptOutput, scriptOutput);
+    }
+
+    private transient ScriptOutputModel scriptOutputModel;
+
+    public ScriptOutputModel getScriptOutputModel() {
+        if (scriptOutputModel == null) scriptOutputModel = createScriptOutputModel();
+        return scriptOutputModel;
+    }
+
+    protected ScriptOutputModel createScriptOutputModel() { return new ScriptOutputModel(); }
+
+    protected class ScriptOutputModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "Release_scriptOutput";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getScriptOutput();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setScriptOutput(value);
+        }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- update properties by map ---
 
     public void updateProperties(Map props) {
@@ -540,10 +647,12 @@ public abstract class GRelease
         label  = (java.lang.String) props.get("label");
         note  = (java.lang.String) props.get("note");
         String releaseDateAsString = (String) props.get("releaseDate");
-        releaseDate  =  releaseDateAsString == null ? null : new ilarkesto.gwt.client.Date(releaseDateAsString);
+        releaseDate  =  releaseDateAsString == null ? null : new ilarkesto.core.time.Date(releaseDateAsString);
         released  = (Boolean) props.get("released");
         releaseNotes  = (java.lang.String) props.get("releaseNotes");
         scmTag  = (java.lang.String) props.get("scmTag");
+        scriptRunning  = (Boolean) props.get("scriptRunning");
+        scriptOutput  = (java.lang.String) props.get("scriptOutput");
         updateLocalModificationTime();
     }
 
@@ -560,6 +669,8 @@ public abstract class GRelease
         properties.put("released", this.released);
         properties.put("releaseNotes", this.releaseNotes);
         properties.put("scmTag", this.scmTag);
+        properties.put("scriptRunning", this.scriptRunning);
+        properties.put("scriptOutput", this.scriptOutput);
     }
 
     public final java.util.List<scrum.client.release.Release> getReleases() {

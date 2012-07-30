@@ -47,12 +47,12 @@ public abstract class GQuality
         return toString().toLowerCase().compareTo(other.toString().toLowerCase());
     }
 
-    public final java.util.Set<scrum.server.project.Requirement> getRequirements() {
-        return requirementDao.getRequirementsByQuality((Quality)this);
-    }
-
     public final java.util.Set<scrum.server.admin.ProjectUserConfig> getProjectUserConfigs() {
         return projectUserConfigDao.getProjectUserConfigsByPblFilterQuality((Quality)this);
+    }
+
+    public final java.util.Set<scrum.server.project.Requirement> getRequirements() {
+        return requirementDao.getRequirementsByQuality((Quality)this);
     }
 
     private static final ilarkesto.core.logging.Log LOG = ilarkesto.core.logging.Log.get(GQuality.class);
@@ -173,7 +173,7 @@ public abstract class GQuality
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -209,7 +209,7 @@ public abstract class GQuality
     }
 
     protected java.lang.String prepareDescription(java.lang.String description) {
-        description = Str.removeUnreadableChars(description);
+        // description = Str.removeUnreadableChars(description);
         return description;
     }
 
@@ -245,7 +245,7 @@ public abstract class GQuality
     }
 
     protected java.lang.String prepareTestDescription(java.lang.String testDescription) {
-        testDescription = Str.removeUnreadableChars(testDescription);
+        // testDescription = Str.removeUnreadableChars(testDescription);
         return testDescription;
     }
 
@@ -313,16 +313,16 @@ public abstract class GQuality
         GQuality.qualityDao = qualityDao;
     }
 
-    static scrum.server.project.RequirementDao requirementDao;
-
-    public static final void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
-        GQuality.requirementDao = requirementDao;
-    }
-
     static scrum.server.admin.ProjectUserConfigDao projectUserConfigDao;
 
     public static final void setProjectUserConfigDao(scrum.server.admin.ProjectUserConfigDao projectUserConfigDao) {
         GQuality.projectUserConfigDao = projectUserConfigDao;
+    }
+
+    static scrum.server.project.RequirementDao requirementDao;
+
+    public static final void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
+        GQuality.requirementDao = requirementDao;
     }
 
 }

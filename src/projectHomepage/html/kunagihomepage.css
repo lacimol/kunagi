@@ -30,10 +30,11 @@ input, textarea {border: 1px solid #192666; font: 14px/19px monospace; padding: 
         h3 {font: 12pt/17pt "georgia",serif; color: black; margin-bottom: 10px;}
         h4 {font: 11pt/16pt "georgia",serif; color: black; margin-bottom: 10px;}
         h5 {font: 10pt/15pt "georgia",serif; color: black; margin-bottom: 10px;}
+        h6 {font: 9pt/14pt "georgia",serif; color: black; margin-bottom: 10px;}
         .middle {float: left; width: 500px;}
         .sidebar {float: right;}
-            #content .starter {background: orange url("img/button_bg.png") 0 0 repeat-x; border: 1px solid orange; width: 150px; padding: 5px; text-align: center; -moz-border-radius: 5px; margin-bottom: 5px;}
-                #content .starter a {color: #B37400; font-size: 16px; font-weight: bold; text-decoration: none;}
+#content .starter {background: orange url("img/button_bg.png") 0 0 repeat-x; border: 1px solid orange; width: 150px; padding: 5px; text-align: center; -moz-border-radius: 5px; margin-bottom: 5px;}
+    #content .starter a {color: #B37400; font-size: 16px; font-weight: bold; text-decoration: none; cursor: pointer;}
         h3 {font: 12pt/16pt "georgia",serif; font-weight: bold; margin-bottom: 10px;}
         img.screenshotthumb {margin: 0px 0px 10px 10px; border: 1px solid #DDD;}
         .featureseparator {clear: both; height: 10px;}
@@ -41,8 +42,7 @@ input, textarea {border: 1px solid #192666; font: 14px/19px monospace; padding: 
         ol {margin-left: 30px; margin-top: 10px; margin-bottom: 10px;}
         .secondaryText {color: #666;}
         .smallText {font-size: 10px;}
-        .codeBlock {border: 1px solid #DDD; padding: 5px; margin: 0 10px 10px 10px; background: #EEE; max-width: 660px; max-height: 600px; overflow: auto;}
-            .codeBlock code, .codeBlock pre {margin: 0; padding: 0;}
+        .codeBlock {display: block; border: 1px solid #DDD; padding: 5px; margin: 0 10px 10px 10px; background: #EEE; max-width: 660px; max-height: 600px; overflow: auto;}
         label.optional {}
         div.sublabel {color: #AAA; font-size: 9px; line-height: 9px;}
         div.socialbuttons {}
@@ -63,3 +63,7 @@ input, textarea {border: 1px solid #192666; font: 14px/19px monospace; padding: 
 input.textinput {width: 170px; padding: 5px 7px 5px 7px;}
 input.submit {color: #B37400; font-size: 16px; font-weight: bold; font-family: "verdana","sans-serif"; background: orange url("img/button_bg.png") 0 0 repeat-x; border: 1px solid orange; width: 150px; padding: 5px; text-align: center; -moz-border-radius: 5px; cursor: pointer;}
 .clear {clear: both;}
+
+#shareme {height: 60px;}
+.sharrre .button{ float:left; width:60px;}
+.sharrre .linkedin { width:70px; }

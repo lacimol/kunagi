@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.admin;
 
 import ilarkesto.auth.OpenId;
@@ -29,7 +43,7 @@ public class UserDao extends GUserDao {
 		return postUser(name, getDefaultPassword());
 	}
 
-	public User postUserWithOpenId(String openId, String nickname, String email) {
+	public User postUserWithOpenId(String openId, String nickname, String fullname, String email) {
 		String name = null;
 
 		if (nickname != null) {
@@ -51,6 +65,7 @@ public class UserDao extends GUserDao {
 
 		User user = newEntityInstance();
 		user.setName(name);
+		user.setFullName(fullname);
 		user.setOpenId(openId);
 		if (!Str.isBlank(email)) {
 			user.setEmail(email);
@@ -65,8 +80,7 @@ public class UserDao extends GUserDao {
 	@Override
 	public User newEntityInstance() {
 		User user = super.newEntityInstance();
-		String password = getDefaultPassword();
-		user.setPassword(password);
+		user.setPassword(getDefaultPassword());
 		user.setRegistrationDateAndTime(DateAndTime.now());
 		return user;
 	}

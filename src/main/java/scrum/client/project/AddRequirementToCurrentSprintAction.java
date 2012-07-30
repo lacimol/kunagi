@@ -1,8 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.project;
 
 import scrum.client.common.TooltipBuilder;
-import scrum.client.sprint.Sprint;
-import scrum.client.sprint.Task;
+import scrum.client.sprint.PullStoryToSprintServiceCall;
 
 public class AddRequirementToCurrentSprintAction extends GAddRequirementToCurrentSprintAction {
 
@@ -16,10 +29,8 @@ public class AddRequirementToCurrentSprintAction extends GAddRequirementToCurren
 	}
 
 	@Override
-	public String getTooltip() {
-
-		TooltipBuilder tb = new TooltipBuilder("Add this Story to the current Sprint Backlog.");
-
+	protected void updateTooltip(TooltipBuilder tb) {
+		tb.setText("Add this Story to the current Sprint Backlog.");
 		if (!getCurrentProject().isTeamMember(getCurrentUser())) {
 			tb.addRemark(TooltipBuilder.NOT_TEAM);
 		} else {
@@ -27,8 +38,6 @@ public class AddRequirementToCurrentSprintAction extends GAddRequirementToCurren
 			if (!requirement.isEstimatedWorkValid()) tb.addRemark("Story has no confirmed estimation yet.");
 			if (isCurrentSprint(requirement.getSprint())) tb.addRemark("Story is already in current sprint.");
 		}
-
-		return tb.getTooltip();
 	}
 
 	@Override
@@ -47,27 +56,7 @@ public class AddRequirementToCurrentSprintAction extends GAddRequirementToCurren
 
 	@Override
 	public void onExecute() {
-		for (Task task : requirement.getTasks()) {
-			task.setBurnedWork(0);
-		}
-		Sprint sprint = getCurrentProject().getCurrentSprint();
-		requirement.setSprint(sprint);
-		sprint.updateRequirementsOrder();
-		addUndo(new Undo());
-	}
-
-	class Undo extends ALocalUndo {
-
-		@Override
-		public String getLabel() {
-			return "Undo Add to Sprint for " + requirement.getReferenceAndLabel();
-		}
-
-		@Override
-		protected void onUndo() {
-			requirement.setSprint(null);
-		}
-
+		new PullStoryToSprintServiceCall(requirement.getId()).execute();
 	}
 
 }

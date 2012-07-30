@@ -11,8 +11,8 @@ public class RequestCommentsServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestComments(serviceCaller.getConversationNumber(), parentId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestComments(serviceCaller.getConversationNumber(), parentId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

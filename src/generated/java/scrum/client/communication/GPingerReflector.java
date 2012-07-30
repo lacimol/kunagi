@@ -6,6 +6,7 @@ public class GPingerReflector implements ilarkesto.core.scope.ComponentReflector
 
     public void injectComponents(Pinger component, ilarkesto.core.scope.Scope scope) {
         component.app = (scrum.client.ScrumGwtApplication) scope.getComponent("app");
+        component.serviceCaller = (scrum.client.core.ServiceCaller) scope.getComponent("serviceCaller");
     }
 
     public void callInitializationMethods(Pinger component) {

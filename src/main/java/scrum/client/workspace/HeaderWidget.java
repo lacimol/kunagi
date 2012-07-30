@@ -1,10 +1,23 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.workspace;
 
 import ilarkesto.core.scope.Scope;
 import ilarkesto.gwt.client.DropdownMenuButtonWidget;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.HyperlinkWidget;
-import ilarkesto.gwt.client.SwitchingNavigatorWidget.SwitchAction;
 import ilarkesto.gwt.client.TableBuilder;
 import ilarkesto.gwt.client.undo.UndoButtonWidget;
 
@@ -35,11 +48,9 @@ public class HeaderWidget extends AScrumWidget {
 	private DropdownMenuButtonWidget switchProjectButton;
 	private SearchInputWidget search;
 	private CommunicationIndicatorWidget status;
-	private HTML feedback;
 
 	@Override
 	protected Widget onInitialization() {
-		setHeight100();
 
 		title = new Label("");
 		title.setStyleName("HeaderWidget-title");
@@ -53,10 +64,16 @@ public class HeaderWidget extends AScrumWidget {
 
 		search = new SearchInputWidget();
 
-		feedback = new HTML("<a href='http://kunagi.org/support.html' target='blank'>Support/Feedback</a>");
-
 		wrapper = Gwt.createDiv("HeaderWidget", title);
 		return wrapper;
+	}
+
+	private HTML createLinksHtml() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<a href='http://kunagi.org/support.html' target='_blank'>Support/Feedback</a>");
+		if (getAuth().isUserLoggedIn() && getCurrentUser().isAdmin())
+			sb.append(" <a href='admin.html' target='_blank'>Administration/Monitoring</a>");
+		return new HTML(sb.toString());
 	}
 
 	@Override
@@ -106,7 +123,7 @@ public class HeaderWidget extends AScrumWidget {
 		// Widget changeProjectWidget = projectOpen ? new HyperlinkWidget(new ChangeProjectAction()) : Gwt
 		// .createEmptyDiv();
 		Widget changeProjectWidget = projectOpen ? switchProjectButton : Gwt.createEmptyDiv();
-		tb.add(createLogo(), status, upgrade, searchWidget, feedback, undoWidget, changeProjectWidget,
+		tb.add(createLogo(), status, upgrade, searchWidget, createLinksHtml(), undoWidget, changeProjectWidget,
 			createCurrentUserWidget(), new HyperlinkWidget(new LogoutAction()));
 		wrapper.setWidget(tb.createTable());
 
@@ -120,7 +137,8 @@ public class HeaderWidget extends AScrumWidget {
 		ProjectWorkspaceWidgets widgets = Scope.get().getComponent(ProjectWorkspaceWidgets.class);
 		if (!ScrumScopeManager.isProjectScope()) return new Label(createCurrentUserText());
 
-		SwitchAction action = widgets.getSidebar().getNavigator().createSwitchAction(widgets.getProjectUserConfig());
+		ScrumNavigatorWidget.SwitchAction action = widgets.getSidebar().getNavigator()
+				.createSwitchAction(widgets.getProjectUserConfig());
 		action.setLabel(createCurrentUserText());
 		return new HyperlinkWidget(action);
 	}

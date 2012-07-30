@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.collaboration;
 
 import ilarkesto.core.scope.Scope;
@@ -10,9 +24,11 @@ import scrum.client.ScrumGwt;
 import scrum.client.common.AScrumAction;
 import scrum.client.common.AScrumGwtEntity;
 import scrum.client.common.AScrumWidget;
+import scrum.client.common.TooltipBuilder;
 import scrum.client.communication.TouchLastActivityServiceCall;
 import scrum.client.journal.ActivateChangeHistoryAction;
 import scrum.client.journal.ChangeHistoryWidget;
+import scrum.client.workspace.Navigator;
 import scrum.client.workspace.PagePanel;
 
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -20,6 +36,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -150,13 +167,13 @@ public class WikiWidget extends AScrumWidget {
 		}
 
 		@Override
-		public String getTooltip() {
-			return "Goto wiki page " + pageName;
+		protected void updateTooltip(TooltipBuilder tb) {
+			tb.setText("Goto wiki page " + pageName);
 		}
 
 		@Override
 		protected void onExecute() {
-			showPage(pageName);
+			History.newItem(Navigator.getEntityHistoryToken("wiki", "[[" + pageName + "]]"));
 		}
 	}
 

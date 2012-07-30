@@ -1,6 +1,23 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.communication;
 
 import ilarkesto.core.logging.Log;
+
+import java.util.LinkedList;
+
 import scrum.client.DataTransferObject;
 import scrum.client.core.ApplicationStartedEvent;
 import scrum.client.core.ApplicationStartedHandler;
@@ -23,6 +40,7 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 	private Timer timer;
 	private int maxDelay = MAX_DELAY;
 	private long lastDataReceiveTime = System.currentTimeMillis();
+	private LinkedList<Long> pingTimes = new LinkedList<Long>();
 
 	@Override
 	public void onApplicationStarted(ApplicationStartedEvent event) {
@@ -30,7 +48,18 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 
 			@Override
 			public void run() {
-				new PingServiceCall().execute();
+				if (!serviceCaller.containsServiceCall(PingServiceCall.class)) {
+					final long start = System.currentTimeMillis();
+					new PingServiceCall().execute(new Runnable() {
+
+						@Override
+						public void run() {
+							long time = System.currentTimeMillis() - start;
+							pingTimes.add(time);
+							if (pingTimes.size() > 10) pingTimes.removeFirst();
+						}
+					});
+				}
 				reschedule();
 			}
 		};
@@ -86,6 +115,21 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 		maxDelay = MAX_DELAY;
 		lastDataReceiveTime = System.currentTimeMillis();
 		log.debug("PowerPolling deactivated");
+	}
+
+	public Long getAvaragePingTime() {
+		if (pingTimes.isEmpty()) return null;
+		long sum = 0;
+		for (Long time : pingTimes) {
+			sum += time;
+		}
+		return sum / pingTimes.size();
+	}
+
+	public String getAvaragePingTimeMessage() {
+		Long time = getAvaragePingTime();
+		if (time == null) return null;
+		return "Current response time: " + time + " ms.";
 	}
 
 }

@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.collaboration;
 
 import ilarkesto.base.Str;
@@ -19,7 +33,11 @@ import scrum.client.common.ReferenceSupport;
 import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
 import scrum.server.common.AHttpServlet;
+import scrum.server.common.KunagiUtl;
+import scrum.server.common.SpamChecker;
+import scrum.server.journal.ProjectEvent;
 import scrum.server.journal.ProjectEventDao;
+import scrum.server.pr.SubscriptionService;
 import scrum.server.project.Project;
 import scrum.server.project.ProjectDao;
 
@@ -34,6 +52,9 @@ public class CommentServlet extends AHttpServlet {
 	private transient ProjectDao projectDao;
 	private transient ProjectEventDao projectEventDao;
 	private transient TransactionService transactionService;
+	private transient SubscriptionService subscriptionService;
+
+	private transient ScrumWebApplication app;
 
 	@Override
 	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
@@ -58,6 +79,7 @@ public class CommentServlet extends AHttpServlet {
 
 		String message;
 		try {
+			SpamChecker.check(req);
 			message = postComment(projectId, entityId, text, name, email);
 		} catch (Throwable ex) {
 			log.error("Posting comment failed.", "\n" + Servlet.toString(req, "  "), ex);
@@ -74,28 +96,38 @@ public class CommentServlet extends AHttpServlet {
 
 	private String postComment(String projectId, String entityId, String text, String name, String email) {
 		if (projectId == null) throw new RuntimeException("projectId == null");
+		if (Str.isBlank(text)) throw new RuntimeException("Comment is empty.");
 		Project project = projectDao.getById(projectId);
 		AEntity entity = daoService.getById(entityId);
 		Comment comment = commentDao.postComment(entity, "<nowiki>" + text + "</nowiki>", name, email, true);
+
+		String message = "New comment posted";
+		if (!Str.isBlank(name)) message += " by " + name;
+		subscriptionService.notifySubscribers(entity, message, project, email);
+
 		project.updateHomepage(entity, true);
 		String reference = ((ReferenceSupport) entity).getReference();
 		String label = ((LabelSupport) entity).getLabel();
-		projectEventDao
-				.postEvent(project, comment.getAuthorName() + " commented on " + reference + " " + label, entity);
+		ProjectEvent event = projectEventDao.postEvent(project, comment.getAuthorName() + " commented on " + reference
+				+ " " + label, entity);
+		if (Str.isEmail(email)) subscriptionService.subscribe(email, entity);
 		transactionService.commit();
 
-		return "<h2>Comment posted</h2><p>Thank you for your comment!</p><p>Back to <a href=\"" + reference
-				+ ".html\">" + label + ".</p>";
+		app.sendToConversationsByProject(project, event);
+
+		return "<h2>Comment posted</h2><p>Thank you for your comment! It will be visible in a few minutes.</p><p>Back to <strong>"
+				+ KunagiUtl.createExternalRelativeHtmlAnchor(entity) + "</strong>.</p>";
 	}
 
 	@Override
 	protected void onInit(ServletConfig config) {
-		ScrumWebApplication app = ScrumWebApplication.get(config);
+		app = ScrumWebApplication.get(config);
 		daoService = app.getDaoService();
 		commentDao = app.getCommentDao();
 		projectDao = app.getProjectDao();
 		transactionService = app.getTransactionService();
 		projectEventDao = app.getProjectEventDao();
+		subscriptionService = app.getSubscriptionService();
 	}
 
 }

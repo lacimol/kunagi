@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.search;
 
 import ilarkesto.core.base.Str;
@@ -5,7 +19,9 @@ import ilarkesto.core.base.Str;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import scrum.client.admin.User;
 import scrum.client.common.AScrumGwtEntity;
 
 public class Search extends GSearch implements SearchResultsChangedHandler {
@@ -30,7 +46,7 @@ public class Search extends GSearch implements SearchResultsChangedHandler {
 			}
 		});
 
-		projectWorkspaceWidgets.showSearchResults();
+		navigator.gotoCurrentProjectSearch();
 
 		searchClient(searchText);
 	}
@@ -46,6 +62,13 @@ public class Search extends GSearch implements SearchResultsChangedHandler {
 		results.addEntities(getMatching(project.getIssues(), keys));
 		results.addEntities(getMatching(project.getImpediments(), keys));
 		results.addEntities(getMatching(project.getRisks(), keys));
+
+		// searched user's tasks
+		Set<User> teamMembers = project.getTeamMembers();
+		List<User> userMaching = getMatching(teamMembers, keys);
+		if (userMaching.size() >= 1) {
+			results.addEntities(userMaching.get(0).getTasks());
+		}
 
 	}
 

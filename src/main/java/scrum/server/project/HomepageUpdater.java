@@ -1,7 +1,22 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.project;
 
 import ilarkesto.base.Proc;
 import ilarkesto.base.Str;
+import ilarkesto.base.Sys;
 import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
 import ilarkesto.base.time.DateAndTime;
@@ -12,10 +27,12 @@ import ilarkesto.io.IO;
 import ilarkesto.persistence.AEntity;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import scrum.client.wiki.Header;
@@ -56,7 +73,8 @@ public class HomepageUpdater {
 	}
 
 	public HomepageUpdater(Project project) {
-		this(project, project.getHomepageVelocityDir(), project.getHomepageDir());
+		this(project, project.getHomepageVelocityDir(), Sys.isDevelopmentMode() ? "runtimedata/homepage" : project
+				.getHomepageDir());
 	}
 
 	public void processAll() {
@@ -242,7 +260,6 @@ public class HomepageUpdater {
 		List<Release> releases = new ArrayList<Release>(project.getReleases());
 		Collections.sort(releases, Release.DATE_REVERSE_COMPARATOR);
 		for (Release release : releases) {
-			if (!release.isReleased()) continue;
 			fillRelease(context.addSubContext("releases"), release);
 		}
 	}
@@ -278,6 +295,8 @@ public class HomepageUpdater {
 		}
 		context.put("date", comment.getDateAndTime()
 				.toString(DateAndTime.FORMAT_WEEKDAY_LONGMONTH_DAY_YEAR_HOUR_MINUTE));
+		context.put("dateDe",
+			comment.getDateAndTime().toString(new SimpleDateFormat("EEE, d. MMMMM yyyy, HH:mm", Locale.GERMANY)));
 	}
 
 	private void fillRelease(ContextBuilder context, Release release) {
@@ -286,11 +305,38 @@ public class HomepageUpdater {
 		context.put("label", toHtml(release.getLabel()));
 		context.put("note", wikiToHtml(release.getNote()));
 		context.put("releaseNotes", wikiToHtml(release.getReleaseNotes()));
-		context.put("releaseDate", release.getReleaseDate());
+		context.put("releaseDate", release.getReleaseDate().toString(Date.FORMAT_LONGMONTH_DAY_YEAR));
 		context.put("released", release.isReleased());
 		context.put("major", release.isMajor());
 		context.put("bugfix", release.isBugfix());
+
+		for (Requirement requirement : release.getClosedRequirements()) {
+			ContextBuilder reqContext = context.addSubContext("finishedStories");
+			reqContext.put("reference", requirement.getReference());
+			reqContext.put("label", requirement.getLabel());
+		}
+
+		for (Issue issue : release.getAffectedIssues()) {
+			fillIssue(context.addSubContext("affectedByIssues"), issue);
+		}
+
+		for (Issue issue : release.getFixIssues()) {
+			if (issue.isFixed() || issue.isClosed()) {
+				fillIssue(context.addSubContext("fixedIssues"), issue);
+			} else {
+				fillIssue(context.addSubContext("plannedIssues"), issue);
+			}
+		}
+
 		fillComments(context, release);
+	}
+
+	private void fillSprint(ContextBuilder context, Sprint sprint) {
+		context.put("id", sprint.getId());
+		context.put("reference", sprint.getReference());
+		context.put("label", toHtml(sprint.getLabel()));
+		context.put("goal", wikiToHtml(sprint.getGoal()));
+		fillComments(context, sprint);
 	}
 
 	private void fillBlog(ContextBuilder context) {
@@ -313,6 +359,7 @@ public class HomepageUpdater {
 		context.put("plainText", wikiToText(entry.getText()));
 		DateAndTime date = entry.getDateAndTime();
 		context.put("date", date.toString(Date.FORMAT_LONGMONTH_DAY_YEAR));
+		context.put("dateDe", date.toString(new SimpleDateFormat("dd. MMMM yyyy", Locale.GERMANY)));
 		context.put("rssDate", date.toString(DateAndTime.FORMAT_RFC822));
 		fillComments(context, entry);
 	}
@@ -323,7 +370,7 @@ public class HomepageUpdater {
 		context.put("goal", wikiToHtml(sprint.getGoal()));
 		context.put("begin", sprint.getBegin().toString(Date.FORMAT_LONGMONTH_DAY_YEAR));
 		context.put("end", sprint.getEnd().toString(Date.FORMAT_LONGMONTH_DAY_YEAR));
-		Release release = sprint.getRelease();
+		Release release = sprint.getNextRelease();
 		if (release != null) context.put("release", release.getLabel());
 		List<Requirement> requirements = new ArrayList<Requirement>(sprint.getRequirements());
 		Collections.sort(requirements, project.getRequirementsOrderComparator());
@@ -343,7 +390,7 @@ public class HomepageUpdater {
 
 	private void fillStories(ContextBuilder context) {
 		for (Requirement requirement : project.getRequirements()) {
-			if (requirement.isClosed()) continue;
+			// if (requirement.isClosed()) continue;
 			fillStory(context.addSubContext("stories"), requirement);
 		}
 	}
@@ -411,6 +458,11 @@ public class HomepageUpdater {
 		public MyHtmlContext(Project project) {
 			super();
 			this.project = project;
+		}
+
+		@Override
+		public boolean isEntityReferenceAvailable(String reference) {
+			return true;
 		}
 
 		@Override

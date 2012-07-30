@@ -86,7 +86,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByParent(ilarkesto.persistence.AEntity parent) {
-        return changesByParentCache.get(parent);
+        return new HashSet<Change>(changesByParentCache.get(parent));
     }
     private Set<ilarkesto.persistence.AEntity> parentsCache;
 
@@ -126,7 +126,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByUser(scrum.server.admin.User user) {
-        return changesByUserCache.get(user);
+        return new HashSet<Change>(changesByUserCache.get(user));
     }
     private Set<scrum.server.admin.User> usersCache;
 
@@ -166,7 +166,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
-        return changesByDateAndTimeCache.get(dateAndTime);
+        return new HashSet<Change>(changesByDateAndTimeCache.get(dateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
 
@@ -206,7 +206,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByKey(java.lang.String key) {
-        return changesByKeyCache.get(key);
+        return new HashSet<Change>(changesByKeyCache.get(key));
     }
     private Set<java.lang.String> keysCache;
 
@@ -246,7 +246,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByOldValue(java.lang.String oldValue) {
-        return changesByOldValueCache.get(oldValue);
+        return new HashSet<Change>(changesByOldValueCache.get(oldValue));
     }
     private Set<java.lang.String> oldValuesCache;
 
@@ -286,7 +286,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByNewValue(java.lang.String newValue) {
-        return changesByNewValueCache.get(newValue);
+        return new HashSet<Change>(changesByNewValueCache.get(newValue));
     }
     private Set<java.lang.String> newValuesCache;
 
@@ -326,7 +326,7 @@ public abstract class GChangeDao
             });
 
     public final Set<Change> getChangesByComment(java.lang.String comment) {
-        return changesByCommentCache.get(comment);
+        return new HashSet<Change>(changesByCommentCache.get(comment));
     }
     private Set<java.lang.String> commentsCache;
 

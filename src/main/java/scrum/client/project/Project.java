@@ -1,14 +1,29 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.project;
 
+import ilarkesto.core.base.Str;
 import ilarkesto.core.base.Utl;
 import ilarkesto.core.logging.Log;
 import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.Time;
 import ilarkesto.gwt.client.AGwtEntity;
-import ilarkesto.gwt.client.Date;
-import ilarkesto.gwt.client.DateAndTime;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.HyperlinkWidget;
-import ilarkesto.gwt.client.Time;
 import ilarkesto.gwt.client.editor.AEditorModel;
 import ilarkesto.gwt.client.editor.AFieldModel;
 
@@ -32,6 +47,7 @@ import scrum.client.collaboration.Subject;
 import scrum.client.collaboration.Wikipage;
 import scrum.client.common.ShowEntityAction;
 import scrum.client.common.WeekdaySelector;
+import scrum.client.dashboard.DashboardWidget;
 import scrum.client.files.File;
 import scrum.client.impediments.Impediment;
 import scrum.client.issues.Issue;
@@ -39,7 +55,9 @@ import scrum.client.journal.ProjectEvent;
 import scrum.client.pr.BlogEntry;
 import scrum.client.release.Release;
 import scrum.client.risks.Risk;
+import scrum.client.sprint.RequirementsOrderComparator;
 import scrum.client.sprint.Sprint;
+import scrum.client.sprint.SprintReport;
 import scrum.client.sprint.Task;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -51,7 +69,8 @@ public class Project extends GProject implements ForumSupport {
 	private static final String effortUnit = "pts";
 	public static final String INIT_LABEL = "New Project";
 
-	private transient Comparator<Requirement> requirementsOrderComparator;
+	public transient boolean historyLoaded;
+	private transient RequirementsOrderComparator requirementsOrderComparator;
 	private transient Comparator<Issue> issuesOrderComparator;
 
 	public Project(User creator) {
@@ -66,6 +85,27 @@ public class Project extends GProject implements ForumSupport {
 
 	public Project(Map data) {
 		super(data);
+	}
+
+	public boolean isInHistory(Requirement requirement) {
+		for (SprintReport report : getSprintReports()) {
+			if (report.containsCompletedRequirement(requirement)) return true;
+			if (report.containsRejectedRequirement(requirement)) return true;
+		}
+		return false;
+	}
+
+	public Set<SprintReport> getSprintReports() {
+		Set<SprintReport> reports = new HashSet<SprintReport>();
+		for (Sprint sprint : getSprints()) {
+			SprintReport report = sprint.getSprintReport();
+			if (report != null) reports.add(report);
+		}
+		return reports;
+	}
+
+	public boolean isHomepagePublishingEnabled() {
+		return !Str.isBlank(getHomepageDir());
 	}
 
 	public int getTotalMisconducts() {
@@ -86,9 +126,11 @@ public class Project extends GProject implements ForumSupport {
 	public List<String> getThemes() {
 		Set<String> themes = new HashSet<String>();
 		for (Requirement requirement : getRequirements()) {
+			if (requirement.isClosed()) continue;
 			themes.addAll(requirement.getThemes());
 		}
 		for (Issue issue : getIssues()) {
+			if (issue.isClosed()) continue;
 			themes.addAll(issue.getThemes());
 		}
 		List<String> ret = new ArrayList<String>(themes);
@@ -142,8 +184,7 @@ public class Project extends GProject implements ForumSupport {
 
 	public String getVelocitiesFromLastSprints() {
 		StringBuilder sb = new StringBuilder();
-		List<Sprint> sprints = getCompletedSprints();
-		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		List<Sprint> sprints = getCompletedSprintsInOrder();
 		float sum = 0;
 		int count = 0;
 		for (Sprint sprint : sprints) {
@@ -182,12 +223,20 @@ public class Project extends GProject implements ForumSupport {
 		return latest;
 	}
 
-	public List<Sprint> getCompletedSprints() {
-		List<Sprint> ret = new ArrayList<Sprint>();
+	public Set<Sprint> getCompletedSprints() {
+		Set<Sprint> ret = new HashSet<Sprint>();
 		for (Sprint sprint : getSprints()) {
 			if (sprint.isCompleted()) ret.add(sprint);
 		}
 		return ret;
+	}
+
+	public List<Sprint> getCompletedSprintsInOrder() {
+		return Utl.sort(getCompletedSprints(), Sprint.END_DATE_COMPARATOR);
+	}
+
+	public List<Sprint> getCompletedSprintsInReverseOrder() {
+		return Utl.sort(getCompletedSprints(), Sprint.END_DATE_REVERSE_COMPARATOR);
 	}
 
 	public List<ProjectEvent> getLatestProjectEvents(int min) {
@@ -216,13 +265,11 @@ public class Project extends GProject implements ForumSupport {
 
 	public ProjectUserConfig getUserConfig(User user) {
 		for (ProjectUserConfig config : getDao().getProjectUserConfigsByProject(this)) {
-			if (config.isUser(user)) { return config; }
+			if (config.isUser(user)) return config;
 		}
-		throw new IllegalStateException("User has no project config: " + user);
+		return null;
 	}
 
-	// TODO: guten namen für die methode finden.. hieß vorher isPig(), allerdings ist der PO eig. kein Pig,
-	// oder?
 	public boolean isScrumTeamMember(User user) {
 		return isProductOwner(user) || isScrumMaster(user) || isTeamMember(user);
 	}
@@ -329,6 +376,9 @@ public class Project extends GProject implements ForumSupport {
 	}
 
 	public void deleteImpediment(Impediment impediment) {
+		for (Task task : getDao().getTasksByImpediment(impediment)) {
+			task.setImpediment(null);
+		}
 		getDao().deleteImpediment(impediment);
 	}
 
@@ -480,9 +530,23 @@ public class Project extends GProject implements ForumSupport {
 	/**
 	 * @param relative The story, before which the new story should be placed. Optional.
 	 */
-	public Requirement createNewRequirement(Requirement relative, boolean before) {
+	public Requirement createNewRequirement(Requirement relative, boolean before, boolean split) {
 		Requirement item = new Requirement(this);
-		getDao().createRequirement(item);
+
+		if (split) {
+			String theme = relative.getLabel();
+			List<String> themes = relative.getThemes();
+			if (!themes.contains(theme)) themes.add(theme);
+
+			relative.setThemes(themes);
+			relative.setDirty(true);
+
+			item.setEpic(relative);
+			item.setThemes(themes);
+			item.setDescription(relative.getDescription());
+			item.setTestDescription(relative.getTestDescription());
+			item.setQualitys(relative.getQualitys());
+		}
 
 		if (relative == null) {
 			updateRequirementsOrder();
@@ -495,6 +559,8 @@ public class Project extends GProject implements ForumSupport {
 			requirements.add(idx, item);
 			updateRequirementsOrder(requirements);
 		}
+
+		getDao().createRequirement(item);
 		return item;
 	}
 
@@ -594,25 +660,14 @@ public class Project extends GProject implements ForumSupport {
 		return issuesOrderComparator;
 	}
 
-	public Comparator<Requirement> getRequirementsOrderComparator() {
-		if (requirementsOrderComparator == null) requirementsOrderComparator = new Comparator<Requirement>() {
+	public RequirementsOrderComparator getRequirementsOrderComparator() {
+		if (requirementsOrderComparator == null) requirementsOrderComparator = new RequirementsOrderComparator() {
 
 			@Override
-			public int compare(Requirement a, Requirement b) {
-				List<String> order = getRequirementsOrderIds();
-				int additional = order.size();
-				int ia = order.indexOf(a.getId());
-				if (ia < 0) {
-					ia = additional;
-					additional++;
-				}
-				int ib = order.indexOf(b.getId());
-				if (ib < 0) {
-					ib = additional;
-					additional++;
-				}
-				return ia - ib;
+			protected List<String> getOrder() {
+				return getRequirementsOrderIds();
 			}
+
 		};
 		return requirementsOrderComparator;
 	}
@@ -657,7 +712,7 @@ public class Project extends GProject implements ForumSupport {
 
 	@Override
 	public Widget createForumItemWidget() {
-		return new HyperlinkWidget(new ShowEntityAction(this, "Project Dashboard"));
+		return new HyperlinkWidget(new ShowEntityAction(DashboardWidget.class, this, "Project Dashboard"));
 	}
 
 	@Override
@@ -708,7 +763,7 @@ public class Project extends GProject implements ForumSupport {
 		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
 		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
 		List<Sprint> reverseSprints = sprints.subList(0, Math.min(toIndex, sprints.size()));
-		Collections.sort(reverseSprints, Sprint.REVERSE_END_DATE_COMPARATOR);
+		Collections.sort(reverseSprints, Sprint.END_DATE_REVERSE_COMPARATOR);
 		return reverseSprints;
 	}
 
@@ -723,6 +778,6 @@ public class Project extends GProject implements ForumSupport {
 
 	public boolean isFreeDay(Date date) {
 		WeekdaySelector freeDays = this.getFreeDaysWeekdaySelectorModel().getValue();
-		return freeDays.isFree(date.getWeekday() + 1);
+		return freeDays.isFree(date.getWeekday().getDayOfWeek() + 1);
 	}
 }

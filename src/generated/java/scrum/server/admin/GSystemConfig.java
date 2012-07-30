@@ -45,6 +45,7 @@ public abstract class GSystemConfig
         properties.put("smtpUser", this.smtpUser);
         properties.put("smtpPassword", this.smtpPassword);
         properties.put("smtpFrom", this.smtpFrom);
+        properties.put("instanceName", this.instanceName);
         properties.put("loginPageLogoUrl", this.loginPageLogoUrl);
         properties.put("loginPageMessage", this.loginPageMessage);
         properties.put("registerPageMessage", this.registerPageMessage);
@@ -54,6 +55,7 @@ public abstract class GSystemConfig
         properties.put("projectCreationDisabled", this.projectCreationDisabled);
         properties.put("defaultUserPassword", this.defaultUserPassword);
         properties.put("openIdDisabled", this.openIdDisabled);
+        properties.put("openIdDomains", this.openIdDomains);
         properties.put("versionCheckEnabled", this.versionCheckEnabled);
         properties.put("ldapEnabled", this.ldapEnabled);
         properties.put("ldapUrl", this.ldapUrl);
@@ -62,6 +64,7 @@ public abstract class GSystemConfig
         properties.put("ldapBaseDn", this.ldapBaseDn);
         properties.put("ldapUserFilterRegex", this.ldapUserFilterRegex);
         properties.put("maxFileSize", this.maxFileSize);
+        properties.put("subscriptionKeySeed", this.subscriptionKeySeed);
         properties.put("myStatisticsDisabled", this.myStatisticsDisabled);
         properties.put("sprintStatisticsDisabled", this.sprintStatisticsDisabled);
         properties.put("usersStatisticsDisabled", this.usersStatisticsDisabled);
@@ -95,7 +98,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareUrl(java.lang.String url) {
-        url = Str.removeUnreadableChars(url);
+        // url = Str.removeUnreadableChars(url);
         return url;
     }
 
@@ -131,7 +134,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareAdminEmail(java.lang.String adminEmail) {
-        adminEmail = Str.removeUnreadableChars(adminEmail);
+        // adminEmail = Str.removeUnreadableChars(adminEmail);
         return adminEmail;
     }
 
@@ -167,7 +170,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareGoogleAnalyticsId(java.lang.String googleAnalyticsId) {
-        googleAnalyticsId = Str.removeUnreadableChars(googleAnalyticsId);
+        // googleAnalyticsId = Str.removeUnreadableChars(googleAnalyticsId);
         return googleAnalyticsId;
     }
 
@@ -203,7 +206,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareSmtpServer(java.lang.String smtpServer) {
-        smtpServer = Str.removeUnreadableChars(smtpServer);
+        // smtpServer = Str.removeUnreadableChars(smtpServer);
         return smtpServer;
     }
 
@@ -304,7 +307,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareSmtpUser(java.lang.String smtpUser) {
-        smtpUser = Str.removeUnreadableChars(smtpUser);
+        // smtpUser = Str.removeUnreadableChars(smtpUser);
         return smtpUser;
     }
 
@@ -340,7 +343,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareSmtpPassword(java.lang.String smtpPassword) {
-        smtpPassword = Str.removeUnreadableChars(smtpPassword);
+        // smtpPassword = Str.removeUnreadableChars(smtpPassword);
         return smtpPassword;
     }
 
@@ -376,7 +379,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareSmtpFrom(java.lang.String smtpFrom) {
-        smtpFrom = Str.removeUnreadableChars(smtpFrom);
+        // smtpFrom = Str.removeUnreadableChars(smtpFrom);
         return smtpFrom;
     }
 
@@ -391,6 +394,42 @@ public abstract class GSystemConfig
 
     protected final void updateSmtpFrom(Object value) {
         setSmtpFrom((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
+    // - instanceName
+    // -----------------------------------------------------------
+
+    private java.lang.String instanceName;
+
+    public final java.lang.String getInstanceName() {
+        return instanceName;
+    }
+
+    public final void setInstanceName(java.lang.String instanceName) {
+        instanceName = prepareInstanceName(instanceName);
+        if (isInstanceName(instanceName)) return;
+        this.instanceName = instanceName;
+        updateLastModified();
+        fireModified("instanceName="+instanceName);
+    }
+
+    protected java.lang.String prepareInstanceName(java.lang.String instanceName) {
+        // instanceName = Str.removeUnreadableChars(instanceName);
+        return instanceName;
+    }
+
+    public final boolean isInstanceNameSet() {
+        return this.instanceName != null;
+    }
+
+    public final boolean isInstanceName(java.lang.String instanceName) {
+        if (this.instanceName == null && instanceName == null) return true;
+        return this.instanceName != null && this.instanceName.equals(instanceName);
+    }
+
+    protected final void updateInstanceName(Object value) {
+        setInstanceName((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -412,7 +451,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLoginPageLogoUrl(java.lang.String loginPageLogoUrl) {
-        loginPageLogoUrl = Str.removeUnreadableChars(loginPageLogoUrl);
+        // loginPageLogoUrl = Str.removeUnreadableChars(loginPageLogoUrl);
         return loginPageLogoUrl;
     }
 
@@ -448,7 +487,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLoginPageMessage(java.lang.String loginPageMessage) {
-        loginPageMessage = Str.removeUnreadableChars(loginPageMessage);
+        // loginPageMessage = Str.removeUnreadableChars(loginPageMessage);
         return loginPageMessage;
     }
 
@@ -484,7 +523,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareRegisterPageMessage(java.lang.String registerPageMessage) {
-        registerPageMessage = Str.removeUnreadableChars(registerPageMessage);
+        // registerPageMessage = Str.removeUnreadableChars(registerPageMessage);
         return registerPageMessage;
     }
 
@@ -520,7 +559,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareAboutPageMessage(java.lang.String aboutPageMessage) {
-        aboutPageMessage = Str.removeUnreadableChars(aboutPageMessage);
+        // aboutPageMessage = Str.removeUnreadableChars(aboutPageMessage);
         return aboutPageMessage;
     }
 
@@ -646,7 +685,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareDefaultUserPassword(java.lang.String defaultUserPassword) {
-        defaultUserPassword = Str.removeUnreadableChars(defaultUserPassword);
+        // defaultUserPassword = Str.removeUnreadableChars(defaultUserPassword);
         return defaultUserPassword;
     }
 
@@ -691,6 +730,42 @@ public abstract class GSystemConfig
 
     protected final void updateOpenIdDisabled(Object value) {
         setOpenIdDisabled((Boolean)value);
+    }
+
+    // -----------------------------------------------------------
+    // - openIdDomains
+    // -----------------------------------------------------------
+
+    private java.lang.String openIdDomains;
+
+    public final java.lang.String getOpenIdDomains() {
+        return openIdDomains;
+    }
+
+    public final void setOpenIdDomains(java.lang.String openIdDomains) {
+        openIdDomains = prepareOpenIdDomains(openIdDomains);
+        if (isOpenIdDomains(openIdDomains)) return;
+        this.openIdDomains = openIdDomains;
+        updateLastModified();
+        fireModified("openIdDomains="+openIdDomains);
+    }
+
+    protected java.lang.String prepareOpenIdDomains(java.lang.String openIdDomains) {
+        // openIdDomains = Str.removeUnreadableChars(openIdDomains);
+        return openIdDomains;
+    }
+
+    public final boolean isOpenIdDomainsSet() {
+        return this.openIdDomains != null;
+    }
+
+    public final boolean isOpenIdDomains(java.lang.String openIdDomains) {
+        if (this.openIdDomains == null && openIdDomains == null) return true;
+        return this.openIdDomains != null && this.openIdDomains.equals(openIdDomains);
+    }
+
+    protected final void updateOpenIdDomains(Object value) {
+        setOpenIdDomains((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -772,7 +847,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLdapUrl(java.lang.String ldapUrl) {
-        ldapUrl = Str.removeUnreadableChars(ldapUrl);
+        // ldapUrl = Str.removeUnreadableChars(ldapUrl);
         return ldapUrl;
     }
 
@@ -808,7 +883,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLdapUser(java.lang.String ldapUser) {
-        ldapUser = Str.removeUnreadableChars(ldapUser);
+        // ldapUser = Str.removeUnreadableChars(ldapUser);
         return ldapUser;
     }
 
@@ -844,7 +919,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLdapPassword(java.lang.String ldapPassword) {
-        ldapPassword = Str.removeUnreadableChars(ldapPassword);
+        // ldapPassword = Str.removeUnreadableChars(ldapPassword);
         return ldapPassword;
     }
 
@@ -880,7 +955,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLdapBaseDn(java.lang.String ldapBaseDn) {
-        ldapBaseDn = Str.removeUnreadableChars(ldapBaseDn);
+        // ldapBaseDn = Str.removeUnreadableChars(ldapBaseDn);
         return ldapBaseDn;
     }
 
@@ -916,7 +991,7 @@ public abstract class GSystemConfig
     }
 
     protected java.lang.String prepareLdapUserFilterRegex(java.lang.String ldapUserFilterRegex) {
-        ldapUserFilterRegex = Str.removeUnreadableChars(ldapUserFilterRegex);
+        // ldapUserFilterRegex = Str.removeUnreadableChars(ldapUserFilterRegex);
         return ldapUserFilterRegex;
     }
 
@@ -966,6 +1041,42 @@ public abstract class GSystemConfig
 
     protected final void updateMaxFileSize(Object value) {
         setMaxFileSize((java.lang.Integer)value);
+    }
+
+    // -----------------------------------------------------------
+    // - subscriptionKeySeed
+    // -----------------------------------------------------------
+
+    private java.lang.String subscriptionKeySeed;
+
+    public final java.lang.String getSubscriptionKeySeed() {
+        return subscriptionKeySeed;
+    }
+
+    public final void setSubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        subscriptionKeySeed = prepareSubscriptionKeySeed(subscriptionKeySeed);
+        if (isSubscriptionKeySeed(subscriptionKeySeed)) return;
+        this.subscriptionKeySeed = subscriptionKeySeed;
+        updateLastModified();
+        fireModified("subscriptionKeySeed="+subscriptionKeySeed);
+    }
+
+    protected java.lang.String prepareSubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        // subscriptionKeySeed = Str.removeUnreadableChars(subscriptionKeySeed);
+        return subscriptionKeySeed;
+    }
+
+    public final boolean isSubscriptionKeySeedSet() {
+        return this.subscriptionKeySeed != null;
+    }
+
+    public final boolean isSubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        if (this.subscriptionKeySeed == null && subscriptionKeySeed == null) return true;
+        return this.subscriptionKeySeed != null && this.subscriptionKeySeed.equals(subscriptionKeySeed);
+    }
+
+    protected final void updateSubscriptionKeySeed(Object value) {
+        setSubscriptionKeySeed((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -1107,6 +1218,7 @@ public abstract class GSystemConfig
             if (property.equals("smtpUser")) updateSmtpUser(value);
             if (property.equals("smtpPassword")) updateSmtpPassword(value);
             if (property.equals("smtpFrom")) updateSmtpFrom(value);
+            if (property.equals("instanceName")) updateInstanceName(value);
             if (property.equals("loginPageLogoUrl")) updateLoginPageLogoUrl(value);
             if (property.equals("loginPageMessage")) updateLoginPageMessage(value);
             if (property.equals("registerPageMessage")) updateRegisterPageMessage(value);
@@ -1116,6 +1228,7 @@ public abstract class GSystemConfig
             if (property.equals("projectCreationDisabled")) updateProjectCreationDisabled(value);
             if (property.equals("defaultUserPassword")) updateDefaultUserPassword(value);
             if (property.equals("openIdDisabled")) updateOpenIdDisabled(value);
+            if (property.equals("openIdDomains")) updateOpenIdDomains(value);
             if (property.equals("versionCheckEnabled")) updateVersionCheckEnabled(value);
             if (property.equals("ldapEnabled")) updateLdapEnabled(value);
             if (property.equals("ldapUrl")) updateLdapUrl(value);
@@ -1124,6 +1237,7 @@ public abstract class GSystemConfig
             if (property.equals("ldapBaseDn")) updateLdapBaseDn(value);
             if (property.equals("ldapUserFilterRegex")) updateLdapUserFilterRegex(value);
             if (property.equals("maxFileSize")) updateMaxFileSize(value);
+            if (property.equals("subscriptionKeySeed")) updateSubscriptionKeySeed(value);
             if (property.equals("myStatisticsDisabled")) updateMyStatisticsDisabled(value);
             if (property.equals("sprintStatisticsDisabled")) updateSprintStatisticsDisabled(value);
             if (property.equals("usersStatisticsDisabled")) updateUsersStatisticsDisabled(value);

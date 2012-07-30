@@ -8,8 +8,8 @@ public class RequestRisksServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestRisks(serviceCaller.getConversationNumber(), new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestRisks(serviceCaller.getConversationNumber(), new DefaultCallback(this, returnHandler));
     }
 
     @Override

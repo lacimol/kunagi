@@ -71,10 +71,13 @@ public abstract class GProject
         properties.put("homepageDir", this.homepageDir);
         properties.put("homepageUrl", this.homepageUrl);
         properties.put("autoUpdateHomepage", this.autoUpdateHomepage);
+        properties.put("releaseScriptPath", this.releaseScriptPath);
         properties.put("supportEmail", this.supportEmail);
         properties.put("issueReplyTemplate", this.issueReplyTemplate);
+        properties.put("subscriberNotificationTemplate", this.subscriberNotificationTemplate);
         properties.put("lastOpenedDateAndTime", this.lastOpenedDateAndTime == null ? null : this.lastOpenedDateAndTime.toString());
         properties.put("freeDays", this.freeDays);
+        properties.put("releasingInfo", this.releasingInfo);
     }
 
     public int compareTo(Project other) {
@@ -83,6 +86,18 @@ public abstract class GProject
 
     public final java.util.Set<scrum.server.sprint.Sprint> getSprints() {
         return sprintDao.getSprintsByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.admin.ProjectUserConfig> getProjectUserConfigs() {
+        return projectUserConfigDao.getProjectUserConfigsByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.project.Quality> getQualitys() {
+        return qualityDao.getQualitysByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.impediments.Impediment> getImpediments() {
+        return impedimentDao.getImpedimentsByProject((Project)this);
     }
 
     public final java.util.Set<scrum.server.project.Requirement> getRequirements() {
@@ -95,30 +110,6 @@ public abstract class GProject
 
     public final java.util.Set<scrum.server.release.Release> getReleases() {
         return releaseDao.getReleasesByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.project.Quality> getQualitys() {
-        return qualityDao.getQualitysByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.impediments.Impediment> getImpediments() {
-        return impedimentDao.getImpedimentsByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.admin.ProjectUserConfig> getProjectUserConfigs() {
-        return projectUserConfigDao.getProjectUserConfigsByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.pr.BlogEntry> getBlogEntrys() {
-        return blogEntryDao.getBlogEntrysByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.risks.Risk> getRisks() {
-        return riskDao.getRisksByProject((Project)this);
-    }
-
-    public final java.util.Set<scrum.server.collaboration.Wikipage> getWikipages() {
-        return wikipageDao.getWikipagesByProject((Project)this);
     }
 
     public final java.util.Set<scrum.server.journal.ProjectEvent> getProjectEvents() {
@@ -135,6 +126,18 @@ public abstract class GProject
 
     public final java.util.Set<scrum.server.collaboration.ChatMessage> getChatMessages() {
         return chatMessageDao.getChatMessagesByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.pr.BlogEntry> getBlogEntrys() {
+        return blogEntryDao.getBlogEntrysByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.risks.Risk> getRisks() {
+        return riskDao.getRisksByProject((Project)this);
+    }
+
+    public final java.util.Set<scrum.server.collaboration.Wikipage> getWikipages() {
+        return wikipageDao.getWikipagesByProject((Project)this);
     }
 
     public final java.util.Set<scrum.server.files.File> getFiles() {
@@ -185,7 +188,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -221,7 +224,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareVision(java.lang.String vision) {
-        vision = Str.removeUnreadableChars(vision);
+        // vision = Str.removeUnreadableChars(vision);
         return vision;
     }
 
@@ -257,7 +260,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareProductLabel(java.lang.String productLabel) {
-        productLabel = Str.removeUnreadableChars(productLabel);
+        // productLabel = Str.removeUnreadableChars(productLabel);
         return productLabel;
     }
 
@@ -293,7 +296,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareShortDescription(java.lang.String shortDescription) {
-        shortDescription = Str.removeUnreadableChars(shortDescription);
+        // shortDescription = Str.removeUnreadableChars(shortDescription);
         return shortDescription;
     }
 
@@ -329,7 +332,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareDescription(java.lang.String description) {
-        description = Str.removeUnreadableChars(description);
+        // description = Str.removeUnreadableChars(description);
         return description;
     }
 
@@ -365,7 +368,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareLongDescription(java.lang.String longDescription) {
-        longDescription = Str.removeUnreadableChars(longDescription);
+        // longDescription = Str.removeUnreadableChars(longDescription);
         return longDescription;
     }
 
@@ -1608,7 +1611,7 @@ public abstract class GProject
     }
 
     protected java.lang.String preparePunishmentUnit(java.lang.String punishmentUnit) {
-        punishmentUnit = Str.removeUnreadableChars(punishmentUnit);
+        // punishmentUnit = Str.removeUnreadableChars(punishmentUnit);
         return punishmentUnit;
     }
 
@@ -1674,7 +1677,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareHomepageDir(java.lang.String homepageDir) {
-        homepageDir = Str.removeUnreadableChars(homepageDir);
+        // homepageDir = Str.removeUnreadableChars(homepageDir);
         return homepageDir;
     }
 
@@ -1710,7 +1713,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareHomepageUrl(java.lang.String homepageUrl) {
-        homepageUrl = Str.removeUnreadableChars(homepageUrl);
+        // homepageUrl = Str.removeUnreadableChars(homepageUrl);
         return homepageUrl;
     }
 
@@ -1758,6 +1761,42 @@ public abstract class GProject
     }
 
     // -----------------------------------------------------------
+    // - releaseScriptPath
+    // -----------------------------------------------------------
+
+    private java.lang.String releaseScriptPath;
+
+    public final java.lang.String getReleaseScriptPath() {
+        return releaseScriptPath;
+    }
+
+    public final void setReleaseScriptPath(java.lang.String releaseScriptPath) {
+        releaseScriptPath = prepareReleaseScriptPath(releaseScriptPath);
+        if (isReleaseScriptPath(releaseScriptPath)) return;
+        this.releaseScriptPath = releaseScriptPath;
+        updateLastModified();
+        fireModified("releaseScriptPath="+releaseScriptPath);
+    }
+
+    protected java.lang.String prepareReleaseScriptPath(java.lang.String releaseScriptPath) {
+        // releaseScriptPath = Str.removeUnreadableChars(releaseScriptPath);
+        return releaseScriptPath;
+    }
+
+    public final boolean isReleaseScriptPathSet() {
+        return this.releaseScriptPath != null;
+    }
+
+    public final boolean isReleaseScriptPath(java.lang.String releaseScriptPath) {
+        if (this.releaseScriptPath == null && releaseScriptPath == null) return true;
+        return this.releaseScriptPath != null && this.releaseScriptPath.equals(releaseScriptPath);
+    }
+
+    protected final void updateReleaseScriptPath(Object value) {
+        setReleaseScriptPath((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
     // - supportEmail
     // -----------------------------------------------------------
 
@@ -1776,7 +1815,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareSupportEmail(java.lang.String supportEmail) {
-        supportEmail = Str.removeUnreadableChars(supportEmail);
+        // supportEmail = Str.removeUnreadableChars(supportEmail);
         return supportEmail;
     }
 
@@ -1812,7 +1851,7 @@ public abstract class GProject
     }
 
     protected java.lang.String prepareIssueReplyTemplate(java.lang.String issueReplyTemplate) {
-        issueReplyTemplate = Str.removeUnreadableChars(issueReplyTemplate);
+        // issueReplyTemplate = Str.removeUnreadableChars(issueReplyTemplate);
         return issueReplyTemplate;
     }
 
@@ -1827,6 +1866,42 @@ public abstract class GProject
 
     protected final void updateIssueReplyTemplate(Object value) {
         setIssueReplyTemplate((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
+    // - subscriberNotificationTemplate
+    // -----------------------------------------------------------
+
+    private java.lang.String subscriberNotificationTemplate;
+
+    public final java.lang.String getSubscriberNotificationTemplate() {
+        return subscriberNotificationTemplate;
+    }
+
+    public final void setSubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        subscriberNotificationTemplate = prepareSubscriberNotificationTemplate(subscriberNotificationTemplate);
+        if (isSubscriberNotificationTemplate(subscriberNotificationTemplate)) return;
+        this.subscriberNotificationTemplate = subscriberNotificationTemplate;
+        updateLastModified();
+        fireModified("subscriberNotificationTemplate="+subscriberNotificationTemplate);
+    }
+
+    protected java.lang.String prepareSubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        // subscriberNotificationTemplate = Str.removeUnreadableChars(subscriberNotificationTemplate);
+        return subscriberNotificationTemplate;
+    }
+
+    public final boolean isSubscriberNotificationTemplateSet() {
+        return this.subscriberNotificationTemplate != null;
+    }
+
+    public final boolean isSubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        if (this.subscriberNotificationTemplate == null && subscriberNotificationTemplate == null) return true;
+        return this.subscriberNotificationTemplate != null && this.subscriberNotificationTemplate.equals(subscriberNotificationTemplate);
+    }
+
+    protected final void updateSubscriberNotificationTemplate(Object value) {
+        setSubscriberNotificationTemplate((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -1895,6 +1970,42 @@ public abstract class GProject
         setFreeDays((Integer)value);
     }
 
+    // -----------------------------------------------------------
+    // - releasingInfo
+    // -----------------------------------------------------------
+
+    private java.lang.String releasingInfo;
+
+    public final java.lang.String getReleasingInfo() {
+        return releasingInfo;
+    }
+
+    public final void setReleasingInfo(java.lang.String releasingInfo) {
+        releasingInfo = prepareReleasingInfo(releasingInfo);
+        if (isReleasingInfo(releasingInfo)) return;
+        this.releasingInfo = releasingInfo;
+        updateLastModified();
+        fireModified("releasingInfo="+releasingInfo);
+    }
+
+    protected java.lang.String prepareReleasingInfo(java.lang.String releasingInfo) {
+        // releasingInfo = Str.removeUnreadableChars(releasingInfo);
+        return releasingInfo;
+    }
+
+    public final boolean isReleasingInfoSet() {
+        return this.releasingInfo != null;
+    }
+
+    public final boolean isReleasingInfo(java.lang.String releasingInfo) {
+        if (this.releasingInfo == null && releasingInfo == null) return true;
+        return this.releasingInfo != null && this.releasingInfo.equals(releasingInfo);
+    }
+
+    protected final void updateReleasingInfo(Object value) {
+        setReleasingInfo((java.lang.String)value);
+    }
+
     public void updateProperties(Map<?, ?> properties) {
         for (Map.Entry entry : properties.entrySet()) {
             String property = (String) entry.getKey();
@@ -1935,10 +2046,13 @@ public abstract class GProject
             if (property.equals("homepageDir")) updateHomepageDir(value);
             if (property.equals("homepageUrl")) updateHomepageUrl(value);
             if (property.equals("autoUpdateHomepage")) updateAutoUpdateHomepage(value);
+            if (property.equals("releaseScriptPath")) updateReleaseScriptPath(value);
             if (property.equals("supportEmail")) updateSupportEmail(value);
             if (property.equals("issueReplyTemplate")) updateIssueReplyTemplate(value);
+            if (property.equals("subscriberNotificationTemplate")) updateSubscriberNotificationTemplate(value);
             if (property.equals("lastOpenedDateAndTime")) updateLastOpenedDateAndTime(value);
             if (property.equals("freeDays")) updateFreeDays(value);
+            if (property.equals("releasingInfo")) updateReleasingInfo(value);
         }
     }
 
@@ -2047,6 +2161,24 @@ public abstract class GProject
         GProject.projectDao = projectDao;
     }
 
+    static scrum.server.admin.ProjectUserConfigDao projectUserConfigDao;
+
+    public static final void setProjectUserConfigDao(scrum.server.admin.ProjectUserConfigDao projectUserConfigDao) {
+        GProject.projectUserConfigDao = projectUserConfigDao;
+    }
+
+    static scrum.server.project.QualityDao qualityDao;
+
+    public static final void setQualityDao(scrum.server.project.QualityDao qualityDao) {
+        GProject.qualityDao = qualityDao;
+    }
+
+    static scrum.server.impediments.ImpedimentDao impedimentDao;
+
+    public static final void setImpedimentDao(scrum.server.impediments.ImpedimentDao impedimentDao) {
+        GProject.impedimentDao = impedimentDao;
+    }
+
     static scrum.server.project.RequirementDao requirementDao;
 
     public static final void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
@@ -2063,42 +2195,6 @@ public abstract class GProject
 
     public static final void setReleaseDao(scrum.server.release.ReleaseDao releaseDao) {
         GProject.releaseDao = releaseDao;
-    }
-
-    static scrum.server.project.QualityDao qualityDao;
-
-    public static final void setQualityDao(scrum.server.project.QualityDao qualityDao) {
-        GProject.qualityDao = qualityDao;
-    }
-
-    static scrum.server.impediments.ImpedimentDao impedimentDao;
-
-    public static final void setImpedimentDao(scrum.server.impediments.ImpedimentDao impedimentDao) {
-        GProject.impedimentDao = impedimentDao;
-    }
-
-    static scrum.server.admin.ProjectUserConfigDao projectUserConfigDao;
-
-    public static final void setProjectUserConfigDao(scrum.server.admin.ProjectUserConfigDao projectUserConfigDao) {
-        GProject.projectUserConfigDao = projectUserConfigDao;
-    }
-
-    static scrum.server.pr.BlogEntryDao blogEntryDao;
-
-    public static final void setBlogEntryDao(scrum.server.pr.BlogEntryDao blogEntryDao) {
-        GProject.blogEntryDao = blogEntryDao;
-    }
-
-    static scrum.server.risks.RiskDao riskDao;
-
-    public static final void setRiskDao(scrum.server.risks.RiskDao riskDao) {
-        GProject.riskDao = riskDao;
-    }
-
-    static scrum.server.collaboration.WikipageDao wikipageDao;
-
-    public static final void setWikipageDao(scrum.server.collaboration.WikipageDao wikipageDao) {
-        GProject.wikipageDao = wikipageDao;
     }
 
     static scrum.server.journal.ProjectEventDao projectEventDao;
@@ -2123,6 +2219,24 @@ public abstract class GProject
 
     public static final void setChatMessageDao(scrum.server.collaboration.ChatMessageDao chatMessageDao) {
         GProject.chatMessageDao = chatMessageDao;
+    }
+
+    static scrum.server.pr.BlogEntryDao blogEntryDao;
+
+    public static final void setBlogEntryDao(scrum.server.pr.BlogEntryDao blogEntryDao) {
+        GProject.blogEntryDao = blogEntryDao;
+    }
+
+    static scrum.server.risks.RiskDao riskDao;
+
+    public static final void setRiskDao(scrum.server.risks.RiskDao riskDao) {
+        GProject.riskDao = riskDao;
+    }
+
+    static scrum.server.collaboration.WikipageDao wikipageDao;
+
+    public static final void setWikipageDao(scrum.server.collaboration.WikipageDao wikipageDao) {
+        GProject.wikipageDao = wikipageDao;
     }
 
     static scrum.server.files.FileDao fileDao;

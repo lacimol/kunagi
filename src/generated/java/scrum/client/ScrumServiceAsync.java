@@ -64,9 +64,17 @@ public interface ScrumServiceAsync {
 
     void updateProjectHomepage(int conversationNumber, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
 
+    void publishRelease(int conversationNumber, String releaseId, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
+
     void requestRisks(int conversationNumber, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
 
     void search(int conversationNumber, String text, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
+
+    void kickStoryFromSprint(int conversationNumber, String storyId, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
+
+    void pullStoryToSprint(int conversationNumber, String storyId, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
+
+    void requestHistory(int conversationNumber, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
 
     void switchToNextSprint(int conversationNumber, com.google.gwt.user.client.rpc.AsyncCallback<scrum.client.DataTransferObject> callback);
 

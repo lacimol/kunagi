@@ -79,6 +79,7 @@ public abstract class GWikipage
 
     public final Wikipage setName(java.lang.String name) {
         if (isName(name)) return (Wikipage)this;
+        if (ilarkesto.core.base.Str.isBlank(name)) throw new RuntimeException("Field is mandatory.");
         this.name = name ;
         propertyChanged("name", this.name);
         return (Wikipage)this;

@@ -39,6 +39,7 @@ public abstract class GProjectUserConfig
         properties.put("projectId", this.projectId);
         properties.put("userId", this.userId);
         properties.put("color", this.color);
+        properties.put("receiveEmailsOnProjectEvents", this.receiveEmailsOnProjectEvents);
         properties.put("misconducts", this.misconducts);
         properties.put("richtextAutosaveText", this.richtextAutosaveText);
         properties.put("richtextAutosaveField", this.richtextAutosaveField);
@@ -185,7 +186,7 @@ public abstract class GProjectUserConfig
     }
 
     protected java.lang.String prepareColor(java.lang.String color) {
-        color = Str.removeUnreadableChars(color);
+        // color = Str.removeUnreadableChars(color);
         return color;
     }
 
@@ -200,6 +201,36 @@ public abstract class GProjectUserConfig
 
     protected final void updateColor(Object value) {
         setColor((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
+    // - receiveEmailsOnProjectEvents
+    // -----------------------------------------------------------
+
+    private boolean receiveEmailsOnProjectEvents;
+
+    public final boolean isReceiveEmailsOnProjectEvents() {
+        return receiveEmailsOnProjectEvents;
+    }
+
+    public final void setReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        receiveEmailsOnProjectEvents = prepareReceiveEmailsOnProjectEvents(receiveEmailsOnProjectEvents);
+        if (isReceiveEmailsOnProjectEvents(receiveEmailsOnProjectEvents)) return;
+        this.receiveEmailsOnProjectEvents = receiveEmailsOnProjectEvents;
+        updateLastModified();
+        fireModified("receiveEmailsOnProjectEvents="+receiveEmailsOnProjectEvents);
+    }
+
+    protected boolean prepareReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        return receiveEmailsOnProjectEvents;
+    }
+
+    public final boolean isReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        return this.receiveEmailsOnProjectEvents == receiveEmailsOnProjectEvents;
+    }
+
+    protected final void updateReceiveEmailsOnProjectEvents(Object value) {
+        setReceiveEmailsOnProjectEvents((Boolean)value);
     }
 
     // -----------------------------------------------------------
@@ -251,7 +282,7 @@ public abstract class GProjectUserConfig
     }
 
     protected java.lang.String prepareRichtextAutosaveText(java.lang.String richtextAutosaveText) {
-        richtextAutosaveText = Str.removeUnreadableChars(richtextAutosaveText);
+        // richtextAutosaveText = Str.removeUnreadableChars(richtextAutosaveText);
         return richtextAutosaveText;
     }
 
@@ -287,7 +318,7 @@ public abstract class GProjectUserConfig
     }
 
     protected java.lang.String prepareRichtextAutosaveField(java.lang.String richtextAutosaveField) {
-        richtextAutosaveField = Str.removeUnreadableChars(richtextAutosaveField);
+        // richtextAutosaveField = Str.removeUnreadableChars(richtextAutosaveField);
         return richtextAutosaveField;
     }
 
@@ -801,7 +832,7 @@ public abstract class GProjectUserConfig
     }
 
     protected java.lang.String preparePblFilterText(java.lang.String pblFilterText) {
-        pblFilterText = Str.removeUnreadableChars(pblFilterText);
+        // pblFilterText = Str.removeUnreadableChars(pblFilterText);
         return pblFilterText;
     }
 
@@ -826,6 +857,7 @@ public abstract class GProjectUserConfig
             if (property.equals("projectId")) updateProject(value);
             if (property.equals("userId")) updateUser(value);
             if (property.equals("color")) updateColor(value);
+            if (property.equals("receiveEmailsOnProjectEvents")) updateReceiveEmailsOnProjectEvents(value);
             if (property.equals("misconducts")) updateMisconducts(value);
             if (property.equals("richtextAutosaveText")) updateRichtextAutosaveText(value);
             if (property.equals("richtextAutosaveField")) updateRichtextAutosaveField(value);

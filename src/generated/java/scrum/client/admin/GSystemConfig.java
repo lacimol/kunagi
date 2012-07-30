@@ -552,6 +552,61 @@ public abstract class GSystemConfig
 
     }
 
+    // --- instanceName ---
+
+    private java.lang.String instanceName ;
+
+    public final java.lang.String getInstanceName() {
+        return this.instanceName ;
+    }
+
+    public final SystemConfig setInstanceName(java.lang.String instanceName) {
+        if (isInstanceName(instanceName)) return (SystemConfig)this;
+        this.instanceName = instanceName ;
+        propertyChanged("instanceName", this.instanceName);
+        return (SystemConfig)this;
+    }
+
+    public final boolean isInstanceName(java.lang.String instanceName) {
+        return equals(this.instanceName, instanceName);
+    }
+
+    private transient InstanceNameModel instanceNameModel;
+
+    public InstanceNameModel getInstanceNameModel() {
+        if (instanceNameModel == null) instanceNameModel = createInstanceNameModel();
+        return instanceNameModel;
+    }
+
+    protected InstanceNameModel createInstanceNameModel() { return new InstanceNameModel(); }
+
+    protected class InstanceNameModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "SystemConfig_instanceName";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getInstanceName();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setInstanceName(value);
+        }
+        @Override
+        public String getTooltip() { return "Name of this Kunagi installation instance. For identification in the title."; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- loginPageLogoUrl ---
 
     private java.lang.String loginPageLogoUrl ;
@@ -1057,6 +1112,61 @@ public abstract class GSystemConfig
 
     }
 
+    // --- openIdDomains ---
+
+    private java.lang.String openIdDomains ;
+
+    public final java.lang.String getOpenIdDomains() {
+        return this.openIdDomains ;
+    }
+
+    public final SystemConfig setOpenIdDomains(java.lang.String openIdDomains) {
+        if (isOpenIdDomains(openIdDomains)) return (SystemConfig)this;
+        this.openIdDomains = openIdDomains ;
+        propertyChanged("openIdDomains", this.openIdDomains);
+        return (SystemConfig)this;
+    }
+
+    public final boolean isOpenIdDomains(java.lang.String openIdDomains) {
+        return equals(this.openIdDomains, openIdDomains);
+    }
+
+    private transient OpenIdDomainsModel openIdDomainsModel;
+
+    public OpenIdDomainsModel getOpenIdDomainsModel() {
+        if (openIdDomainsModel == null) openIdDomainsModel = createOpenIdDomainsModel();
+        return openIdDomainsModel;
+    }
+
+    protected OpenIdDomainsModel createOpenIdDomainsModel() { return new OpenIdDomainsModel(); }
+
+    protected class OpenIdDomainsModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "SystemConfig_openIdDomains";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getOpenIdDomains();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setOpenIdDomains(value);
+        }
+        @Override
+        public String getTooltip() { return "Limits accepted OpenID domains for new users. Multiple domains separated by commas allowed. Leave empty to allow all domains."; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- versionCheckEnabled ---
 
     private boolean versionCheckEnabled ;
@@ -1510,6 +1620,59 @@ public abstract class GSystemConfig
 
     }
 
+    // --- subscriptionKeySeed ---
+
+    private java.lang.String subscriptionKeySeed ;
+
+    public final java.lang.String getSubscriptionKeySeed() {
+        return this.subscriptionKeySeed ;
+    }
+
+    public final SystemConfig setSubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        if (isSubscriptionKeySeed(subscriptionKeySeed)) return (SystemConfig)this;
+        this.subscriptionKeySeed = subscriptionKeySeed ;
+        propertyChanged("subscriptionKeySeed", this.subscriptionKeySeed);
+        return (SystemConfig)this;
+    }
+
+    public final boolean isSubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        return equals(this.subscriptionKeySeed, subscriptionKeySeed);
+    }
+
+    private transient SubscriptionKeySeedModel subscriptionKeySeedModel;
+
+    public SubscriptionKeySeedModel getSubscriptionKeySeedModel() {
+        if (subscriptionKeySeedModel == null) subscriptionKeySeedModel = createSubscriptionKeySeedModel();
+        return subscriptionKeySeedModel;
+    }
+
+    protected SubscriptionKeySeedModel createSubscriptionKeySeedModel() { return new SubscriptionKeySeedModel(); }
+
+    protected class SubscriptionKeySeedModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "SystemConfig_subscriptionKeySeed";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getSubscriptionKeySeed();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setSubscriptionKeySeed(value);
+        }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- myStatisticsDisabled ---
 
     private boolean myStatisticsDisabled ;
@@ -1752,6 +1915,7 @@ public abstract class GSystemConfig
         smtpUser  = (java.lang.String) props.get("smtpUser");
         smtpPassword  = (java.lang.String) props.get("smtpPassword");
         smtpFrom  = (java.lang.String) props.get("smtpFrom");
+        instanceName  = (java.lang.String) props.get("instanceName");
         loginPageLogoUrl  = (java.lang.String) props.get("loginPageLogoUrl");
         loginPageMessage  = (java.lang.String) props.get("loginPageMessage");
         registerPageMessage  = (java.lang.String) props.get("registerPageMessage");
@@ -1761,6 +1925,7 @@ public abstract class GSystemConfig
         projectCreationDisabled  = (Boolean) props.get("projectCreationDisabled");
         defaultUserPassword  = (java.lang.String) props.get("defaultUserPassword");
         openIdDisabled  = (Boolean) props.get("openIdDisabled");
+        openIdDomains  = (java.lang.String) props.get("openIdDomains");
         versionCheckEnabled  = (Boolean) props.get("versionCheckEnabled");
         ldapEnabled  = (Boolean) props.get("ldapEnabled");
         ldapUrl  = (java.lang.String) props.get("ldapUrl");
@@ -1769,6 +1934,7 @@ public abstract class GSystemConfig
         ldapBaseDn  = (java.lang.String) props.get("ldapBaseDn");
         ldapUserFilterRegex  = (java.lang.String) props.get("ldapUserFilterRegex");
         maxFileSize  = (java.lang.Integer) props.get("maxFileSize");
+        subscriptionKeySeed  = (java.lang.String) props.get("subscriptionKeySeed");
         myStatisticsDisabled  = (Boolean) props.get("myStatisticsDisabled");
         sprintStatisticsDisabled  = (Boolean) props.get("sprintStatisticsDisabled");
         usersStatisticsDisabled  = (Boolean) props.get("usersStatisticsDisabled");
@@ -1788,6 +1954,7 @@ public abstract class GSystemConfig
         properties.put("smtpUser", this.smtpUser);
         properties.put("smtpPassword", this.smtpPassword);
         properties.put("smtpFrom", this.smtpFrom);
+        properties.put("instanceName", this.instanceName);
         properties.put("loginPageLogoUrl", this.loginPageLogoUrl);
         properties.put("loginPageMessage", this.loginPageMessage);
         properties.put("registerPageMessage", this.registerPageMessage);
@@ -1797,6 +1964,7 @@ public abstract class GSystemConfig
         properties.put("projectCreationDisabled", this.projectCreationDisabled);
         properties.put("defaultUserPassword", this.defaultUserPassword);
         properties.put("openIdDisabled", this.openIdDisabled);
+        properties.put("openIdDomains", this.openIdDomains);
         properties.put("versionCheckEnabled", this.versionCheckEnabled);
         properties.put("ldapEnabled", this.ldapEnabled);
         properties.put("ldapUrl", this.ldapUrl);
@@ -1805,6 +1973,7 @@ public abstract class GSystemConfig
         properties.put("ldapBaseDn", this.ldapBaseDn);
         properties.put("ldapUserFilterRegex", this.ldapUserFilterRegex);
         properties.put("maxFileSize", this.maxFileSize);
+        properties.put("subscriptionKeySeed", this.subscriptionKeySeed);
         properties.put("myStatisticsDisabled", this.myStatisticsDisabled);
         properties.put("sprintStatisticsDisabled", this.sprintStatisticsDisabled);
         properties.put("usersStatisticsDisabled", this.usersStatisticsDisabled);

@@ -1,14 +1,30 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.issues;
 
 import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
-import ilarkesto.gwt.client.Date;
-import ilarkesto.gwt.client.DateAndTime;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.TimePeriod;
 import ilarkesto.gwt.client.HyperlinkWidget;
 import ilarkesto.gwt.client.LabelProvider;
 import ilarkesto.gwt.client.editor.AFieldModel;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +73,11 @@ public class Issue extends GIssue implements ReferenceSupport, LabelSupport, For
 	@Override
 	public boolean isThemesEditable() {
 		return getLabelModel().isEditable();
+	}
+
+	@Override
+	public boolean isThemesCreatable() {
+		return ScrumGwt.isCurrentUserProductOwner();
 	}
 
 	public List<Requirement> getRelatedRequirements() {
@@ -120,6 +141,10 @@ public class Issue extends GIssue implements ReferenceSupport, LabelSupport, For
 		return isAccepted() && isUrgent();
 	}
 
+	public boolean isUnclosedBug() {
+		return isBug() && !isClosed();
+	}
+
 	public boolean isIdea() {
 		return isAccepted() && !isUrgent();
 	}
@@ -133,20 +158,39 @@ public class Issue extends GIssue implements ReferenceSupport, LabelSupport, For
 	}
 
 	public String getStatusLabel() {
-		if (isClosed()) return "closed on " + getCloseDate();
+		if (isClosed()) {
+			TimePeriod period = getCloseDate().getPeriodToToday();
+			String time = period.toDays() < 1 ? "today" : period.toShortestString() + " ago";
+			return "closed " + time;
+		}
 		if (isBug()) {
 			String s = "";
-			if (isFixed()) s += "fixed by ";
-			if (isOwnerSet()) s += getOwner().getName();
+			if (isFixed()) {
+				s += "fixed ";
+				TimePeriod period = getFixDate().getPeriodToToday();
+				s += period.toDays() < 1 ? "today" : period.toShortestString() + " ago";
+			} else if (isOwnerSet()) {
+				s += "claimed";
+			}
+			if (isOwnerSet()) s += " by " + getOwner().getName();
 			return s;
 		}
-		if (isIdea()) return "accepted on " + getAcceptDate();
+		if (isIdea()) {
+			TimePeriod period = getAcceptDate().getPeriodToToday();
+			String time = period.toDays() < 1 ? "today" : period.toShortestString() + " ago";
+			return "accepted " + time;
+		}
 		if (isSuspended()) return "suspended until " + getSuspendedUntilDate();
-		return "issued on " + getDate().getDate();
+
+		String issuer = getIssuer();
+		if (Str.isBlank(issuer)) issuer = "anonymous";
+		return "issued " + getDate().getPeriodToNow().toShortestString() + " ago by " + issuer;
 	}
 
 	public String getThemesAsString() {
-		return Str.concat(getThemes(), ", ");
+		List<String> themes = getThemes();
+		Collections.sort(themes);
+		return Str.concat(themes, ", ");
 	}
 
 	public void setFixed(User user) {
@@ -168,11 +212,12 @@ public class Issue extends GIssue implements ReferenceSupport, LabelSupport, For
 	}
 
 	public void acceptAsIdea() {
-		setAcceptDate(Date.today());
+		if (getAcceptDate() == null) setAcceptDate(Date.today());
+		setUrgent(false);
 	}
 
 	public void acceptAsBug() {
-		setAcceptDate(Date.today());
+		if (getAcceptDate() == null) setAcceptDate(Date.today());
 		setUrgent(true);
 	}
 
@@ -217,7 +262,7 @@ public class Issue extends GIssue implements ReferenceSupport, LabelSupport, For
 
 	@Override
 	public Widget createForumItemWidget() {
-		return new HyperlinkWidget(new ShowEntityAction(this, getLabel()));
+		return new HyperlinkWidget(new ShowEntityAction(IssueManagementWidget.class, this, getLabel()));
 	}
 
 	private AFieldModel<String> severityLabelModel;

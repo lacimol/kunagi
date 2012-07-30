@@ -15,7 +15,7 @@
 
 package scrum.client.statistics;
 
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.gwt.client.TableBuilder;
 import scrum.client.project.Project;
 import scrum.client.workspace.PagePanel;

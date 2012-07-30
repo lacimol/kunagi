@@ -90,7 +90,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByProject(scrum.server.project.Project project) {
-        return simpleEventsByProjectCache.get(project);
+        return new HashSet<SimpleEvent>(simpleEventsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -130,7 +130,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByLabel(java.lang.String label) {
-        return simpleEventsByLabelCache.get(label);
+        return new HashSet<SimpleEvent>(simpleEventsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -170,7 +170,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByNumber(int number) {
-        return simpleEventsByNumberCache.get(number);
+        return new HashSet<SimpleEvent>(simpleEventsByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -210,7 +210,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByDate(ilarkesto.base.time.Date date) {
-        return simpleEventsByDateCache.get(date);
+        return new HashSet<SimpleEvent>(simpleEventsByDateCache.get(date));
     }
     private Set<ilarkesto.base.time.Date> datesCache;
 
@@ -250,7 +250,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByTime(ilarkesto.base.time.Time time) {
-        return simpleEventsByTimeCache.get(time);
+        return new HashSet<SimpleEvent>(simpleEventsByTimeCache.get(time));
     }
     private Set<ilarkesto.base.time.Time> timesCache;
 
@@ -290,7 +290,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByLocation(java.lang.String location) {
-        return simpleEventsByLocationCache.get(location);
+        return new HashSet<SimpleEvent>(simpleEventsByLocationCache.get(location));
     }
     private Set<java.lang.String> locationsCache;
 
@@ -330,7 +330,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByDuration(java.lang.Integer duration) {
-        return simpleEventsByDurationCache.get(duration);
+        return new HashSet<SimpleEvent>(simpleEventsByDurationCache.get(duration));
     }
     private Set<java.lang.Integer> durationsCache;
 
@@ -370,7 +370,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByAgenda(java.lang.String agenda) {
-        return simpleEventsByAgendaCache.get(agenda);
+        return new HashSet<SimpleEvent>(simpleEventsByAgendaCache.get(agenda));
     }
     private Set<java.lang.String> agendasCache;
 
@@ -410,7 +410,7 @@ public abstract class GSimpleEventDao
             });
 
     public final Set<SimpleEvent> getSimpleEventsByNote(java.lang.String note) {
-        return simpleEventsByNoteCache.get(note);
+        return new HashSet<SimpleEvent>(simpleEventsByNoteCache.get(note));
     }
     private Set<java.lang.String> notesCache;
 

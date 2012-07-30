@@ -66,7 +66,8 @@ public class EfficiencyChart extends Chart {
 		Double efficiency = 0.0;
 		Double allBurnedHours = 0.0;
 		Double initialBurnableHours = 0.0;
-		List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
+		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
+		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
 		int initialWork = 0;
 
 		for (Task task : sprintTasks) {

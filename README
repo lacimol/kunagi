@@ -45,8 +45,8 @@ DESCRIPTION
 
 COPYING
 
-    Copyright 2008, 2009, 2010
-    Witoslaw Koczewski, Artjom Kochtchi, Fabian Hager, Kacper Grubalski
+    Copyright 2008-2011
+    Witoslaw Koczewski, Artjom Kochtchi, Arne Moehle, Fabian Hager, Kacper Grubalski
 
     Kunagi is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -67,15 +67,20 @@ INCLUDED LIBRARIES
     Kunagi uses libraries from other projects with different open source
     licenses. The following are included in our package:
 
-    - Google Web Toolkit - Apache License, Version 2.0
-    - gwt-dnd - Apache License, Version 2.0
-    - gwt-upload - Apache License, Version 2.0
-    - iText PDF - GNU Affero General Public License
-    - JFreeChart - GNU Lesser General Public License
-    - XStream - Berkeley Software Distribution License
-    - JDOM - Apache-style open source license
-    - Commons Fileupload - Apache License, Version 2.0
-    - JavaMail - Common Development and Distribution License
-    - Log4j - Apache License, Version 2.0
+    * Google Web Toolkit - Apache License, Version 2.0
+    * gwt-dnd - Apache License, Version 2.0
+    * gwt-upload - Apache License, Version 2.0
+    * iText PDF - GNU Affero General Public License
+    * JFreeChart - GNU Lesser General Public License
+    * XStream - Berkeley Software Distribution License
+    * JDOM - Apache-style open source license
+    * Commons Fileupload - Apache License, Version 2.0
+    * JavaMail - Common Development and Distribution License
+    * Log4j - Apache License, Version 2.0
+    * Velocity Engine - Apache License, Version 2.0
+    * openid4java - Apache License, Version 2.0
+    * CodeMirror - zlib-style open source license
+    * Liberation Fonts - GNU General Public License
+    * Ubuntu Font - Ubuntu Font License
 
     

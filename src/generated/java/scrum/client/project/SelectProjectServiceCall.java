@@ -11,8 +11,8 @@ public class SelectProjectServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().selectProject(serviceCaller.getConversationNumber(), projectId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().selectProject(serviceCaller.getConversationNumber(), projectId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

@@ -11,8 +11,8 @@ public class RequestForumServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestForum(serviceCaller.getConversationNumber(), all, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestForum(serviceCaller.getConversationNumber(), all, new DefaultCallback(this, returnHandler));
     }
 
     @Override

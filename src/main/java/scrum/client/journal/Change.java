@@ -1,8 +1,24 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.journal;
 
 import ilarkesto.core.base.Str;
 import ilarkesto.core.diff.HtmlDiffMarker;
 import ilarkesto.core.diff.TokenDiff;
+import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.gwt.client.AGwtEntity;
 import ilarkesto.gwt.client.EntityDoesNotExistException;
 
@@ -10,6 +26,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 import scrum.client.ScrumGwt;
+import scrum.client.admin.User;
 import scrum.client.core.RequestEntityServiceCall;
 import scrum.client.impediments.Impediment;
 import scrum.client.issues.Issue;
@@ -19,14 +36,33 @@ import scrum.client.risks.RiskComputer;
 
 public class Change extends GChange {
 
+	public static final String CREATED = "@created";
+	public static final String REQ_COMPLETED_IN_SPRINT = "@completedInSprint";
+	public static final String REQ_REJECTED_IN_SPRINT = "@rejectedInSprint";
+	public static final String NOTIFICATION_EMAILS_SENT = "@notificationEmailsSent";
+
 	public Change(Map data) {
 		super(data);
+	}
+
+	public Change(AGwtEntity parent, String key) {
+		setParent(parent);
+		setKey(key);
+		setDateAndTime(DateAndTime.now());
+		setUser(Scope.get().getComponent(User.class));
 	}
 
 	public String getLabel() {
 		String key = getKey();
 		AGwtEntity parent = getParent();
-		if ("@created".equals(key)) return "created entity";
+		if (parent instanceof Requirement) {
+			if (CREATED.equals(key) && getNewValue() != null) return "splitted story from " + getNewValue();
+			if ("@split".equals(key)) return "splitted " + getNewValue();
+			if (REQ_COMPLETED_IN_SPRINT.equals(key))
+				return "Completed in " + getEntityReferenceAndLabel(getNewValue());
+			if (REQ_REJECTED_IN_SPRINT.equals(key)) return "Rejected in " + getEntityReferenceAndLabel(getNewValue());
+		}
+		if (CREATED.equals(key)) return "created entity";
 		if (parent instanceof Issue) {
 			if (key.equals("@reply")) return "emailed a reply";
 		}
@@ -40,15 +76,18 @@ public class Change extends GChange {
 		String oldValue = getOldValue();
 		String newValue = getNewValue();
 
+		if (key.equals(NOTIFICATION_EMAILS_SENT)) return "Notification emails sent to subscribers";
+
 		if (parent instanceof Issue) {
 			if (key.equals("closeDate")) return Str.isBlank(newValue) ? "reopened issue" : "closed issue";
 			if (key.equals("storyId")) return "converted issue to story " + getEntityReferenceAndLabel(newValue);
 		} else if (parent instanceof Impediment) {
 			if (key.equals("closed")) return Str.isTrue(newValue) ? "closed impediment" : "reopened impediment";
 		} else if (parent instanceof Requirement) {
-			if (key.equals("closed")) return Str.isTrue(newValue) ? "closed story" : "reopened story";
+			if (key.equals("closed")) return Str.isTrue(newValue) ? "accepted story" : "reopened story";
 			if (key.equals("sprintId"))
-				return newValue == null ? "kicked story from sprint" : "pulled story to sprint";
+				return newValue == null ? "kicked story from " + getEntityReferenceAndLabel(oldValue)
+						: "pulled story to " + getEntityReferenceAndLabel(newValue);
 			if (key.equals("issueId")) return "created story from issue " + getEntityReferenceAndLabel(newValue);
 		}
 
@@ -58,6 +97,7 @@ public class Change extends GChange {
 	}
 
 	private String getEntityReferenceAndLabel(String id) {
+		if (id == null) return null;
 		try {
 			return ScrumGwt.getReferenceAndLabel(getDao().getEntity(id));
 		} catch (EntityDoesNotExistException ex) {
@@ -71,6 +111,8 @@ public class Change extends GChange {
 		AGwtEntity parent = getParent();
 		String oldValue = getOldValue();
 		String newValue = getNewValue();
+
+		if (key.equals(NOTIFICATION_EMAILS_SENT)) return Str.toHtml(newValue);
 
 		if (parent instanceof Issue) {
 			if (key.equals("closeDate")) return null;
@@ -100,7 +142,13 @@ public class Change extends GChange {
 
 	@Override
 	public String toString() {
-		return getUser() + " on " + getDateAndTime() + ": " + getParent() + " ." + getKey();
+		String parent;
+		try {
+			parent = getParent().toString();
+		} catch (Exception ex) {
+			parent = "<?>";
+		}
+		return getUser() + " on " + getDateAndTime() + ": " + parent + " ." + getKey();
 	}
 
 	public static transient final Comparator<Change> DATE_AND_TIME_COMPARATOR = new Comparator<Change>() {
@@ -114,6 +162,14 @@ public class Change extends GChange {
 	private static String createDiff(String oldValue, String newValue) {
 		String s = TokenDiff.combinedDiff(oldValue, newValue, new HtmlDiffMarker());
 		return s;
+	}
+
+	public boolean isDiffAvailable() {
+		if (getParent() instanceof Requirement) {
+			if (isKey(REQ_REJECTED_IN_SPRINT)) return false;
+			if (isKey(REQ_COMPLETED_IN_SPRINT)) return false;
+		}
+		return true;
 	}
 
 }

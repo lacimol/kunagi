@@ -84,7 +84,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByProject(scrum.server.project.Project project) {
-        return filesByProjectCache.get(project);
+        return new HashSet<File>(filesByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -124,7 +124,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByFilename(java.lang.String filename) {
-        return filesByFilenameCache.get(filename);
+        return new HashSet<File>(filesByFilenameCache.get(filename));
     }
     private Set<java.lang.String> filenamesCache;
 
@@ -164,7 +164,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByUploadTime(ilarkesto.base.time.DateAndTime uploadTime) {
-        return filesByUploadTimeCache.get(uploadTime);
+        return new HashSet<File>(filesByUploadTimeCache.get(uploadTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> uploadTimesCache;
 
@@ -204,7 +204,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByLabel(java.lang.String label) {
-        return filesByLabelCache.get(label);
+        return new HashSet<File>(filesByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -244,7 +244,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByNumber(int number) {
-        return filesByNumberCache.get(number);
+        return new HashSet<File>(filesByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -284,7 +284,7 @@ public abstract class GFileDao
             });
 
     public final Set<File> getFilesByNote(java.lang.String note) {
-        return filesByNoteCache.get(note);
+        return new HashSet<File>(filesByNoteCache.get(note));
     }
     private Set<java.lang.String> notesCache;
 

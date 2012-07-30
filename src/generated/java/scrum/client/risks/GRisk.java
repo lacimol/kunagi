@@ -144,6 +144,7 @@ public abstract class GRisk
 
     public final Risk setLabel(java.lang.String label) {
         if (isLabel(label)) return (Risk)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Risk)this;

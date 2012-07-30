@@ -60,6 +60,8 @@ public abstract class GTaskDao
         ownersCache = null;
         tasksByImpedimentCache.clear();
         impedimentsCache = null;
+        tasksByClosedInPastSprintCache.clear();
+        closedInPastSprintsCache = null;
     }
 
     @Override
@@ -90,7 +92,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByRequirement(scrum.server.project.Requirement requirement) {
-        return tasksByRequirementCache.get(requirement);
+        return new HashSet<Task>(tasksByRequirementCache.get(requirement));
     }
     private Set<scrum.server.project.Requirement> requirementsCache;
 
@@ -130,7 +132,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByNumber(int number) {
-        return tasksByNumberCache.get(number);
+        return new HashSet<Task>(tasksByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -170,7 +172,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByLabel(java.lang.String label) {
-        return tasksByLabelCache.get(label);
+        return new HashSet<Task>(tasksByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -210,7 +212,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByDescription(java.lang.String description) {
-        return tasksByDescriptionCache.get(description);
+        return new HashSet<Task>(tasksByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -250,7 +252,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByInitialWork(int initialWork) {
-        return tasksByInitialWorkCache.get(initialWork);
+        return new HashSet<Task>(tasksByInitialWorkCache.get(initialWork));
     }
     private Set<Integer> initialWorksCache;
 
@@ -290,7 +292,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByRemainingWork(int remainingWork) {
-        return tasksByRemainingWorkCache.get(remainingWork);
+        return new HashSet<Task>(tasksByRemainingWorkCache.get(remainingWork));
     }
     private Set<Integer> remainingWorksCache;
 
@@ -330,7 +332,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByBurnedWork(int burnedWork) {
-        return tasksByBurnedWorkCache.get(burnedWork);
+        return new HashSet<Task>(tasksByBurnedWorkCache.get(burnedWork));
     }
     private Set<Integer> burnedWorksCache;
 
@@ -370,7 +372,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByOwner(scrum.server.admin.User owner) {
-        return tasksByOwnerCache.get(owner);
+        return new HashSet<Task>(tasksByOwnerCache.get(owner));
     }
     private Set<scrum.server.admin.User> ownersCache;
 
@@ -410,7 +412,7 @@ public abstract class GTaskDao
             });
 
     public final Set<Task> getTasksByImpediment(scrum.server.impediments.Impediment impediment) {
-        return tasksByImpedimentCache.get(impediment);
+        return new HashSet<Task>(tasksByImpedimentCache.get(impediment));
     }
     private Set<scrum.server.impediments.Impediment> impedimentsCache;
 
@@ -434,6 +436,46 @@ public abstract class GTaskDao
 
         public boolean test(Task e) {
             return e.isImpediment(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - closedInPastSprint
+    // -----------------------------------------------------------
+
+    private final Cache<scrum.server.sprint.Sprint,Set<Task>> tasksByClosedInPastSprintCache = new Cache<scrum.server.sprint.Sprint,Set<Task>>(
+            new Cache.Factory<scrum.server.sprint.Sprint,Set<Task>>() {
+                public Set<Task> create(scrum.server.sprint.Sprint closedInPastSprint) {
+                    return getEntities(new IsClosedInPastSprint(closedInPastSprint));
+                }
+            });
+
+    public final Set<Task> getTasksByClosedInPastSprint(scrum.server.sprint.Sprint closedInPastSprint) {
+        return new HashSet<Task>(tasksByClosedInPastSprintCache.get(closedInPastSprint));
+    }
+    private Set<scrum.server.sprint.Sprint> closedInPastSprintsCache;
+
+    public final Set<scrum.server.sprint.Sprint> getClosedInPastSprints() {
+        if (closedInPastSprintsCache == null) {
+            closedInPastSprintsCache = new HashSet<scrum.server.sprint.Sprint>();
+            for (Task e : getEntities()) {
+                if (e.isClosedInPastSprintSet()) closedInPastSprintsCache.add(e.getClosedInPastSprint());
+            }
+        }
+        return closedInPastSprintsCache;
+    }
+
+    private static class IsClosedInPastSprint implements Predicate<Task> {
+
+        private scrum.server.sprint.Sprint value;
+
+        public IsClosedInPastSprint(scrum.server.sprint.Sprint value) {
+            this.value = value;
+        }
+
+        public boolean test(Task e) {
+            return e.isClosedInPastSprint(value);
         }
 
     }
@@ -463,6 +505,12 @@ public abstract class GTaskDao
 
     public void setImpedimentDao(scrum.server.impediments.ImpedimentDao impedimentDao) {
         this.impedimentDao = impedimentDao;
+    }
+
+    scrum.server.sprint.SprintDao sprintDao;
+
+    public void setSprintDao(scrum.server.sprint.SprintDao sprintDao) {
+        this.sprintDao = sprintDao;
     }
 
 }

@@ -71,20 +71,20 @@ public abstract class GTaskDaySnapshot
 
     // --- date ---
 
-    private ilarkesto.gwt.client.Date date ;
+    private ilarkesto.core.time.Date date ;
 
-    public final ilarkesto.gwt.client.Date getDate() {
+    public final ilarkesto.core.time.Date getDate() {
         return this.date ;
     }
 
-    public final TaskDaySnapshot setDate(ilarkesto.gwt.client.Date date) {
+    public final TaskDaySnapshot setDate(ilarkesto.core.time.Date date) {
         if (isDate(date)) return (TaskDaySnapshot)this;
         this.date = date ;
         propertyChanged("date", this.date);
         return (TaskDaySnapshot)this;
     }
 
-    public final boolean isDate(ilarkesto.gwt.client.Date date) {
+    public final boolean isDate(ilarkesto.core.time.Date date) {
         return equals(this.date, date);
     }
 
@@ -105,17 +105,17 @@ public abstract class GTaskDaySnapshot
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -278,7 +278,7 @@ public abstract class GTaskDaySnapshot
     public void updateProperties(Map props) {
         taskId = (String) props.get("taskId");
         String dateAsString = (String) props.get("date");
-        date  =  dateAsString == null ? null : new ilarkesto.gwt.client.Date(dateAsString);
+        date  =  dateAsString == null ? null : new ilarkesto.core.time.Date(dateAsString);
         remainingWork  = (Integer) props.get("remainingWork");
         burnedWork  = (Integer) props.get("burnedWork");
         ownerId = (String) props.get("ownerId");

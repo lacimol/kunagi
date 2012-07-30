@@ -8,8 +8,8 @@ public class RequestImpedimentsServiceCall extends scrum.client.core.AServiceCal
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestImpediments(serviceCaller.getConversationNumber(), new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestImpediments(serviceCaller.getConversationNumber(), new DefaultCallback(this, returnHandler));
     }
 
     @Override

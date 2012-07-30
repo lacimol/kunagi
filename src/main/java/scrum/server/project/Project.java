@@ -1,9 +1,25 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.project;
 
 import ilarkesto.base.Money;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
+import ilarkesto.base.time.DateAndTime;
+import ilarkesto.base.time.Time;
 import ilarkesto.persistence.AEntity;
 import ilarkesto.persistence.Persist;
 import ilarkesto.rss.Rss20Builder;
@@ -23,6 +39,7 @@ import java.util.Set;
 
 import scrum.client.common.WeekdaySelector;
 import scrum.server.KunagiRootConfig;
+import scrum.server.ScrumWebApplication;
 import scrum.server.admin.ProjectUserConfig;
 import scrum.server.admin.User;
 import scrum.server.calendar.SimpleEvent;
@@ -40,6 +57,8 @@ import scrum.server.release.Release;
 import scrum.server.risks.Risk;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.SprintDaySnapshot;
+import scrum.server.sprint.SprintReport;
+import scrum.server.sprint.SprintReportDao;
 import scrum.server.sprint.Task;
 import scrum.server.sprint.TaskDao;
 import scrum.server.task.TaskDaySnapshot;
@@ -48,12 +67,25 @@ public class Project extends GProject {
 
 	private transient Comparator<Requirement> requirementsOrderComparator;
 
+	private static final String NEXT_SPRINT_LABEL = "Next Sprint";
+	private static final String CURRENT_SPRINT_LABEL = "Current Sprint";
+
 	// --- dependencies ---
 
-	private static ProjectSprintSnapshotDao projectSprintSnapshotDao;
-	private static TaskDao taskDao;
-	private static KunagiRootConfig config;
-	private static CommentDao commentDao;
+	private static transient ProjectSprintSnapshotDao projectSprintSnapshotDao;
+	private static transient TaskDao taskDao;
+	private static transient KunagiRootConfig config;
+	private static transient CommentDao commentDao;
+	private static transient SprintReportDao sprintReportDao;
+	private static transient ScrumWebApplication webApplication;
+
+	public static void setWebApplication(ScrumWebApplication webApplication) {
+		Project.webApplication = webApplication;
+	}
+
+	public static void setSprintReportDao(SprintReportDao sprintReportDao) {
+		Project.sprintReportDao = sprintReportDao;
+	}
 
 	public static void setCommentDao(CommentDao commentDao) {
 		Project.commentDao = commentDao;
@@ -72,6 +104,28 @@ public class Project extends GProject {
 	}
 
 	// --- ---
+
+	public Set<Requirement> getProductBacklogRequirements() {
+		Set<Requirement> requirements = getRequirements();
+		Iterator<Requirement> iterator = requirements.iterator();
+		while (iterator.hasNext()) {
+			Requirement requirement = iterator.next();
+			if (requirement.isClosed() || requirement.isInCurrentSprint()) iterator.remove();
+		}
+		return requirements;
+	}
+
+	public Set<SprintReport> getSprintReports() {
+		return sprintReportDao.getSprintReportsByProject(this);
+	}
+
+	public void moveRequirementToTop(Requirement requirement) {
+		List<String> orderIds = getRequirementsOrderIds();
+		String id = requirement.getId();
+		orderIds.remove(id);
+		orderIds.add(0, id);
+		setRequirementsOrderIds(orderIds);
+	}
 
 	public void addRequirementsOrderId(int index, String id) {
 		List<String> ids = getRequirementsOrderIds();
@@ -192,19 +246,18 @@ public class Project extends GProject {
 		return true;
 	}
 
-	public void writeJournalAsRss(OutputStream out, String encoding, String baseUrl) {
+	public void writeJournalAsRss(OutputStream out, String encoding) {
 		Rss20Builder rss = new Rss20Builder();
 		rss.setTitle(getLabel() + " Event Journal");
 		rss.setLanguage("en");
-		rss.setLink(baseUrl + "#project=" + getId());
-		for (ProjectEvent event : getLatestProjectEvents()) {
+		rss.setLink(webApplication.createUrl(this, null));
+		for (ProjectEvent event : getLatestProjectEvents(30)) {
 			Rss20Builder.Item item = rss.addItem();
 			item.setTitle(event.getLabel());
 			item.setDescription(event.getLabel());
-			String link = baseUrl + "#project=" + getId();
-			if (event.isSubjectSet()) link += "|entity=" + event.getSubjectId();
+			String link = webApplication.createUrl(this, event.getSubject()) + "|fromEvent=" + event.getId();
 			item.setLink(link);
-			item.setGuid(event.getId());
+			item.setGuid(link);
 			item.setPubDate(event.getDateAndTime());
 		}
 		rss.sortItems();
@@ -219,15 +272,19 @@ public class Project extends GProject {
 		return simpleEventDao.getSimpleEventsByProject(this);
 	}
 
-	public List<ProjectEvent> getLatestProjectEvents() {
-		List<ProjectEvent> events = new LinkedList<ProjectEvent>(getProjectEvents());
-		int max = 30;
-		if (events.size() <= max) return events;
-		Collections.sort(events);
-		while (events.size() > max) {
-			events.remove(0);
+	public List<ProjectEvent> getLatestProjectEvents(int min) {
+		List<ProjectEvent> events = Utl.sort(projectEventDao.getProjectEventsByProject(this));
+
+		DateAndTime deadline = new DateAndTime(Date.today().prevDay(), Time.now());
+		List<ProjectEvent> ret = new ArrayList<ProjectEvent>();
+		int count = 0;
+		for (ProjectEvent event : events) {
+			ret.add(event);
+			count++;
+			DateAndTime dateAndTime = event.getDateAndTime();
+			if (count > min && dateAndTime.isBefore(deadline)) break;
 		}
-		return events;
+		return ret;
 	}
 
 	public Set<ProjectUserConfig> getUserConfigs() {
@@ -450,7 +507,7 @@ public class Project extends GProject {
 		return projectSprintSnapshotDao.getProjectSprintSnapshotsByProject(this);
 	}
 
-	public void switchToNextSprint() {
+	public Sprint switchToNextSprint() {
 		Sprint oldSprint = getCurrentSprint();
 		oldSprint.close();
 		oldSprint.setEnd(Date.today());
@@ -463,6 +520,7 @@ public class Project extends GProject {
 		if (!newSprint.isEndSet() || newSprint.getEnd().isBeforeOrSame(newSprint.getBegin()))
 			newSprint.setEnd(newSprint.getBegin().addDays(oldSprint.getLengthInDays()));
 
+		if (newSprint.isLabel(NEXT_SPRINT_LABEL)) newSprint.setLabel(CURRENT_SPRINT_LABEL);
 		setCurrentSprint(newSprint);
 		createNextSprint();
 
@@ -473,6 +531,8 @@ public class Project extends GProject {
 				taskDao.deleteEntity(task);
 			}
 		}
+
+		return newSprint;
 	}
 
 	private ProjectSprintSnapshot createSprintSnapshot() {
@@ -486,7 +546,7 @@ public class Project extends GProject {
 	public Sprint createNextSprint() {
 		Sprint sprint = sprintDao.newEntityInstance();
 		sprint.setProject(this);
-		sprint.setLabel("Next Sprint");
+		sprint.setLabel(NEXT_SPRINT_LABEL);
 		if (isCurrentSprintSet()) {
 			sprint.setBegin(getCurrentSprint().getEnd());
 			Integer length = getCurrentSprint().getLengthInDays();
@@ -603,7 +663,8 @@ public class Project extends GProject {
 		if (comments.size() < 2) return comments;
 		Comment latest = null;
 		for (Comment comment : comments) {
-			if (latest == null || comment.getDateAndTime().isAfter(latest.getDateAndTime())) latest = comment;
+			DateAndTime dateAndTime = comment.getDateAndTime();
+			if (latest == null || dateAndTime.isAfter(latest.getDateAndTime())) latest = comment;
 		}
 		assert latest != null;
 		return Utl.toSet(latest);
@@ -637,6 +698,37 @@ public class Project extends GProject {
 			setPunishmentFactor(1);
 		}
 		if (!isHomepageDirSet()) setAutoUpdateHomepage(false);
+		if (!isIssueReplyTemplateSet()) setIssueReplyTemplate(createDefaultIssueReplyTemplate());
+		if (!isSubscriberNotificationTemplateSet())
+			setSubscriberNotificationTemplate(createDefaultSubscriberNotificationTemplate());
+	}
+
+	private String createDefaultIssueReplyTemplate() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Hello ${issuer.name},\n");
+		sb.append("\n");
+		sb.append("thank you very much for your feedback.\n");
+		sb.append("\n");
+		sb.append("Your issue is now known as ${issue.reference}. You can view it on our homepage: ${homepage.url}/${issue.reference}.html\n");
+		return sb.toString();
+	}
+
+	private String createDefaultSubscriberNotificationTemplate() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Hello,\n");
+		sb.append("\n");
+		sb.append("there is news on an entity you are subscribed to:\n");
+		sb.append("\n");
+		sb.append("    ${entity.reference} ${entity.label}\n");
+		sb.append("    ${homepage.url}/${entity.reference}.html\n");
+		sb.append("\n");
+		sb.append("    ${change.message}\n");
+		sb.append("\n");
+		sb.append("---\n");
+		sb.append("Unsubscribe from ${entity.reference}: ${unsubscribe.url}\n");
+		sb.append("\n");
+		sb.append("Unsubscribe from all entities: ${unsubscribeall.url}\n");
+		return sb.toString();
 	}
 
 	@Override
@@ -749,6 +841,14 @@ public class Project extends GProject {
 		iss = issueDao.postIssue(this, "I like this software, thank you!");
 		iss.setDescription("I'm using Kunagi for my own project now. Thanks for the great work.");
 		iss.setCloseDate(Date.today());
+	}
+
+	public void addTestReleases() {
+		Release r1 = releaseDao.postRelease(this, Date.beforeDays(30), "1.0");
+		r1.setReleased(true);
+
+		Release r2 = releaseDao.postRelease(this, Date.inDays(5), "1.1");
+		r2.addSprint(getCurrentSprint());
 	}
 
 	public void addTestRequirements() {
@@ -912,6 +1012,7 @@ public class Project extends GProject {
 	}
 
 	public void addTestSprints() {
+		//sprintDao.createTestHistorySprint(this, Date.beforeDays(45), Date.beforeDays(15));
 		sprintDao.createTestFormerSprints(this);
 		sprintDao.createTestSprint(this);
 	}

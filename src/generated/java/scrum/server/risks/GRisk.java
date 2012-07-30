@@ -169,7 +169,7 @@ public abstract class GRisk
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -205,7 +205,7 @@ public abstract class GRisk
     }
 
     protected java.lang.String prepareDescription(java.lang.String description) {
-        description = Str.removeUnreadableChars(description);
+        // description = Str.removeUnreadableChars(description);
         return description;
     }
 
@@ -241,7 +241,7 @@ public abstract class GRisk
     }
 
     protected java.lang.String prepareProbabilityMitigation(java.lang.String probabilityMitigation) {
-        probabilityMitigation = Str.removeUnreadableChars(probabilityMitigation);
+        // probabilityMitigation = Str.removeUnreadableChars(probabilityMitigation);
         return probabilityMitigation;
     }
 
@@ -277,7 +277,7 @@ public abstract class GRisk
     }
 
     protected java.lang.String prepareImpactMitigation(java.lang.String impactMitigation) {
-        impactMitigation = Str.removeUnreadableChars(impactMitigation);
+        // impactMitigation = Str.removeUnreadableChars(impactMitigation);
         return impactMitigation;
     }
 

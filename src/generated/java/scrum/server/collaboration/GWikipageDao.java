@@ -78,7 +78,7 @@ public abstract class GWikipageDao
             });
 
     public final Set<Wikipage> getWikipagesByProject(scrum.server.project.Project project) {
-        return wikipagesByProjectCache.get(project);
+        return new HashSet<Wikipage>(wikipagesByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -118,7 +118,7 @@ public abstract class GWikipageDao
             });
 
     public final Set<Wikipage> getWikipagesByName(java.lang.String name) {
-        return wikipagesByNameCache.get(name);
+        return new HashSet<Wikipage>(wikipagesByNameCache.get(name));
     }
     private Set<java.lang.String> namesCache;
 
@@ -158,7 +158,7 @@ public abstract class GWikipageDao
             });
 
     public final Set<Wikipage> getWikipagesByText(java.lang.String text) {
-        return wikipagesByTextCache.get(text);
+        return new HashSet<Wikipage>(wikipagesByTextCache.get(text));
     }
     private Set<java.lang.String> textsCache;
 

@@ -1,11 +1,26 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.sprint;
 
 import ilarkesto.core.base.Utl;
 import ilarkesto.core.scope.Scope;
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.TimePeriod;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.HyperlinkWidget;
-import ilarkesto.gwt.client.TimePeriod;
+import ilarkesto.gwt.client.editor.ATextEditorModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +40,9 @@ import scrum.client.common.WeekdaySelector;
 import scrum.client.impediments.Impediment;
 import scrum.client.project.Project;
 import scrum.client.project.Requirement;
+import scrum.client.sprint.SprintHistoryHelper.StoryInfo;
+import scrum.client.sprint.SprintHistoryHelper.TaskInfo;
+import scrum.client.tasks.WhiteboardWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
@@ -34,7 +52,7 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 	public static final String REFERENCE_PREFIX = "spr";
 
 	private transient Comparator<Task> tasksOrderComparator;
-	private transient Comparator<Requirement> requirementsOrderComparator;
+	private transient RequirementsOrderComparator requirementsOrderComparator;
 
 	public Sprint(Project project, String label) {
 		setProject(project);
@@ -187,7 +205,7 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 	public List<Task> getTasks(User user) {
 		List<Task> ret = new ArrayList<Task>();
 		for (Requirement requirement : getRequirements()) {
-			for (Task task : requirement.getTasks()) {
+			for (Task task : requirement.getTasksInSprint()) {
 				if (user == null) {
 					if (!task.isOwnerSet()) {
 						ret.add(task);
@@ -261,7 +279,7 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 
 	@Override
 	public String toString() {
-		return getReference() + " " + getLabel();
+		return getReferenceAndLabel();
 	}
 
 	@Override
@@ -324,16 +342,16 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 
 		@Override
 		public int compare(Sprint a, Sprint b) {
-			return Utl.compare(b.getEnd(), a.getEnd());
+			return Utl.compare(a.getEnd(), b.getEnd());
 		}
 
 	};
 
-	public static final Comparator<Sprint> REVERSE_END_DATE_COMPARATOR = new Comparator<Sprint>() {
+	public static final Comparator<Sprint> END_DATE_REVERSE_COMPARATOR = new Comparator<Sprint>() {
 
 		@Override
 		public int compare(Sprint a, Sprint b) {
-			return Utl.compare(a.getEnd(), b.getEnd());
+			return Utl.compare(b.getEnd(), a.getEnd());
 		}
 
 	};
@@ -341,7 +359,8 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 	@Override
 	public Widget createForumItemWidget() {
 		String label = isCurrent() ? "Sprint Backlog" : "Sprint";
-		return new HyperlinkWidget(new ShowEntityAction(this, label));
+		return new HyperlinkWidget(new ShowEntityAction(isCurrent() ? WhiteboardWidget.class
+				: SprintHistoryWidget.class, this, label));
 	}
 
 	@Override
@@ -356,24 +375,12 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		return lengthInDaysModel;
 	}
 
-	public Comparator<Requirement> getRequirementsOrderComparator() {
-		if (requirementsOrderComparator == null) requirementsOrderComparator = new Comparator<Requirement>() {
+	public RequirementsOrderComparator getRequirementsOrderComparator() {
+		if (requirementsOrderComparator == null) requirementsOrderComparator = new RequirementsOrderComparator() {
 
 			@Override
-			public int compare(Requirement a, Requirement b) {
-				List<String> order = getRequirementsOrderIds();
-				int additional = order.size();
-				int ia = order.indexOf(a.getId());
-				if (ia < 0) {
-					ia = additional;
-					additional++;
-				}
-				int ib = order.indexOf(b.getId());
-				if (ib < 0) {
-					ib = additional;
-					additional++;
-				}
-				return ia - ib;
+			protected List<String> getOrder() {
+				return getRequirementsOrderIds();
 			}
 		};
 		return requirementsOrderComparator;
@@ -460,18 +467,57 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 
 	}
 
+	private transient ATextEditorModel completedRequirementLabelsModel;
+
+	public ATextEditorModel getCompletedRequirementLabelsModel() {
+		if (completedRequirementLabelsModel == null) completedRequirementLabelsModel = new ATextEditorModel() {
+
+			@Override
+			public String getValue() {
+				StringBuilder sb = new StringBuilder();
+				List<StoryInfo> stories = SprintHistoryHelper.parseRequirementsAndTasks(getCompletedRequirementsData());
+				for (StoryInfo story : stories) {
+					sb.append("\n* ").append(story.getReference()).append(" ").append(story.getLabel());
+					sb.append(" ''").append(story.getEstimatedWorkAsString()).append(", ")
+							.append(story.getBurnedWorkAsString()).append("''");
+					for (TaskInfo task : story.getTasks()) {
+						sb.append("\n  * ").append(task.getReference()).append(" ").append(task.getLabel());
+						sb.append(" ''").append(task.getBurnedWork()).append(" hrs.''");
+					}
+				}
+				return sb.toString();
+			}
+
+			@Override
+			public void setValue(String value) {}
+
+			@Override
+			public boolean isEditable() {
+				return false;
+			}
+		};
+		return completedRequirementLabelsModel;
+	}
+
+	public String getReferenceAndLabel() {
+		return getReference() + " " + getLabel();
+	}
+
+	public String getFullLabel() {
+		return getLabel() + " (" + getReference() + ")";
+	}
+
 	public Date getLastWorkDay() {
 		Date begin = getBegin();
 		Date lastWorkDay = Date.today().prevDay();
 		WeekdaySelector freeDays = getProject().getFreeDaysWeekdaySelectorModel().getValue();
-		int dayOfWeek = lastWorkDay.getWeekday() + 1;
+		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek() + 1;
 		int count = 0;
 		while (freeDays.isFree(dayOfWeek) && count < 28 && !begin.isAfter(lastWorkDay)) {
 			lastWorkDay = lastWorkDay.prevDay();
-			dayOfWeek = lastWorkDay.getWeekday() + 1;
+			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek() + 1;
 			count++;
 		}
 		return lastWorkDay;
 	}
-
 }

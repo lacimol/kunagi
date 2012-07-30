@@ -88,7 +88,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByProject(scrum.server.project.Project project) {
-        return risksByProjectCache.get(project);
+        return new HashSet<Risk>(risksByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -128,7 +128,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByNumber(int number) {
-        return risksByNumberCache.get(number);
+        return new HashSet<Risk>(risksByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -168,7 +168,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByLabel(java.lang.String label) {
-        return risksByLabelCache.get(label);
+        return new HashSet<Risk>(risksByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -208,7 +208,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByDescription(java.lang.String description) {
-        return risksByDescriptionCache.get(description);
+        return new HashSet<Risk>(risksByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -248,7 +248,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByProbabilityMitigation(java.lang.String probabilityMitigation) {
-        return risksByProbabilityMitigationCache.get(probabilityMitigation);
+        return new HashSet<Risk>(risksByProbabilityMitigationCache.get(probabilityMitigation));
     }
     private Set<java.lang.String> probabilityMitigationsCache;
 
@@ -288,7 +288,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByImpactMitigation(java.lang.String impactMitigation) {
-        return risksByImpactMitigationCache.get(impactMitigation);
+        return new HashSet<Risk>(risksByImpactMitigationCache.get(impactMitigation));
     }
     private Set<java.lang.String> impactMitigationsCache;
 
@@ -328,7 +328,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByProbability(int probability) {
-        return risksByProbabilityCache.get(probability);
+        return new HashSet<Risk>(risksByProbabilityCache.get(probability));
     }
     private Set<Integer> probabilitysCache;
 
@@ -368,7 +368,7 @@ public abstract class GRiskDao
             });
 
     public final Set<Risk> getRisksByImpact(int impact) {
-        return risksByImpactCache.get(impact);
+        return new HashSet<Risk>(risksByImpactCache.get(impact));
     }
     private Set<Integer> impactsCache;
 

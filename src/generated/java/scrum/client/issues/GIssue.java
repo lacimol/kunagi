@@ -219,20 +219,21 @@ public abstract class GIssue
 
     // --- date ---
 
-    private ilarkesto.gwt.client.DateAndTime date ;
+    private ilarkesto.core.time.DateAndTime date ;
 
-    public final ilarkesto.gwt.client.DateAndTime getDate() {
+    public final ilarkesto.core.time.DateAndTime getDate() {
         return this.date ;
     }
 
-    public final Issue setDate(ilarkesto.gwt.client.DateAndTime date) {
+    public final Issue setDate(ilarkesto.core.time.DateAndTime date) {
         if (isDate(date)) return (Issue)this;
+        if (date == null) throw new RuntimeException("Field is mandatory.");
         this.date = date ;
         propertyChanged("date", this.date);
         return (Issue)this;
     }
 
-    public final boolean isDate(ilarkesto.gwt.client.DateAndTime date) {
+    public final boolean isDate(ilarkesto.core.time.DateAndTime date) {
         return equals(this.date, date);
     }
 
@@ -253,12 +254,12 @@ public abstract class GIssue
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setDate(value);
         }
 
@@ -266,7 +267,7 @@ public abstract class GIssue
         public boolean isMandatory() { return true; }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -308,6 +309,7 @@ public abstract class GIssue
 
     public final Issue setLabel(java.lang.String label) {
         if (isLabel(label)) return (Issue)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Issue)this;
@@ -584,20 +586,20 @@ public abstract class GIssue
 
     // --- acceptDate ---
 
-    private ilarkesto.gwt.client.Date acceptDate ;
+    private ilarkesto.core.time.Date acceptDate ;
 
-    public final ilarkesto.gwt.client.Date getAcceptDate() {
+    public final ilarkesto.core.time.Date getAcceptDate() {
         return this.acceptDate ;
     }
 
-    public final Issue setAcceptDate(ilarkesto.gwt.client.Date acceptDate) {
+    public final Issue setAcceptDate(ilarkesto.core.time.Date acceptDate) {
         if (isAcceptDate(acceptDate)) return (Issue)this;
         this.acceptDate = acceptDate ;
         propertyChanged("acceptDate", this.acceptDate);
         return (Issue)this;
     }
 
-    public final boolean isAcceptDate(ilarkesto.gwt.client.Date acceptDate) {
+    public final boolean isAcceptDate(ilarkesto.core.time.Date acceptDate) {
         return equals(this.acceptDate, acceptDate);
     }
 
@@ -618,17 +620,17 @@ public abstract class GIssue
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getAcceptDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setAcceptDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -777,20 +779,20 @@ public abstract class GIssue
 
     // --- fixDate ---
 
-    private ilarkesto.gwt.client.Date fixDate ;
+    private ilarkesto.core.time.Date fixDate ;
 
-    public final ilarkesto.gwt.client.Date getFixDate() {
+    public final ilarkesto.core.time.Date getFixDate() {
         return this.fixDate ;
     }
 
-    public final Issue setFixDate(ilarkesto.gwt.client.Date fixDate) {
+    public final Issue setFixDate(ilarkesto.core.time.Date fixDate) {
         if (isFixDate(fixDate)) return (Issue)this;
         this.fixDate = fixDate ;
         propertyChanged("fixDate", this.fixDate);
         return (Issue)this;
     }
 
-    public final boolean isFixDate(ilarkesto.gwt.client.Date fixDate) {
+    public final boolean isFixDate(ilarkesto.core.time.Date fixDate) {
         return equals(this.fixDate, fixDate);
     }
 
@@ -811,17 +813,17 @@ public abstract class GIssue
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getFixDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setFixDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -830,20 +832,20 @@ public abstract class GIssue
 
     // --- closeDate ---
 
-    private ilarkesto.gwt.client.Date closeDate ;
+    private ilarkesto.core.time.Date closeDate ;
 
-    public final ilarkesto.gwt.client.Date getCloseDate() {
+    public final ilarkesto.core.time.Date getCloseDate() {
         return this.closeDate ;
     }
 
-    public final Issue setCloseDate(ilarkesto.gwt.client.Date closeDate) {
+    public final Issue setCloseDate(ilarkesto.core.time.Date closeDate) {
         if (isCloseDate(closeDate)) return (Issue)this;
         this.closeDate = closeDate ;
         propertyChanged("closeDate", this.closeDate);
         return (Issue)this;
     }
 
-    public final boolean isCloseDate(ilarkesto.gwt.client.Date closeDate) {
+    public final boolean isCloseDate(ilarkesto.core.time.Date closeDate) {
         return equals(this.closeDate, closeDate);
     }
 
@@ -864,17 +866,17 @@ public abstract class GIssue
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getCloseDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setCloseDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -883,20 +885,20 @@ public abstract class GIssue
 
     // --- suspendedUntilDate ---
 
-    private ilarkesto.gwt.client.Date suspendedUntilDate ;
+    private ilarkesto.core.time.Date suspendedUntilDate ;
 
-    public final ilarkesto.gwt.client.Date getSuspendedUntilDate() {
+    public final ilarkesto.core.time.Date getSuspendedUntilDate() {
         return this.suspendedUntilDate ;
     }
 
-    public final Issue setSuspendedUntilDate(ilarkesto.gwt.client.Date suspendedUntilDate) {
+    public final Issue setSuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         if (isSuspendedUntilDate(suspendedUntilDate)) return (Issue)this;
         this.suspendedUntilDate = suspendedUntilDate ;
         propertyChanged("suspendedUntilDate", this.suspendedUntilDate);
         return (Issue)this;
     }
 
-    public final boolean isSuspendedUntilDate(ilarkesto.gwt.client.Date suspendedUntilDate) {
+    public final boolean isSuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         return equals(this.suspendedUntilDate, suspendedUntilDate);
     }
 
@@ -917,17 +919,17 @@ public abstract class GIssue
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getSuspendedUntilDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setSuspendedUntilDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -1083,7 +1085,7 @@ public abstract class GIssue
         number  = (Integer) props.get("number");
         type  = (java.lang.String) props.get("type");
         String dateAsString = (String) props.get("date");
-        date  =  dateAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(dateAsString);
+        date  =  dateAsString == null ? null : new ilarkesto.core.time.DateAndTime(dateAsString);
         creatorId = (String) props.get("creatorId");
         label  = (java.lang.String) props.get("label");
         description  = (java.lang.String) props.get("description");
@@ -1091,16 +1093,16 @@ public abstract class GIssue
         issuerName  = (java.lang.String) props.get("issuerName");
         issuerEmail  = (java.lang.String) props.get("issuerEmail");
         String acceptDateAsString = (String) props.get("acceptDate");
-        acceptDate  =  acceptDateAsString == null ? null : new ilarkesto.gwt.client.Date(acceptDateAsString);
+        acceptDate  =  acceptDateAsString == null ? null : new ilarkesto.core.time.Date(acceptDateAsString);
         urgent  = (Boolean) props.get("urgent");
         severity  = (Integer) props.get("severity");
         ownerId = (String) props.get("ownerId");
         String fixDateAsString = (String) props.get("fixDate");
-        fixDate  =  fixDateAsString == null ? null : new ilarkesto.gwt.client.Date(fixDateAsString);
+        fixDate  =  fixDateAsString == null ? null : new ilarkesto.core.time.Date(fixDateAsString);
         String closeDateAsString = (String) props.get("closeDate");
-        closeDate  =  closeDateAsString == null ? null : new ilarkesto.gwt.client.Date(closeDateAsString);
+        closeDate  =  closeDateAsString == null ? null : new ilarkesto.core.time.Date(closeDateAsString);
         String suspendedUntilDateAsString = (String) props.get("suspendedUntilDate");
-        suspendedUntilDate  =  suspendedUntilDateAsString == null ? null : new ilarkesto.gwt.client.Date(suspendedUntilDateAsString);
+        suspendedUntilDate  =  suspendedUntilDateAsString == null ? null : new ilarkesto.core.time.Date(suspendedUntilDateAsString);
         affectedReleasesIds = (Set<String>) props.get("affectedReleasesIds");
         fixReleasesIds = (Set<String>) props.get("fixReleasesIds");
         published  = (Boolean) props.get("published");

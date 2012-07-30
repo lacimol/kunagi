@@ -79,6 +79,7 @@ public abstract class GSubject
 
     public final Subject setLabel(java.lang.String label) {
         if (isLabel(label)) return (Subject)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (Subject)this;

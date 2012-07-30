@@ -1,8 +1,23 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.workspace.history;
 
 import ilarkesto.core.base.Str;
 import ilarkesto.core.base.Utl;
 import ilarkesto.core.logging.Log;
+import ilarkesto.gwt.client.AGwtEntity;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +56,7 @@ public class HistoryToken {
 		String oldProjectId = projectId;
 		String oldPage = page;
 		String oldEntityId = entityId;
+		boolean oldToggle = toggle;
 
 		projectId = props.get("project");
 		page = props.get("page");
@@ -50,7 +66,7 @@ public class HistoryToken {
 		if (projectId == null || !Utl.equals(oldProjectId, projectId)) {
 			observer.onProjectChanged();
 			return;
-		} else if (!Utl.equals(oldPage, page) || !Utl.equals(oldEntityId, entityId)) {
+		} else if (!Utl.equals(oldPage, page) || !Utl.equals(oldEntityId, entityId) || toggle != oldToggle) {
 			observer.onPageOrEntityChanged();
 		} else {
 			log.debug("Nothing changed");
@@ -85,6 +101,25 @@ public class HistoryToken {
 
 	public void update(String projectId) {
 		History.newItem(projectId == null ? "projectSelector" : "project=" + projectId + "|page=" + START_PAGE, true);
+	}
+
+	public void updatePage(String page) {
+		History.newItem("project=" + projectId + "|page=" + page, true);
+	}
+
+	public void updatePageAndEntity(String page, AGwtEntity entity, boolean event) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("project=").append(getProjectId());
+
+		if (!Str.isBlank(page)) sb.append("|page=").append(page);
+		this.page = page;
+
+		if (entity != null) sb.append("|entity=").append(entity.getId());
+		this.entityId = entity == null ? null : entity.getId();
+
+		String token = sb.toString();
+		if (token.equals(History.getToken())) return;
+		History.newItem(token, event);
 	}
 
 	public String getProjectId() {

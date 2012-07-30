@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.sprint;
 
 import scrum.client.common.TooltipBuilder;
@@ -14,32 +28,25 @@ public class UnclaimTaskAction extends GReopenTaskAction {
 	}
 
 	@Override
-	public String getTooltip() {
-
-		TooltipBuilder tb = new TooltipBuilder("Unclaim ownership for this Task.");
-
+	public void updateTooltip(TooltipBuilder tb) {
+		tb.setText("Unclaim ownership for this Task.");
 		if (!getCurrentProject().isTeamMember(getCurrentUser())) {
 			tb.addRemark(TooltipBuilder.NOT_TEAM);
 		} else {
 			if (task.isClosed()) tb.addRemark("Task is already closed.");
-			if (!task.isOwner(getCurrentUser())) tb.addRemark("You are not the owner of this Task.");
 		}
-
-		return tb.getTooltip();
 	}
 
 	@Override
 	public boolean isExecutable() {
-
+		if (!task.isClaimed()) return false;
 		if (task.isClosed()) return false;
-		if (!task.isOwner(getCurrentUser())) return false;
-
+		if (!getCurrentProject().isTeamMember(getCurrentUser())) return false;
 		return true;
 	}
 
 	@Override
 	public boolean isPermitted() {
-		if (!getCurrentProject().isTeamMember(getCurrentUser())) return false;
 		return true;
 	}
 

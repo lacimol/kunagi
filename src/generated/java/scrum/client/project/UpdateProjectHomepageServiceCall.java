@@ -8,8 +8,8 @@ public class UpdateProjectHomepageServiceCall extends scrum.client.core.AService
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().updateProjectHomepage(serviceCaller.getConversationNumber(), new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().updateProjectHomepage(serviceCaller.getConversationNumber(), new DefaultCallback(this, returnHandler));
     }
 
     @Override

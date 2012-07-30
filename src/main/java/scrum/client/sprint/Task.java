@@ -1,7 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.sprint;
 
 import ilarkesto.core.scope.Scope;
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.gwt.client.EntityDoesNotExistException;
 import ilarkesto.gwt.client.HyperlinkWidget;
 import ilarkesto.gwt.client.editor.AFieldModel;
@@ -22,6 +36,7 @@ import scrum.client.project.Project;
 import scrum.client.project.Requirement;
 import scrum.client.task.BurnHours;
 import scrum.client.task.TaskDaySnapshot;
+import scrum.client.tasks.WhiteboardWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -29,6 +44,10 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 	public static final int INIT_EFFORT = 1;
 	public static final String REFERENCE_PREFIX = "tsk";
+
+	public Sprint getSprint() {
+		return getRequirement().getSprint();
+	}
 
 	public Task(Requirement requirement) {
 		setRequirement(requirement);
@@ -38,6 +57,10 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 	public Task(Map data) {
 		super(data);
+	}
+
+	public boolean isInCurrentSprint() {
+		return getRequirement().isInCurrentSprint();
 	}
 
 	@Override
@@ -71,7 +94,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		StringBuilder sb = new StringBuilder();
 		sb.append(getLabel());
 		if (showOwner && isOwnerSet()) {
-			sb.append(" (").append(getOwner().getName()).append(')');
+			sb.append(" (").append(getOwnerName()).append(')');
 		}
 		if (showRequirement) {
 			Requirement requirement = getRequirement();
@@ -187,13 +210,15 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 	@Override
 	public boolean isEditable() {
+		if (getClosedInPastSprint() != null) return false;
+		if (!isInCurrentSprint()) return false;
 		if (!getProject().isTeamMember(Scope.get().getComponent(Auth.class).getUser())) return false;
 		return true;
 	}
 
 	@Override
 	public Widget createForumItemWidget() {
-		return new HyperlinkWidget(new ShowEntityAction(this, getLabel()));
+		return new HyperlinkWidget(new ShowEntityAction(WhiteboardWidget.class, this, getLabel()));
 	}
 
 	private transient AFieldModel<String> ownerModel;
@@ -203,8 +228,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 			@Override
 			public String getValue() {
-				User owner = getOwner();
-				return owner == null ? null : owner.getName();
+				return getOwnerName();
 			}
 		};
 		return ownerModel;
@@ -236,8 +260,6 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 		return results;
 	}
-
-
 
 	public List<BurnHours> getTaskDaySnapshotsInSprint(Date date, Sprint sprint) {
 
@@ -272,6 +294,10 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		newSnapshot.setRemainingWork(snapshot.getRemainingWork());
 		newSnapshot.setTask(snapshot.getTask());
 		return newSnapshot;
+	}
+
+	public String getOwnerName() {
+		return getOwner() == null ? null : getOwner().getName();
 	}
 
 }

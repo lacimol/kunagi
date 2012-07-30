@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.mda;
 
 import ilarkesto.base.time.Date;
@@ -64,7 +78,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 		if (systemConfigModel == null) {
 			systemConfigModel = createEntityModel("SystemConfig", "admin");
 			systemConfigModel.setGwtSupport(true);
-			systemConfigModel.setViewProtected(true);
 			systemConfigModel.setEditProtected(true);
 			systemConfigModel.addStringProperty("url").setTooltip(
 				"URL, on which this Kunagi instance is installed. It will be used in emails.");
@@ -82,6 +95,8 @@ public class ScrumModelApplication extends AGeneratorApplication {
 					.setTooltip("Password, if your SMTP email server requires authentication.");
 			systemConfigModel.addStringProperty("smtpFrom").setTooltip(
 				"Email address, which is used as sender, when Kunagi sends Emails.");
+			systemConfigModel.addStringProperty("instanceName").setTooltip(
+				"Name of this Kunagi installation instance. For identification in the title.");
 			systemConfigModel.addStringProperty("loginPageLogoUrl").setTooltip(
 				"If you wand your custom logo on the login page, type the URL to the image here.");
 			systemConfigModel.addStringProperty("loginPageMessage").setRichtext(true)
@@ -100,6 +115,10 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			systemConfigModel.addProperty("openIdDisabled", boolean.class).setTooltip(
 				"Activate this, if you want to disable logins with OpenID.");
 			systemConfigModel
+					.addStringProperty("openIdDomains")
+					.setTooltip(
+						"Limits accepted OpenID domains for new users. Multiple domains separated by commas allowed. Leave empty to allow all domains.");
+			systemConfigModel
 					.addProperty("versionCheckEnabled", boolean.class)
 					.setTooltip(
 						"Acitvate this, if you want Kunagi to check for new versions and display a small Icon, when available.");
@@ -116,6 +135,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 				"Example: (&(objectClass=user)(sAMAccountName=%u))");
 			systemConfigModel.addIntegerProperty("maxFileSize").setTooltip(
 				"Maximum size in megabytes for uploaded files.");
+			systemConfigModel.addStringProperty("subscriptionKeySeed");
 			systemConfigModel.addProperty("myStatisticsDisabled", boolean.class).setTooltip(
 				"Acitviate this, if you want to disable the my statistics page for team members.");
 			systemConfigModel.addProperty("sprintStatisticsDisabled", boolean.class).setTooltip(
@@ -135,7 +155,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 		if (simpleEventModel == null) {
 			simpleEventModel = createEntityModel("SimpleEvent", "calendar");
 			simpleEventModel.setGwtSupport(true);
-			simpleEventModel.setViewProtected(true);
 			simpleEventModel.addReference("project", getProjectModel()).setMaster(true);
 			simpleEventModel.addStringProperty("label").setMandatory(true).setSearchable(true);
 			simpleEventModel.addProperty("number", int.class).setMandatory(true);
@@ -157,7 +176,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 	public EntityModel getProjectModel() {
 		if (projectModel == null) {
 			projectModel = createEntityModel("Project", "project");
-			projectModel.setViewProtected(true);
 			projectModel.setDeleteProtected(true);
 			projectModel.setGwtSupport(true);
 			projectModel.addPredicate("editable");
@@ -236,6 +254,9 @@ public class ScrumModelApplication extends AGeneratorApplication {
 					.setTooltip("URL on which the project homepage is accessible.");
 			projectModel.addProperty("autoUpdateHomepage", boolean.class).setTooltip(
 				"Automatically update the homepage.");
+			projectModel.addStringProperty("releaseScriptPath").setTooltip(
+				"Full path to the script, which needs to be executed when publishing a release. "
+						+ "The Script recives the release label as the first argument.");
 			projectModel.addStringProperty("supportEmail").setTooltip("Email address of the support for this project.");
 			projectModel
 					.addStringProperty("issueReplyTemplate")
@@ -244,9 +265,18 @@ public class ScrumModelApplication extends AGeneratorApplication {
 						"Text template, which to use when replying to issue authors by email.<br><br>"
 								+ "The following variables can be used: "
 								+ "${issue.reference} ${issuer.name} ${issuer.email} ${homepage.url} ${user.name} ${user.email}");
+			projectModel
+					.addStringProperty("subscriberNotificationTemplate")
+					.setRichtext(true)
+					.setTooltip(
+						"Text template, which to use when sending change notifications to subscribers.<br><br>"
+								+ "The following variables can be used: "
+								+ "${entity.reference} ${entity.label} ${change.message} ${unsubscribe.url} ${unsubscribeall.url} ${homepage.url} ${product.label} ${project.label} ${project.id} ${kunagi.instance} ${kunagi.url}");
 			projectModel.addProperty("lastOpenedDateAndTime", DateAndTime.class);
 			projectModel.addProperty("freeDays", int.class).setTooltip("Weekdays, on which no work is done.");
 			getApplicationModel().addCreateAction(projectModel);
+			projectModel.addStringProperty("releasingInfo").setRichtext(true)
+					.setTooltip("Custom info text for the releases page. Could be used for a release checklist.");
 			projectModel.addAction("DeleteProject");
 			projectModel.addAction("OpenProject");
 			projectModel.addAction("UpdateProjectHomepage");
@@ -260,7 +290,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 		if (fileModel == null) {
 			fileModel = createEntityModel("File", "files");
 			fileModel.setGwtSupport(true);
-			fileModel.setViewProtected(true);
 			fileModel.addReference("project", getProjectModel()).setMaster(true);
 			fileModel.addStringProperty("filename").setEditablePredicate("false").setMandatory(true)
 					.setSearchable(true);
@@ -290,7 +319,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 		if (releaseModel == null) {
 			releaseModel = createEntityModel("Release", "release");
 			releaseModel.setGwtSupport(true);
-			releaseModel.setViewProtected(true);
 			releaseModel.addReference("project", getProjectModel()).setMaster(true);
 			releaseModel.addReference("parentRelease", getReleaseModel());
 			releaseModel.addSetReference("sprints", getSprintModel()).setTooltip(
@@ -324,6 +352,8 @@ public class ScrumModelApplication extends AGeneratorApplication {
 								+ "It should be done in human readable format and an informative manner.");
 			releaseModel.addStringProperty("scmTag").setSearchable(true)
 					.setTooltip("The tag used in content management systems for this release.");
+			releaseModel.addProperty("scriptRunning", boolean.class);
+			releaseModel.addStringProperty("scriptOutput");
 			getApplicationModel().addCreateAction(releaseModel);
 			releaseModel.addAction("DeleteRelease");
 			releaseModel.addAction("CreateBlogEntry");
@@ -392,6 +422,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			requirementModel.addProperty("workEstimationVotingShowoff", boolean.class);
 			requirementModel.addListProperty("tasksOrderIds", String.class);
 			requirementModel.addListProperty("themes", String.class);
+			requirementModel.addReference("epic", getRequirementModel());
 			getApplicationModel().addCreateAction(requirementModel);
 			requirementModel.addAction("DeleteRequirement");
 			requirementModel.addAction("AddRequirementToCurrentSprint");
@@ -407,6 +438,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			requirementModel.addAction("RequirementEstimationVotingShowoff");
 			requirementModel.addAction("ResetRequirementEstimationVoting");
 			requirementModel.addAction("RequirementEstimationVote").addParameter("estimatedWork", Float.class);
+			requirementModel.addAction("SplitRequirement");
 		}
 		return requirementModel;
 	}
@@ -491,7 +523,6 @@ public class ScrumModelApplication extends AGeneratorApplication {
 						"The date by which the Team will finish working on this Sprint. "
 								+ "A Sprint Review meeting should be scheduled to present results.");
 			sprintModel.addProperty("velocity", Float.class);
-			sprintModel.addStringProperty("completedRequirementLabels").setRichtext(true);
 			sprintModel.addStringProperty("completedRequirementsData");
 			sprintModel.addStringProperty("incompletedRequirementsData");
 			sprintModel
@@ -529,6 +560,23 @@ public class ScrumModelApplication extends AGeneratorApplication {
 		return sprintModel;
 	}
 
+	private EntityModel sprintReportModel;
+
+	public EntityModel getSprintReportModel() {
+		if (sprintReportModel == null) {
+			sprintReportModel = createEntityModel("SprintReport", "sprint");
+			sprintReportModel.setGwtSupport(true);
+			sprintReportModel.addReference("sprint", getSprintModel()).setMaster(true).setUnique(true);
+			sprintReportModel.addSetReference("completedRequirements", getRequirementModel());
+			sprintReportModel.addSetReference("rejectedRequirements", getRequirementModel());
+			sprintReportModel.addListProperty("requirementsOrderIds", String.class);
+			sprintReportModel.addSetReference("closedTasks", getTaskModel());
+			sprintReportModel.addSetReference("openTasks", getTaskModel());
+			sprintReportModel.addProperty("burnedWork", int.class);
+		}
+		return sprintReportModel;
+	}
+
 	private EntityModel sprintDaySnapshotModel;
 
 	public EntityModel getSprintDaySnapshotModel() {
@@ -538,6 +586,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			sprintDaySnapshotModel.addProperty("date", Date.class);
 			sprintDaySnapshotModel.addProperty("remainingWork", int.class);
 			sprintDaySnapshotModel.addProperty("burnedWork", int.class);
+			sprintDaySnapshotModel.addProperty("burnedWorkFromDeleted", int.class);
 		}
 		return sprintDaySnapshotModel;
 	}
@@ -577,6 +626,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 					.setTooltip("The Team member working on the Task.");
 			taskModel.addReference("impediment", getImpedimentModel()).setEditablePredicate("editable")
 					.setTooltip("Blocked by Impediment.");
+			taskModel.addReference("closedInPastSprint", getSprintModel()).setBackReferenceName("closedTasksInPast");
 			getApplicationModel().addCreateAction(taskModel);
 			taskModel.addAction("DeleteTask");
 			taskModel.addAction("ClaimTask");
@@ -698,12 +748,12 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			userModel = createEntityModel("User", "admin");
 			userModel.setGwtSupport(true);
 			userModel.setSuperbean(super.getUserModel());
-			userModel.setViewProtected(true);
 			userModel.setEditProtected(true);
 			userModel.addStringProperty("name").setMandatory(true).setSearchable(true).setUnique(true)
 					.setTooltip("Login name.");
 			userModel.addStringProperty("publicName").setSearchable(true)
 					.setTooltip("Name, which is displayed to the public on blog entries or emails.");
+			userModel.addStringProperty("fullName").setSearchable(true).setTooltip("Full name of the person.");
 			userModel.addProperty("admin", boolean.class);
 			userModel.addProperty("emailVerified", boolean.class);
 			userModel.addStringProperty("email").setSearchable(true).setUnique(true);
@@ -749,6 +799,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			projectUserConfigModel.addReference("project", getProjectModel()).setMaster(true);
 			projectUserConfigModel.addReference("user", getUserModel()).setMaster(true);
 			projectUserConfigModel.addStringProperty("color");
+			projectUserConfigModel.addProperty("receiveEmailsOnProjectEvents", boolean.class);
 			projectUserConfigModel.addProperty("misconducts", int.class).setEditablePredicate("misconductsEditable");
 			projectUserConfigModel.addStringProperty("richtextAutosaveText");
 			projectUserConfigModel.addStringProperty("richtextAutosaveField");
@@ -879,7 +930,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			emoticonModel = createEntityModel("Emoticon", "collaboration");
 			emoticonModel.setGwtSupport(true);
 			emoticonModel.addReference("parent", getEntityModel()).setMaster(true);
-			emoticonModel.addReference("owner", getUserModel());
+			emoticonModel.addReference("owner", getUserModel()).setMaster(true);
 			emoticonModel.addStringProperty("emotion");
 		}
 		return emoticonModel;
@@ -979,6 +1030,18 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			blogEntryModel.addAction("UnpublishBlogEntry");
 		}
 		return blogEntryModel;
+	}
+
+	private EntityModel subscriptionModel;
+
+	public EntityModel getSubscriptionModel() {
+		if (subscriptionModel == null) {
+			subscriptionModel = createEntityModel("Subscription", "pr");
+			subscriptionModel.setGwtSupport(true);
+			subscriptionModel.addReference("subject", getEntityModel()).setMaster(true).setUnique(true);
+			subscriptionModel.addSetProperty("subscribersEmails", String.class);
+		}
+		return subscriptionModel;
 	}
 
 	@Override

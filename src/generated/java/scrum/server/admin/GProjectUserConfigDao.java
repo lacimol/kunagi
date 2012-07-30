@@ -48,6 +48,7 @@ public abstract class GProjectUserConfigDao
         usersCache = null;
         projectUserConfigsByColorCache.clear();
         colorsCache = null;
+        projectUserConfigsByReceiveEmailsOnProjectEventsCache.clear();
         projectUserConfigsByMisconductsCache.clear();
         misconductssCache = null;
         projectUserConfigsByRichtextAutosaveTextCache.clear();
@@ -103,7 +104,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByProject(scrum.server.project.Project project) {
-        return projectUserConfigsByProjectCache.get(project);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -143,7 +144,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByUser(scrum.server.admin.User user) {
-        return projectUserConfigsByUserCache.get(user);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByUserCache.get(user));
     }
     private Set<scrum.server.admin.User> usersCache;
 
@@ -183,7 +184,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByColor(java.lang.String color) {
-        return projectUserConfigsByColorCache.get(color);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByColorCache.get(color));
     }
     private Set<java.lang.String> colorsCache;
 
@@ -212,6 +213,35 @@ public abstract class GProjectUserConfigDao
     }
 
     // -----------------------------------------------------------
+    // - receiveEmailsOnProjectEvents
+    // -----------------------------------------------------------
+
+    private final Cache<Boolean,Set<ProjectUserConfig>> projectUserConfigsByReceiveEmailsOnProjectEventsCache = new Cache<Boolean,Set<ProjectUserConfig>>(
+            new Cache.Factory<Boolean,Set<ProjectUserConfig>>() {
+                public Set<ProjectUserConfig> create(Boolean receiveEmailsOnProjectEvents) {
+                    return getEntities(new IsReceiveEmailsOnProjectEvents(receiveEmailsOnProjectEvents));
+                }
+            });
+
+    public final Set<ProjectUserConfig> getProjectUserConfigsByReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByReceiveEmailsOnProjectEventsCache.get(receiveEmailsOnProjectEvents));
+    }
+
+    private static class IsReceiveEmailsOnProjectEvents implements Predicate<ProjectUserConfig> {
+
+        private boolean value;
+
+        public IsReceiveEmailsOnProjectEvents(boolean value) {
+            this.value = value;
+        }
+
+        public boolean test(ProjectUserConfig e) {
+            return value == e.isReceiveEmailsOnProjectEvents();
+        }
+
+    }
+
+    // -----------------------------------------------------------
     // - misconducts
     // -----------------------------------------------------------
 
@@ -223,7 +253,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByMisconducts(int misconducts) {
-        return projectUserConfigsByMisconductsCache.get(misconducts);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByMisconductsCache.get(misconducts));
     }
     private Set<Integer> misconductssCache;
 
@@ -263,7 +293,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByRichtextAutosaveText(java.lang.String richtextAutosaveText) {
-        return projectUserConfigsByRichtextAutosaveTextCache.get(richtextAutosaveText);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByRichtextAutosaveTextCache.get(richtextAutosaveText));
     }
     private Set<java.lang.String> richtextAutosaveTextsCache;
 
@@ -303,7 +333,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByRichtextAutosaveField(java.lang.String richtextAutosaveField) {
-        return projectUserConfigsByRichtextAutosaveFieldCache.get(richtextAutosaveField);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByRichtextAutosaveFieldCache.get(richtextAutosaveField));
     }
     private Set<java.lang.String> richtextAutosaveFieldsCache;
 
@@ -343,7 +373,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsBySelectedEntitysId(java.lang.String selectedEntitysId) {
-        return projectUserConfigsBySelectedEntitysIdCache.get(selectedEntitysId);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsBySelectedEntitysIdCache.get(selectedEntitysId));
     }
     private Set<java.lang.String> selectedEntitysIdsCache;
 
@@ -383,7 +413,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByOnline(boolean online) {
-        return projectUserConfigsByOnlineCache.get(online);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByOnlineCache.get(online));
     }
 
     private static class IsOnline implements Predicate<ProjectUserConfig> {
@@ -412,7 +442,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByLastActivityDateAndTime(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
-        return projectUserConfigsByLastActivityDateAndTimeCache.get(lastActivityDateAndTime);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByLastActivityDateAndTimeCache.get(lastActivityDateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> lastActivityDateAndTimesCache;
 
@@ -452,7 +482,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterTheme(java.lang.String pblFilterTheme) {
-        return projectUserConfigsByPblFilterThemeCache.get(pblFilterTheme);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterThemeCache.get(pblFilterTheme));
     }
     private Set<java.lang.String> pblFilterThemesCache;
 
@@ -492,7 +522,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterQuality(scrum.server.project.Quality pblFilterQuality) {
-        return projectUserConfigsByPblFilterQualityCache.get(pblFilterQuality);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterQualityCache.get(pblFilterQuality));
     }
     private Set<scrum.server.project.Quality> pblFilterQualitysCache;
 
@@ -532,7 +562,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateFrom(ilarkesto.base.time.Date pblFilterDateFrom) {
-        return projectUserConfigsByPblFilterDateFromCache.get(pblFilterDateFrom);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterDateFromCache.get(pblFilterDateFrom));
     }
     private Set<ilarkesto.base.time.Date> pblFilterDateFromsCache;
 
@@ -572,7 +602,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateTo(ilarkesto.base.time.Date pblFilterDateTo) {
-        return projectUserConfigsByPblFilterDateToCache.get(pblFilterDateTo);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterDateToCache.get(pblFilterDateTo));
     }
     private Set<ilarkesto.base.time.Date> pblFilterDateTosCache;
 
@@ -612,7 +642,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterEstimationFrom(java.lang.Float pblFilterEstimationFrom) {
-        return projectUserConfigsByPblFilterEstimationFromCache.get(pblFilterEstimationFrom);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterEstimationFromCache.get(pblFilterEstimationFrom));
     }
     private Set<java.lang.Float> pblFilterEstimationFromsCache;
 
@@ -652,7 +682,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterEstimationTo(java.lang.Float pblFilterEstimationTo) {
-        return projectUserConfigsByPblFilterEstimationToCache.get(pblFilterEstimationTo);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterEstimationToCache.get(pblFilterEstimationTo));
     }
     private Set<java.lang.Float> pblFilterEstimationTosCache;
 
@@ -692,7 +722,7 @@ public abstract class GProjectUserConfigDao
             });
 
     public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterText(java.lang.String pblFilterText) {
-        return projectUserConfigsByPblFilterTextCache.get(pblFilterText);
+        return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterTextCache.get(pblFilterText));
     }
     private Set<java.lang.String> pblFilterTextsCache;
 

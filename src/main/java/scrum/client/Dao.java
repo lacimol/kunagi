@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client;
 
 import ilarkesto.core.scope.Scope;
@@ -45,13 +59,8 @@ public class Dao extends GDao {
 	private static final Dao INSTANCE = new Dao();
 
 	private EntityChangeCache cache = new EntityChangeCache();
-	private ScrumGwtApplication app;
 
 	private Dao() {}
-
-	public void setApp(ScrumGwtApplication app) {
-		this.app = app;
-	}
 
 	public void clearProjectEntities() {
 		clearChatMessages();
@@ -249,7 +258,12 @@ public class Dao extends GDao {
 		private void flush() {
 			if (!entityProperties.isEmpty()) {
 				ChangeHistoryManager changeHistoryManager = Scope.get().getComponent(ChangeHistoryManager.class);
-				if (changeHistoryManager != null) changeHistoryManager.deactivateChangeHistory();
+				if (changeHistoryManager != null) {
+					for (String entityId : entityProperties.keySet()) {
+						if (changeHistoryManager.isChangeHistoryActive(entityId))
+							changeHistoryManager.deactivateChangeHistory();
+					}
+				}
 			}
 
 			for (Map.Entry<String, Map> entry : entityProperties.entrySet()) {

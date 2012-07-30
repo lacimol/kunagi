@@ -173,7 +173,7 @@ public abstract class GChatMessage
     }
 
     protected java.lang.String prepareText(java.lang.String text) {
-        text = Str.removeUnreadableChars(text);
+        // text = Str.removeUnreadableChars(text);
         return text;
     }
 

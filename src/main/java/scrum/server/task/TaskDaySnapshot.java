@@ -44,4 +44,9 @@ public class TaskDaySnapshot extends GTaskDaySnapshot implements BurndownSnapsho
 		}
 	}
 
+	@Override
+	public int getBurnedWorkTotal() {
+		return getBurnedWork();
+	}
+
 }

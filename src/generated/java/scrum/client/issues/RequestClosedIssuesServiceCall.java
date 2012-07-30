@@ -8,8 +8,8 @@ public class RequestClosedIssuesServiceCall extends scrum.client.core.AServiceCa
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestClosedIssues(serviceCaller.getConversationNumber(), new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestClosedIssues(serviceCaller.getConversationNumber(), new DefaultCallback(this, returnHandler));
     }
 
     @Override

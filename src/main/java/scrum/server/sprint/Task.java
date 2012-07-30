@@ -1,20 +1,37 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.sprint;
 
 import ilarkesto.base.time.Date;
 
 import java.util.List;
 
+import scrum.client.common.LabelSupport;
+import scrum.client.common.ReferenceSupport;
 import scrum.server.admin.User;
 import scrum.server.common.Numbered;
 import scrum.server.project.Project;
 import scrum.server.task.TaskDaySnapshot;
 
-public class Task extends GTask implements Numbered {
+public class Task extends GTask implements Numbered, ReferenceSupport, LabelSupport {
 
 	public String getReferenceAndLabel() {
 		return getReference() + " " + getLabel();
 	}
 
+	@Override
 	public String getReference() {
 		return scrum.client.sprint.Task.REFERENCE_PREFIX + getNumber();
 	}
@@ -33,6 +50,7 @@ public class Task extends GTask implements Numbered {
 	}
 
 	public boolean isSprint(Sprint sprint) {
+		if (isClosedInPastSprintSet()) return false;
 		return getRequirement().isSprint(sprint);
 	}
 
@@ -45,15 +63,6 @@ public class Task extends GTask implements Numbered {
 	public void ensureIntegrity() {
 		super.ensureIntegrity();
 		updateNumber();
-
-		if (!getRequirement().isInCurrentSprint()) {
-			if (getRequirement().isClosed()) {
-				getDao().deleteEntity(this);
-			} else {
-				reset();
-			}
-		}
-
 	}
 
 	public Project getProject() {

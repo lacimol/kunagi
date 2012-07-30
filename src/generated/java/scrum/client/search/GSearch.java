@@ -8,9 +8,9 @@ public abstract class GSearch {
 
     protected scrum.client.ScrumGwtApplication app;
 
-    protected scrum.client.project.Project project;
+    protected scrum.client.workspace.Navigator navigator;
 
-    protected scrum.client.workspace.ProjectWorkspaceWidgets projectWorkspaceWidgets;
+    protected scrum.client.project.Project project;
 
     @Override
     public String toString() {

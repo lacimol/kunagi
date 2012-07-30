@@ -1,6 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.admin;
 
-import ilarkesto.base.Crypt;
+import ilarkesto.auth.PasswordHasher;
+import ilarkesto.base.CryptOneWay;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
 import ilarkesto.core.logging.Log;
@@ -8,11 +23,10 @@ import ilarkesto.core.logging.Log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import scrum.server.ScrumWebApplication;
-import scrum.server.project.Project;
+import scrum.server.pr.EmailSender;
 
 public class User extends GUser {
 
@@ -21,9 +35,16 @@ public class User extends GUser {
 
 	private static Log log = Log.get(User.class);
 
+	private String passwordSalt;
+
 	// --- dependencies ---
 
 	private static ScrumWebApplication webApplication;
+	private static EmailSender emailSender;
+
+	public static void setEmailSender(EmailSender emailSender) {
+		User.emailSender = emailSender;
+	}
 
 	public static void setWebApplication(ScrumWebApplication webApplication) {
 		User.webApplication = webApplication;
@@ -41,10 +62,6 @@ public class User extends GUser {
 		return getName();
 	}
 
-	public Set<Project> getProjects() {
-		return projectDao.getProjectsByParticipant(this);
-	}
-
 	private String password;
 
 	public void triggerEmailVerification() {
@@ -53,9 +70,13 @@ public class User extends GUser {
 			return;
 		}
 
-		String urlBase = webApplication.getBaseUrl();
+		String urlBase = webApplication.createUrl(null);
 		StringBuilder sb = new StringBuilder();
-		sb.append("You have created a Kunagi account on ").append(urlBase).append("\n");
+		String nameSuffix = webApplication.getSystemConfig().isInstanceNameSet() ? " @ "
+				+ webApplication.getSystemConfig().getInstanceName() : "";
+		sb.append(
+			"You have created an account for " + webApplication.getSystemConfig().getInstanceNameWithApplicationLabel())
+				.append(urlBase).append("\n");
 		sb.append("\n");
 		sb.append("Please visit the following link, to confirm your email: ").append(urlBase)
 				.append("confirmEmail?user=").append(getId()).append("&email=").append(getEmail()).append("\n");
@@ -63,7 +84,7 @@ public class User extends GUser {
 		sb.append("Please confirm your email within " + HOURS_FOR_EMAIL_VERIFICATION
 				+ " hours, otherwise your account will be deleted.\n");
 		try {
-			webApplication.sendEmail(null, getEmail(), "Kunagi email verification: " + getEmail(), sb.toString());
+			emailSender.sendEmail((String) null, getEmail(), "Kunagi email verification: " + getEmail(), sb.toString());
 		} catch (Exception ex) {
 			log.error("Sending verification email failed:", getEmail(), ex);
 		}
@@ -78,7 +99,7 @@ public class User extends GUser {
 		String newPassword = Str.generatePassword(8);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("You requested a new password for your Kunagi account on ").append(webApplication.getBaseUrl())
+		sb.append("You requested a new password for your Kunagi account on ").append(webApplication.createUrl(null))
 				.append("\n");
 		sb.append("\n");
 		sb.append("Email: ").append(getEmail()).append("\n");
@@ -86,14 +107,14 @@ public class User extends GUser {
 		sb.append("\n");
 		sb.append("You sould change this password, since somebody else could read this email.");
 
-		webApplication.sendEmail(null, getEmail(), "Kunagi password", sb.toString());
+		emailSender.sendEmail((String) null, getEmail(), "Kunagi password", sb.toString());
 
 		setPassword(newPassword);
 		log.info("Password changed for", this);
 	}
 
 	public void triggerPasswordReset() {
-		String urlBase = webApplication.getBaseUrl();
+		String urlBase = webApplication.createUrl(null);
 
 		String newPassword = Str.generatePassword(8);
 		setPassword(newPassword);
@@ -106,7 +127,7 @@ public class User extends GUser {
 		sb.append("Password: ").append(newPassword).append("\n");
 		sb.append("\n");
 		sb.append("You sould change this password, since somebody else could read this email.");
-		webApplication.sendEmail(null, getEmail(), "Kunagi password", sb.toString());
+		emailSender.sendEmail((String) null, getEmail(), "Kunagi password", sb.toString());
 	}
 
 	@Override
@@ -116,13 +137,28 @@ public class User extends GUser {
 
 	@Override
 	public boolean matchesPassword(String password) {
-		return Crypt.cryptWebPassword(password).equals(this.password);
+		if (this.password != null && this.password.startsWith(CryptOneWay.DEFAULT_SALT)) {
+			boolean success = CryptOneWay.cryptWebPassword(password).equals(this.password);
+			if (!success) return false;
+			log.warn("Converting old password hash into new:", this);
+			setPassword(password);
+			return true;
+		}
+		return hashPassword(password).equals(this.password);
 	}
 
 	@Override
 	public void setPassword(String value) {
-		this.password = Crypt.cryptWebPassword(value);
+		this.password = hashPassword(value);
 		fireModified("password=xxx");
+	}
+
+	private String hashPassword(String password) {
+		if (passwordSalt == null) {
+			passwordSalt = Str.generatePassword(32);
+			fireModified("passwordSalt=" + this.passwordSalt);
+		}
+		return PasswordHasher.hashPassword(password, this.passwordSalt, "SHA-256:");
 	}
 
 	@Override
@@ -137,6 +173,7 @@ public class User extends GUser {
 	@Override
 	public void ensureIntegrity() {
 		super.ensureIntegrity();
+		if (Str.isBlank(this.password)) setPassword(webApplication.getSystemConfig().getDefaultUserPassword());
 		if (!isPublicNameSet()) setPublicName(getName());
 		if (!isColorSet()) setColor(getDefaultColor());
 		if (!isLoginTokenSet()) createLoginToken();
@@ -170,9 +207,12 @@ public class User extends GUser {
 		colors.add("darkorange");
 		colors.add("darkorchid");
 		colors.add("darkslateblue");
-		colors.add("darkgray");
 		colors.add("orange");
 		colors.add("green");
+		colors.add("blueviolet");
+		colors.add("darkgoldenrod");
+		colors.add("darkslategray");
+		colors.add("olive");
 		return colors;
 	}
 

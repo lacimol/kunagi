@@ -149,6 +149,59 @@ public abstract class GProjectUserConfig
 
     }
 
+    // --- receiveEmailsOnProjectEvents ---
+
+    private boolean receiveEmailsOnProjectEvents ;
+
+    public final boolean isReceiveEmailsOnProjectEvents() {
+        return this.receiveEmailsOnProjectEvents ;
+    }
+
+    public final ProjectUserConfig setReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        if (isReceiveEmailsOnProjectEvents(receiveEmailsOnProjectEvents)) return (ProjectUserConfig)this;
+        this.receiveEmailsOnProjectEvents = receiveEmailsOnProjectEvents ;
+        propertyChanged("receiveEmailsOnProjectEvents", this.receiveEmailsOnProjectEvents);
+        return (ProjectUserConfig)this;
+    }
+
+    public final boolean isReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        return equals(this.receiveEmailsOnProjectEvents, receiveEmailsOnProjectEvents);
+    }
+
+    private transient ReceiveEmailsOnProjectEventsModel receiveEmailsOnProjectEventsModel;
+
+    public ReceiveEmailsOnProjectEventsModel getReceiveEmailsOnProjectEventsModel() {
+        if (receiveEmailsOnProjectEventsModel == null) receiveEmailsOnProjectEventsModel = createReceiveEmailsOnProjectEventsModel();
+        return receiveEmailsOnProjectEventsModel;
+    }
+
+    protected ReceiveEmailsOnProjectEventsModel createReceiveEmailsOnProjectEventsModel() { return new ReceiveEmailsOnProjectEventsModel(); }
+
+    protected class ReceiveEmailsOnProjectEventsModel extends ilarkesto.gwt.client.editor.ABooleanEditorModel {
+
+        @Override
+        public String getId() {
+            return "ProjectUserConfig_receiveEmailsOnProjectEvents";
+        }
+
+        @Override
+        public java.lang.Boolean getValue() {
+            return isReceiveEmailsOnProjectEvents();
+        }
+
+        @Override
+        public void setValue(java.lang.Boolean value) {
+            setReceiveEmailsOnProjectEvents(value);
+        }
+
+        @Override
+        protected void onChangeValue(java.lang.Boolean oldValue, java.lang.Boolean newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- misconducts ---
 
     private int misconducts ;
@@ -396,20 +449,20 @@ public abstract class GProjectUserConfig
 
     // --- lastActivityDateAndTime ---
 
-    private ilarkesto.gwt.client.DateAndTime lastActivityDateAndTime ;
+    private ilarkesto.core.time.DateAndTime lastActivityDateAndTime ;
 
-    public final ilarkesto.gwt.client.DateAndTime getLastActivityDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getLastActivityDateAndTime() {
         return this.lastActivityDateAndTime ;
     }
 
-    public final ProjectUserConfig setLastActivityDateAndTime(ilarkesto.gwt.client.DateAndTime lastActivityDateAndTime) {
+    public final ProjectUserConfig setLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         if (isLastActivityDateAndTime(lastActivityDateAndTime)) return (ProjectUserConfig)this;
         this.lastActivityDateAndTime = lastActivityDateAndTime ;
         propertyChanged("lastActivityDateAndTime", this.lastActivityDateAndTime);
         return (ProjectUserConfig)this;
     }
 
-    public final boolean isLastActivityDateAndTime(ilarkesto.gwt.client.DateAndTime lastActivityDateAndTime) {
+    public final boolean isLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         return equals(this.lastActivityDateAndTime, lastActivityDateAndTime);
     }
 
@@ -430,17 +483,17 @@ public abstract class GProjectUserConfig
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getLastActivityDateAndTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setLastActivityDateAndTime(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -502,20 +555,20 @@ public abstract class GProjectUserConfig
 
     // --- pblFilterDateFrom ---
 
-    private ilarkesto.gwt.client.Date pblFilterDateFrom ;
+    private ilarkesto.core.time.Date pblFilterDateFrom ;
 
-    public final ilarkesto.gwt.client.Date getPblFilterDateFrom() {
+    public final ilarkesto.core.time.Date getPblFilterDateFrom() {
         return this.pblFilterDateFrom ;
     }
 
-    public final ProjectUserConfig setPblFilterDateFrom(ilarkesto.gwt.client.Date pblFilterDateFrom) {
+    public final ProjectUserConfig setPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         if (isPblFilterDateFrom(pblFilterDateFrom)) return (ProjectUserConfig)this;
         this.pblFilterDateFrom = pblFilterDateFrom ;
         propertyChanged("pblFilterDateFrom", this.pblFilterDateFrom);
         return (ProjectUserConfig)this;
     }
 
-    public final boolean isPblFilterDateFrom(ilarkesto.gwt.client.Date pblFilterDateFrom) {
+    public final boolean isPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         return equals(this.pblFilterDateFrom, pblFilterDateFrom);
     }
 
@@ -536,17 +589,17 @@ public abstract class GProjectUserConfig
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getPblFilterDateFrom();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setPblFilterDateFrom(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -555,20 +608,20 @@ public abstract class GProjectUserConfig
 
     // --- pblFilterDateTo ---
 
-    private ilarkesto.gwt.client.Date pblFilterDateTo ;
+    private ilarkesto.core.time.Date pblFilterDateTo ;
 
-    public final ilarkesto.gwt.client.Date getPblFilterDateTo() {
+    public final ilarkesto.core.time.Date getPblFilterDateTo() {
         return this.pblFilterDateTo ;
     }
 
-    public final ProjectUserConfig setPblFilterDateTo(ilarkesto.gwt.client.Date pblFilterDateTo) {
+    public final ProjectUserConfig setPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         if (isPblFilterDateTo(pblFilterDateTo)) return (ProjectUserConfig)this;
         this.pblFilterDateTo = pblFilterDateTo ;
         propertyChanged("pblFilterDateTo", this.pblFilterDateTo);
         return (ProjectUserConfig)this;
     }
 
-    public final boolean isPblFilterDateTo(ilarkesto.gwt.client.Date pblFilterDateTo) {
+    public final boolean isPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         return equals(this.pblFilterDateTo, pblFilterDateTo);
     }
 
@@ -589,17 +642,17 @@ public abstract class GProjectUserConfig
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getPblFilterDateTo();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setPblFilterDateTo(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -771,19 +824,20 @@ public abstract class GProjectUserConfig
         projectId = (String) props.get("projectId");
         userId = (String) props.get("userId");
         color  = (java.lang.String) props.get("color");
+        receiveEmailsOnProjectEvents  = (Boolean) props.get("receiveEmailsOnProjectEvents");
         misconducts  = (Integer) props.get("misconducts");
         richtextAutosaveText  = (java.lang.String) props.get("richtextAutosaveText");
         richtextAutosaveField  = (java.lang.String) props.get("richtextAutosaveField");
         selectedEntitysIds  = (java.util.List<java.lang.String>) props.get("selectedEntitysIds");
         online  = (Boolean) props.get("online");
         String lastActivityDateAndTimeAsString = (String) props.get("lastActivityDateAndTime");
-        lastActivityDateAndTime  =  lastActivityDateAndTimeAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(lastActivityDateAndTimeAsString);
+        lastActivityDateAndTime  =  lastActivityDateAndTimeAsString == null ? null : new ilarkesto.core.time.DateAndTime(lastActivityDateAndTimeAsString);
         pblFilterThemes  = (java.util.List<java.lang.String>) props.get("pblFilterThemes");
         pblFilterQualitysIds = (Set<String>) props.get("pblFilterQualitysIds");
         String pblFilterDateFromAsString = (String) props.get("pblFilterDateFrom");
-        pblFilterDateFrom  =  pblFilterDateFromAsString == null ? null : new ilarkesto.gwt.client.Date(pblFilterDateFromAsString);
+        pblFilterDateFrom  =  pblFilterDateFromAsString == null ? null : new ilarkesto.core.time.Date(pblFilterDateFromAsString);
         String pblFilterDateToAsString = (String) props.get("pblFilterDateTo");
-        pblFilterDateTo  =  pblFilterDateToAsString == null ? null : new ilarkesto.gwt.client.Date(pblFilterDateToAsString);
+        pblFilterDateTo  =  pblFilterDateToAsString == null ? null : new ilarkesto.core.time.Date(pblFilterDateToAsString);
         pblFilterEstimationFrom  = (java.lang.Float) props.get("pblFilterEstimationFrom");
         pblFilterEstimationTo  = (java.lang.Float) props.get("pblFilterEstimationTo");
         pblFilterText  = (java.lang.String) props.get("pblFilterText");
@@ -796,6 +850,7 @@ public abstract class GProjectUserConfig
         properties.put("projectId", this.projectId);
         properties.put("userId", this.userId);
         properties.put("color", this.color);
+        properties.put("receiveEmailsOnProjectEvents", this.receiveEmailsOnProjectEvents);
         properties.put("misconducts", this.misconducts);
         properties.put("richtextAutosaveText", this.richtextAutosaveText);
         properties.put("richtextAutosaveField", this.richtextAutosaveField);

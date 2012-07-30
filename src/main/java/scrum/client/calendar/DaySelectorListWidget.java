@@ -1,6 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.calendar;
 
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.Weekday;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.TableBuilder;
 
@@ -34,7 +49,7 @@ public class DaySelectorListWidget extends AScrumWidget {
 		for (int i = 1; i < 8; i++) {
 			// 2009-11-23 is a Monday
 			Date weekday = new Date(2009, 11, 22 + i);
-			tb.add(Gwt.createDiv("DateSelectorWidget-weekday", weekday.getWeekdayLabel()));
+			tb.add(Gwt.createDiv("DateSelectorWidget-weekday", weekday.getWeekday().toLocalString()));
 		}
 		tb.nextRow();
 
@@ -46,10 +61,9 @@ public class DaySelectorListWidget extends AScrumWidget {
 		tb.add(Gwt.createDiv("DateSelectorWidget-weeknumber", "" + month.get(0).getWeek()));
 		count++;
 
-		int weekday = month.get(0).getWeekday();
-		if (weekday == 0) weekday = 7;
+		Weekday weekday = month.get(0).getWeekday();
 
-		for (int i = 1; i < weekday; i++) {
+		for (int i = 1; i < weekday.getDayOfWeek() - 1; i++) {
 			count++;
 			tb.add(Gwt.createDiv("DateSelectorWidget-spacer", ""));
 		}

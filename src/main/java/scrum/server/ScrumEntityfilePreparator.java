@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server;
 
 import ilarkesto.core.logging.Log;
@@ -20,15 +34,40 @@ public class ScrumEntityfilePreparator implements EntityfilePreparator {
 
 	private static final Log LOG = Log.get(ScrumEntityfilePreparator.class);
 
+	@Override
+	public void prepareClusterfile(File file, Class type, String alias) {}
+
+	@Override
 	public void prepareEntityfile(File file, Class type, String alias) {
 
 		try {
 			if ("_template_".equalsIgnoreCase(alias)) prepare_template_(file);
+			if ("sprint".equalsIgnoreCase(alias)) prepareSprint(file);
 			// if ("projectUserConfig".equalsIgnoreCase(alias)) prepareProjectUserConfig(file);
 			// if ("change".equalsIgnoreCase(alias)) prepareChange(file);
 		} catch (Throwable ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	private void prepareSprint(File file) throws IOException {
+		boolean modified = false;
+
+		Document doc;
+		try {
+			doc = new SAXBuilder().build(file);
+		} catch (JDOMException ex) {
+			throw new RuntimeException(ex);
+		}
+		Element eSprint = doc.getRootElement();
+
+		Element eCompletedRequirementLabels = eSprint.getChild("completedRequirementLabels");
+		if (eCompletedRequirementLabels != null) {
+			eSprint.removeContent(eCompletedRequirementLabels);
+			modified = true;
+		}
+
+		if (modified) save(doc, file);
 	}
 
 	private void prepareIssue(File file) throws IOException {

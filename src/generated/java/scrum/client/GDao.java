@@ -122,7 +122,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.pr.BlogEntry> getBlogEntrysByDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final List<scrum.client.pr.BlogEntry> getBlogEntrysByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         List<scrum.client.pr.BlogEntry> ret = new ArrayList<scrum.client.pr.BlogEntry>();
         for (scrum.client.pr.BlogEntry entity : blogEntrys.values()) {
             if (entity.isDateAndTime(dateAndTime)) ret.add(entity);
@@ -224,7 +224,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.journal.Change> getChangesByDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final List<scrum.client.journal.Change> getChangesByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         List<scrum.client.journal.Change> ret = new ArrayList<scrum.client.journal.Change>();
         for (scrum.client.journal.Change entity : changes.values()) {
             if (entity.isDateAndTime(dateAndTime)) ret.add(entity);
@@ -350,7 +350,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.collaboration.ChatMessage> getChatMessagesByDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final List<scrum.client.collaboration.ChatMessage> getChatMessagesByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         List<scrum.client.collaboration.ChatMessage> ret = new ArrayList<scrum.client.collaboration.ChatMessage>();
         for (scrum.client.collaboration.ChatMessage entity : chatMessages.values()) {
             if (entity.isDateAndTime(dateAndTime)) ret.add(entity);
@@ -476,7 +476,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.collaboration.Comment> getCommentsByDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final List<scrum.client.collaboration.Comment> getCommentsByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         List<scrum.client.collaboration.Comment> ret = new ArrayList<scrum.client.collaboration.Comment>();
         for (scrum.client.collaboration.Comment entity : comments.values()) {
             if (entity.isDateAndTime(dateAndTime)) ret.add(entity);
@@ -648,7 +648,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.files.File> getFilesByUploadTime(ilarkesto.gwt.client.DateAndTime uploadTime) {
+    public final List<scrum.client.files.File> getFilesByUploadTime(ilarkesto.core.time.DateAndTime uploadTime) {
         List<scrum.client.files.File> ret = new ArrayList<scrum.client.files.File>();
         for (scrum.client.files.File entity : files.values()) {
             if (entity.isUploadTime(uploadTime)) ret.add(entity);
@@ -766,7 +766,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.impediments.Impediment> getImpedimentsByDate(ilarkesto.gwt.client.Date date) {
+    public final List<scrum.client.impediments.Impediment> getImpedimentsByDate(ilarkesto.core.time.Date date) {
         List<scrum.client.impediments.Impediment> ret = new ArrayList<scrum.client.impediments.Impediment>();
         for (scrum.client.impediments.Impediment entity : impediments.values()) {
             if (entity.isDate(date)) ret.add(entity);
@@ -892,7 +892,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.issues.Issue> getIssuesByDate(ilarkesto.gwt.client.DateAndTime date) {
+    public final List<scrum.client.issues.Issue> getIssuesByDate(ilarkesto.core.time.DateAndTime date) {
         List<scrum.client.issues.Issue> ret = new ArrayList<scrum.client.issues.Issue>();
         for (scrum.client.issues.Issue entity : issues.values()) {
             if (entity.isDate(date)) ret.add(entity);
@@ -948,7 +948,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.issues.Issue> getIssuesByAcceptDate(ilarkesto.gwt.client.Date acceptDate) {
+    public final List<scrum.client.issues.Issue> getIssuesByAcceptDate(ilarkesto.core.time.Date acceptDate) {
         List<scrum.client.issues.Issue> ret = new ArrayList<scrum.client.issues.Issue>();
         for (scrum.client.issues.Issue entity : issues.values()) {
             if (entity.isAcceptDate(acceptDate)) ret.add(entity);
@@ -980,7 +980,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.issues.Issue> getIssuesByFixDate(ilarkesto.gwt.client.Date fixDate) {
+    public final List<scrum.client.issues.Issue> getIssuesByFixDate(ilarkesto.core.time.Date fixDate) {
         List<scrum.client.issues.Issue> ret = new ArrayList<scrum.client.issues.Issue>();
         for (scrum.client.issues.Issue entity : issues.values()) {
             if (entity.isFixDate(fixDate)) ret.add(entity);
@@ -988,7 +988,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.issues.Issue> getIssuesByCloseDate(ilarkesto.gwt.client.Date closeDate) {
+    public final List<scrum.client.issues.Issue> getIssuesByCloseDate(ilarkesto.core.time.Date closeDate) {
         List<scrum.client.issues.Issue> ret = new ArrayList<scrum.client.issues.Issue>();
         for (scrum.client.issues.Issue entity : issues.values()) {
             if (entity.isCloseDate(closeDate)) ret.add(entity);
@@ -996,7 +996,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.issues.Issue> getIssuesBySuspendedUntilDate(ilarkesto.gwt.client.Date suspendedUntilDate) {
+    public final List<scrum.client.issues.Issue> getIssuesBySuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         List<scrum.client.issues.Issue> ret = new ArrayList<scrum.client.issues.Issue>();
         for (scrum.client.issues.Issue entity : issues.values()) {
             if (entity.isSuspendedUntilDate(suspendedUntilDate)) ret.add(entity);
@@ -1145,7 +1145,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.project.Project> getProjectsByBegin(ilarkesto.gwt.client.Date begin) {
+    public final List<scrum.client.project.Project> getProjectsByBegin(ilarkesto.core.time.Date begin) {
         List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
         for (scrum.client.project.Project entity : projects.values()) {
             if (entity.isBegin(begin)) ret.add(entity);
@@ -1153,7 +1153,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.project.Project> getProjectsByEnd(ilarkesto.gwt.client.Date end) {
+    public final List<scrum.client.project.Project> getProjectsByEnd(ilarkesto.core.time.Date end) {
         List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
         for (scrum.client.project.Project entity : projects.values()) {
             if (entity.isEnd(end)) ret.add(entity);
@@ -1377,6 +1377,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.project.Project> getProjectsByReleaseScriptPath(java.lang.String releaseScriptPath) {
+        List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
+        for (scrum.client.project.Project entity : projects.values()) {
+            if (entity.isReleaseScriptPath(releaseScriptPath)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.project.Project> getProjectsBySupportEmail(java.lang.String supportEmail) {
         List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
         for (scrum.client.project.Project entity : projects.values()) {
@@ -1393,7 +1401,15 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.project.Project> getProjectsByLastOpenedDateAndTime(ilarkesto.gwt.client.DateAndTime lastOpenedDateAndTime) {
+    public final List<scrum.client.project.Project> getProjectsBySubscriberNotificationTemplate(java.lang.String subscriberNotificationTemplate) {
+        List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
+        for (scrum.client.project.Project entity : projects.values()) {
+            if (entity.isSubscriberNotificationTemplate(subscriberNotificationTemplate)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.project.Project> getProjectsByLastOpenedDateAndTime(ilarkesto.core.time.DateAndTime lastOpenedDateAndTime) {
         List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
         for (scrum.client.project.Project entity : projects.values()) {
             if (entity.isLastOpenedDateAndTime(lastOpenedDateAndTime)) ret.add(entity);
@@ -1405,6 +1421,14 @@ public abstract class GDao
         List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
         for (scrum.client.project.Project entity : projects.values()) {
             if (entity.isFreeDays(freeDays)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.project.Project> getProjectsByReleasingInfo(java.lang.String releasingInfo) {
+        List<scrum.client.project.Project> ret = new ArrayList<scrum.client.project.Project>();
+        for (scrum.client.project.Project entity : projects.values()) {
+            if (entity.isReleasingInfo(releasingInfo)) ret.add(entity);
         }
         return ret;
     }
@@ -1495,7 +1519,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.journal.ProjectEvent> getProjectEventsByDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final List<scrum.client.journal.ProjectEvent> getProjectEventsByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         List<scrum.client.journal.ProjectEvent> ret = new ArrayList<scrum.client.journal.ProjectEvent>();
         for (scrum.client.journal.ProjectEvent entity : projectEvents.values()) {
             if (entity.isDateAndTime(dateAndTime)) ret.add(entity);
@@ -1589,6 +1613,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByReceiveEmailsOnProjectEvents(boolean receiveEmailsOnProjectEvents) {
+        List<scrum.client.admin.ProjectUserConfig> ret = new ArrayList<scrum.client.admin.ProjectUserConfig>();
+        for (scrum.client.admin.ProjectUserConfig entity : projectUserConfigs.values()) {
+            if (entity.isReceiveEmailsOnProjectEvents(receiveEmailsOnProjectEvents)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByMisconducts(int misconducts) {
         List<scrum.client.admin.ProjectUserConfig> ret = new ArrayList<scrum.client.admin.ProjectUserConfig>();
         for (scrum.client.admin.ProjectUserConfig entity : projectUserConfigs.values()) {
@@ -1629,7 +1661,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByLastActivityDateAndTime(ilarkesto.gwt.client.DateAndTime lastActivityDateAndTime) {
+    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         List<scrum.client.admin.ProjectUserConfig> ret = new ArrayList<scrum.client.admin.ProjectUserConfig>();
         for (scrum.client.admin.ProjectUserConfig entity : projectUserConfigs.values()) {
             if (entity.isLastActivityDateAndTime(lastActivityDateAndTime)) ret.add(entity);
@@ -1653,7 +1685,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByPblFilterDateFrom(ilarkesto.gwt.client.Date pblFilterDateFrom) {
+    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         List<scrum.client.admin.ProjectUserConfig> ret = new ArrayList<scrum.client.admin.ProjectUserConfig>();
         for (scrum.client.admin.ProjectUserConfig entity : projectUserConfigs.values()) {
             if (entity.isPblFilterDateFrom(pblFilterDateFrom)) ret.add(entity);
@@ -1661,7 +1693,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByPblFilterDateTo(ilarkesto.gwt.client.Date pblFilterDateTo) {
+    public final List<scrum.client.admin.ProjectUserConfig> getProjectUserConfigsByPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         List<scrum.client.admin.ProjectUserConfig> ret = new ArrayList<scrum.client.admin.ProjectUserConfig>();
         for (scrum.client.admin.ProjectUserConfig entity : projectUserConfigs.values()) {
             if (entity.isPblFilterDateTo(pblFilterDateTo)) ret.add(entity);
@@ -1905,7 +1937,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.release.Release> getReleasesByReleaseDate(ilarkesto.gwt.client.Date releaseDate) {
+    public final List<scrum.client.release.Release> getReleasesByReleaseDate(ilarkesto.core.time.Date releaseDate) {
         List<scrum.client.release.Release> ret = new ArrayList<scrum.client.release.Release>();
         for (scrum.client.release.Release entity : releases.values()) {
             if (entity.isReleaseDate(releaseDate)) ret.add(entity);
@@ -1933,6 +1965,22 @@ public abstract class GDao
         List<scrum.client.release.Release> ret = new ArrayList<scrum.client.release.Release>();
         for (scrum.client.release.Release entity : releases.values()) {
             if (entity.isScmTag(scmTag)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.release.Release> getReleasesByScriptRunning(boolean scriptRunning) {
+        List<scrum.client.release.Release> ret = new ArrayList<scrum.client.release.Release>();
+        for (scrum.client.release.Release entity : releases.values()) {
+            if (entity.isScriptRunning(scriptRunning)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.release.Release> getReleasesByScriptOutput(java.lang.String scriptOutput) {
+        List<scrum.client.release.Release> ret = new ArrayList<scrum.client.release.Release>();
+        for (scrum.client.release.Release entity : releases.values()) {
+            if (entity.isScriptOutput(scriptOutput)) ret.add(entity);
         }
         return ret;
     }
@@ -2071,7 +2119,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.project.Requirement> getRequirementsByRejectDate(ilarkesto.gwt.client.Date rejectDate) {
+    public final List<scrum.client.project.Requirement> getRequirementsByRejectDate(ilarkesto.core.time.Date rejectDate) {
         List<scrum.client.project.Requirement> ret = new ArrayList<scrum.client.project.Requirement>();
         for (scrum.client.project.Requirement entity : requirements.values()) {
             if (entity.isRejectDate(rejectDate)) ret.add(entity);
@@ -2123,6 +2171,14 @@ public abstract class GDao
         List<scrum.client.project.Requirement> ret = new ArrayList<scrum.client.project.Requirement>();
         for (scrum.client.project.Requirement entity : requirements.values()) {
             if (entity.containsTheme(theme)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.project.Requirement> getRequirementsByEpic(scrum.client.project.Requirement epic) {
+        List<scrum.client.project.Requirement> ret = new ArrayList<scrum.client.project.Requirement>();
+        for (scrum.client.project.Requirement entity : requirements.values()) {
+            if (entity.isEpic(epic)) ret.add(entity);
         }
         return ret;
     }
@@ -2425,7 +2481,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.calendar.SimpleEvent> getSimpleEventsByDate(ilarkesto.gwt.client.Date date) {
+    public final List<scrum.client.calendar.SimpleEvent> getSimpleEventsByDate(ilarkesto.core.time.Date date) {
         List<scrum.client.calendar.SimpleEvent> ret = new ArrayList<scrum.client.calendar.SimpleEvent>();
         for (scrum.client.calendar.SimpleEvent entity : simpleEvents.values()) {
             if (entity.isDate(date)) ret.add(entity);
@@ -2433,7 +2489,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.calendar.SimpleEvent> getSimpleEventsByTime(ilarkesto.gwt.client.Time time) {
+    public final List<scrum.client.calendar.SimpleEvent> getSimpleEventsByTime(ilarkesto.core.time.Time time) {
         List<scrum.client.calendar.SimpleEvent> ret = new ArrayList<scrum.client.calendar.SimpleEvent>();
         for (scrum.client.calendar.SimpleEvent entity : simpleEvents.values()) {
             if (entity.isTime(time)) ret.add(entity);
@@ -2567,7 +2623,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.sprint.Sprint> getSprintsByBegin(ilarkesto.gwt.client.Date begin) {
+    public final List<scrum.client.sprint.Sprint> getSprintsByBegin(ilarkesto.core.time.Date begin) {
         List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
         for (scrum.client.sprint.Sprint entity : sprints.values()) {
             if (entity.isBegin(begin)) ret.add(entity);
@@ -2575,7 +2631,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.sprint.Sprint> getSprintsByEnd(ilarkesto.gwt.client.Date end) {
+    public final List<scrum.client.sprint.Sprint> getSprintsByEnd(ilarkesto.core.time.Date end) {
         List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
         for (scrum.client.sprint.Sprint entity : sprints.values()) {
             if (entity.isEnd(end)) ret.add(entity);
@@ -2587,14 +2643,6 @@ public abstract class GDao
         List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
         for (scrum.client.sprint.Sprint entity : sprints.values()) {
             if (entity.isVelocity(velocity)) ret.add(entity);
-        }
-        return ret;
-    }
-
-    public final List<scrum.client.sprint.Sprint> getSprintsByCompletedRequirementLabels(java.lang.String completedRequirementLabels) {
-        List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
-        for (scrum.client.sprint.Sprint entity : sprints.values()) {
-            if (entity.isCompletedRequirementLabels(completedRequirementLabels)) ret.add(entity);
         }
         return ret;
     }
@@ -2667,6 +2715,123 @@ public abstract class GDao
         List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
         for (scrum.client.sprint.Sprint entity : sprints.values()) {
             if (entity.containsTeamMember(teamMember)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    // --- SprintReport ---
+
+    protected Map<String, scrum.client.sprint.SprintReport> sprintReports = new HashMap<String, scrum.client.sprint.SprintReport>();
+
+    public final void clearSprintReports() {
+        ilarkesto.core.logging.Log.DEBUG("Clearing SprintReports");
+        sprintReports.clear();
+    }
+
+    public final boolean containsSprintReport(scrum.client.sprint.SprintReport sprintReport) {
+        return sprintReports.containsKey(sprintReport.getId());
+    }
+
+    public final void deleteSprintReport(scrum.client.sprint.SprintReport sprintReport) {
+        sprintReports.remove(sprintReport.getId());
+        entityDeleted(sprintReport);
+    }
+
+    public final void createSprintReport(scrum.client.sprint.SprintReport sprintReport, Runnable successAction) {
+        sprintReports.put(sprintReport.getId(), sprintReport);
+        entityCreated(sprintReport, successAction);
+    }
+
+    public final void createSprintReport(scrum.client.sprint.SprintReport sprintReport) {
+        sprintReports.put(sprintReport.getId(), sprintReport);
+        entityCreated(sprintReport, null);
+    }
+
+    protected scrum.client.sprint.SprintReport updateSprintReport(Map data) {
+        String id = (String) data.get("id");
+        scrum.client.sprint.SprintReport entity = sprintReports.get(id);
+        if (entity == null) {
+            entity = new scrum.client.sprint.SprintReport(data);
+            sprintReports.put(id, entity);
+            ilarkesto.core.logging.Log.DEBUG("SprintReport received: " + entity.getId() + " ("+entity+")");
+        } else {
+            entity.updateProperties(data);
+            ilarkesto.core.logging.Log.DEBUG("SprintReport updated: " + entity);
+        }
+        return entity;
+    }
+
+    public final scrum.client.sprint.SprintReport getSprintReport(String id) {
+        scrum.client.sprint.SprintReport ret = sprintReports.get(id);
+        if (ret == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+        return ret;
+    }
+
+    public final Set<scrum.client.sprint.SprintReport> getSprintReports(Collection<String> ids) {
+        Set<scrum.client.sprint.SprintReport> ret = new HashSet<scrum.client.sprint.SprintReport>();
+        for (String id : ids) {
+            scrum.client.sprint.SprintReport entity = sprintReports.get(id);
+            if (entity == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+            ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReports() {
+        return new ArrayList<scrum.client.sprint.SprintReport>(sprintReports.values());
+    }
+
+    public final scrum.client.sprint.SprintReport getSprintReportBySprint(scrum.client.sprint.Sprint sprint) {
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.isSprint(sprint)) return entity;
+        }
+        return null;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByCompletedRequirement(scrum.client.project.Requirement completedRequirement) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsCompletedRequirement(completedRequirement)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByRejectedRequirement(scrum.client.project.Requirement rejectedRequirement) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsRejectedRequirement(rejectedRequirement)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByRequirementsOrderId(java.lang.String requirementsOrderId) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsRequirementsOrderId(requirementsOrderId)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByClosedTask(scrum.client.sprint.Task closedTask) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsClosedTask(closedTask)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByOpenTask(scrum.client.sprint.Task openTask) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsOpenTask(openTask)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByBurnedWork(int burnedWork) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.isBurnedWork(burnedWork)) ret.add(entity);
         }
         return ret;
     }
@@ -2761,6 +2926,83 @@ public abstract class GDao
         List<scrum.client.collaboration.Subject> ret = new ArrayList<scrum.client.collaboration.Subject>();
         for (scrum.client.collaboration.Subject entity : subjects.values()) {
             if (entity.isNumber(number)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    // --- Subscription ---
+
+    protected Map<String, scrum.client.pr.Subscription> subscriptions = new HashMap<String, scrum.client.pr.Subscription>();
+
+    public final void clearSubscriptions() {
+        ilarkesto.core.logging.Log.DEBUG("Clearing Subscriptions");
+        subscriptions.clear();
+    }
+
+    public final boolean containsSubscription(scrum.client.pr.Subscription subscription) {
+        return subscriptions.containsKey(subscription.getId());
+    }
+
+    public final void deleteSubscription(scrum.client.pr.Subscription subscription) {
+        subscriptions.remove(subscription.getId());
+        entityDeleted(subscription);
+    }
+
+    public final void createSubscription(scrum.client.pr.Subscription subscription, Runnable successAction) {
+        subscriptions.put(subscription.getId(), subscription);
+        entityCreated(subscription, successAction);
+    }
+
+    public final void createSubscription(scrum.client.pr.Subscription subscription) {
+        subscriptions.put(subscription.getId(), subscription);
+        entityCreated(subscription, null);
+    }
+
+    protected scrum.client.pr.Subscription updateSubscription(Map data) {
+        String id = (String) data.get("id");
+        scrum.client.pr.Subscription entity = subscriptions.get(id);
+        if (entity == null) {
+            entity = new scrum.client.pr.Subscription(data);
+            subscriptions.put(id, entity);
+            ilarkesto.core.logging.Log.DEBUG("Subscription received: " + entity.getId() + " ("+entity+")");
+        } else {
+            entity.updateProperties(data);
+            ilarkesto.core.logging.Log.DEBUG("Subscription updated: " + entity);
+        }
+        return entity;
+    }
+
+    public final scrum.client.pr.Subscription getSubscription(String id) {
+        scrum.client.pr.Subscription ret = subscriptions.get(id);
+        if (ret == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+        return ret;
+    }
+
+    public final Set<scrum.client.pr.Subscription> getSubscriptions(Collection<String> ids) {
+        Set<scrum.client.pr.Subscription> ret = new HashSet<scrum.client.pr.Subscription>();
+        for (String id : ids) {
+            scrum.client.pr.Subscription entity = subscriptions.get(id);
+            if (entity == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+            ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.pr.Subscription> getSubscriptions() {
+        return new ArrayList<scrum.client.pr.Subscription>(subscriptions.values());
+    }
+
+    public final scrum.client.pr.Subscription getSubscriptionBySubject(ilarkesto.gwt.client.AGwtEntity subject) {
+        for (scrum.client.pr.Subscription entity : subscriptions.values()) {
+            if (entity.isSubject(subject)) return entity;
+        }
+        return null;
+    }
+
+    public final List<scrum.client.pr.Subscription> getSubscriptionsBySubscribersEmail(java.lang.String subscribersEmail) {
+        List<scrum.client.pr.Subscription> ret = new ArrayList<scrum.client.pr.Subscription>();
+        for (scrum.client.pr.Subscription entity : subscriptions.values()) {
+            if (entity.containsSubscribersEmail(subscribersEmail)) ret.add(entity);
         }
         return ret;
     }
@@ -2899,6 +3141,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.admin.SystemConfig> getSystemConfigsByInstanceName(java.lang.String instanceName) {
+        List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
+        for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
+            if (entity.isInstanceName(instanceName)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.admin.SystemConfig> getSystemConfigsByLoginPageLogoUrl(java.lang.String loginPageLogoUrl) {
         List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
         for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
@@ -2971,6 +3221,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.admin.SystemConfig> getSystemConfigsByOpenIdDomains(java.lang.String openIdDomains) {
+        List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
+        for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
+            if (entity.isOpenIdDomains(openIdDomains)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.admin.SystemConfig> getSystemConfigsByVersionCheckEnabled(boolean versionCheckEnabled) {
         List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
         for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
@@ -3031,6 +3289,14 @@ public abstract class GDao
         List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
         for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
             if (entity.isMaxFileSize(maxFileSize)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.admin.SystemConfig> getSystemConfigsBySubscriptionKeySeed(java.lang.String subscriptionKeySeed) {
+        List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
+        for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
+            if (entity.isSubscriptionKeySeed(subscriptionKeySeed)) ret.add(entity);
         }
         return ret;
     }
@@ -3201,6 +3467,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.sprint.Task> getTasksByClosedInPastSprint(scrum.client.sprint.Sprint closedInPastSprint) {
+        List<scrum.client.sprint.Task> ret = new ArrayList<scrum.client.sprint.Task>();
+        for (scrum.client.sprint.Task entity : tasks.values()) {
+            if (entity.isClosedInPastSprint(closedInPastSprint)) ret.add(entity);
+        }
+        return ret;
+    }
+
     // --- TaskDaySnapshot ---
 
     protected Map<String, scrum.client.task.TaskDaySnapshot> taskDaySnapshots = new HashMap<String, scrum.client.task.TaskDaySnapshot>();
@@ -3271,7 +3545,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.task.TaskDaySnapshot> getTaskDaySnapshotsByDate(ilarkesto.gwt.client.Date date) {
+    public final List<scrum.client.task.TaskDaySnapshot> getTaskDaySnapshotsByDate(ilarkesto.core.time.Date date) {
         List<scrum.client.task.TaskDaySnapshot> ret = new ArrayList<scrum.client.task.TaskDaySnapshot>();
         for (scrum.client.task.TaskDaySnapshot entity : taskDaySnapshots.values()) {
             if (entity.isDate(date)) ret.add(entity);
@@ -3380,6 +3654,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.admin.User> getUsersByFullName(java.lang.String fullName) {
+        List<scrum.client.admin.User> ret = new ArrayList<scrum.client.admin.User>();
+        for (scrum.client.admin.User entity : users.values()) {
+            if (entity.isFullName(fullName)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.admin.User> getUsersByAdmin(boolean admin) {
         List<scrum.client.admin.User> ret = new ArrayList<scrum.client.admin.User>();
         for (scrum.client.admin.User entity : users.values()) {
@@ -3419,7 +3701,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.admin.User> getUsersByLastLoginDateAndTime(ilarkesto.gwt.client.DateAndTime lastLoginDateAndTime) {
+    public final List<scrum.client.admin.User> getUsersByLastLoginDateAndTime(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
         List<scrum.client.admin.User> ret = new ArrayList<scrum.client.admin.User>();
         for (scrum.client.admin.User entity : users.values()) {
             if (entity.isLastLoginDateAndTime(lastLoginDateAndTime)) ret.add(entity);
@@ -3427,7 +3709,7 @@ public abstract class GDao
         return ret;
     }
 
-    public final List<scrum.client.admin.User> getUsersByRegistrationDateAndTime(ilarkesto.gwt.client.DateAndTime registrationDateAndTime) {
+    public final List<scrum.client.admin.User> getUsersByRegistrationDateAndTime(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
         List<scrum.client.admin.User> ret = new ArrayList<scrum.client.admin.User>();
         for (scrum.client.admin.User entity : users.values()) {
             if (entity.isRegistrationDateAndTime(registrationDateAndTime)) ret.add(entity);
@@ -3682,7 +3964,9 @@ public abstract class GDao
             clearRisks();
             clearSimpleEvents();
             clearSprints();
+            clearSprintReports();
             clearSubjects();
+            clearSubscriptions();
             clearSystemConfigs();
             clearTasks();
             clearTaskDaySnapshots();
@@ -3714,7 +3998,9 @@ public abstract class GDao
             entityMaps.add(risks);
             entityMaps.add(simpleEvents);
             entityMaps.add(sprints);
+            entityMaps.add(sprintReports);
             entityMaps.add(subjects);
+            entityMaps.add(subscriptions);
             entityMaps.add(systemConfigs);
             entityMaps.add(tasks);
             entityMaps.add(taskDaySnapshots);
@@ -3780,8 +4066,14 @@ public abstract class GDao
         if (type.equals(scrum.client.sprint.Sprint.ENTITY_TYPE)) {
             return updateSprint(data);
         }
+        if (type.equals(scrum.client.sprint.SprintReport.ENTITY_TYPE)) {
+            return updateSprintReport(data);
+        }
         if (type.equals(scrum.client.collaboration.Subject.ENTITY_TYPE)) {
             return updateSubject(data);
+        }
+        if (type.equals(scrum.client.pr.Subscription.ENTITY_TYPE)) {
+            return updateSubscription(data);
         }
         if (type.equals(scrum.client.admin.SystemConfig.ENTITY_TYPE)) {
             return updateSystemConfig(data);
@@ -3822,7 +4114,9 @@ public abstract class GDao
         ret.put("Risk", risks.size());
         ret.put("SimpleEvent", simpleEvents.size());
         ret.put("Sprint", sprints.size());
+        ret.put("SprintReport", sprintReports.size());
         ret.put("Subject", subjects.size());
+        ret.put("Subscription", subscriptions.size());
         ret.put("SystemConfig", systemConfigs.size());
         ret.put("Task", tasks.size());
         ret.put("TaskDaySnapshot", taskDaySnapshots.size());

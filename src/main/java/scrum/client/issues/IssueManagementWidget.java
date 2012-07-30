@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.issues;
 
 import ilarkesto.core.scope.Scope;
@@ -6,6 +20,7 @@ import ilarkesto.gwt.client.Gwt;
 
 import java.util.List;
 
+import scrum.client.ScrumGwt;
 import scrum.client.common.AScrumWidget;
 import scrum.client.common.BlockListSelectionManager;
 import scrum.client.common.BlockListWidget;
@@ -64,10 +79,14 @@ public class IssueManagementWidget extends AScrumWidget {
 		documentationPage.addSection(new UserGuideWidget(getLocalizer().views().issues(), getCurrentProject()
 				.getIssues().size() < 15, getCurrentUser().getHideUserGuideIssuesModel()));
 
-		return Gwt.createFlowPanel(inboxPage, Gwt.createSpacer(1, 10),
-			PagePanel.createSimple("bugs (Team needs to fix this)", bugList), Gwt.createSpacer(1, 10),
-			PagePanel.createSimple("ideas (Product owner needs to create stories)", ideaList), Gwt.createSpacer(1, 10),
-			createClosedPage(), Gwt.createSpacer(1, 10), documentationPage);
+		PagePanel bugsPage = PagePanel.createSimple("bugs (Team needs to fix this)", bugList);
+		bugsPage.addSection(ScrumGwt.createPdfLink("Download as PDF", "bugList", getCurrentProject()));
+
+		PagePanel ideasPage = PagePanel.createSimple("ideas (Product owner needs to create stories)", ideaList);
+		ideasPage.addSection(ScrumGwt.createPdfLink("Download as PDF", "ideaList", getCurrentProject()));
+
+		return Gwt.createFlowPanel(inboxPage, Gwt.createSpacer(1, 10), bugsPage, Gwt.createSpacer(1, 10), ideasPage,
+			Gwt.createSpacer(1, 10), createClosedPage(), Gwt.createSpacer(1, 10), documentationPage);
 	}
 
 	private Widget createClosedPage() {
@@ -98,6 +117,7 @@ public class IssueManagementWidget extends AScrumWidget {
 
 	class UrgentMoveObserver implements Runnable {
 
+		@Override
 		public void run() {
 			List<Issue> issues = bugList.getObjects();
 			getCurrentProject().updateUrgentIssuesOrder(issues);

@@ -11,8 +11,8 @@ public class RequestReleaseIssuesServiceCall extends scrum.client.core.AServiceC
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().requestReleaseIssues(serviceCaller.getConversationNumber(), releaseId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().requestReleaseIssues(serviceCaller.getConversationNumber(), releaseId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

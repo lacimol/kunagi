@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.wiki;
 
 import org.testng.Assert;
@@ -40,7 +54,7 @@ public class WikiTest extends Assert {
 
 	@Test
 	public void toc() {
-		Assert.assertEquals(toHtml("TOC\n= 1 =\n== 1.1 ==\n= 2 ="), "<div class=\"toc\"><ul><li>"
+		Assert.assertEquals(toHtml("__TOC__\n= 1 =\n== 1.1 ==\n= 2 ="), "<div class=\"toc\"><ul><li>"
 				+ "<a href=\"#wiki_h1_1\">1</a></li><ul><li>" + "<a href=\"#wiki_h2_1_1\">1.1</a></li></ul><li>"
 				+ "<a href=\"#wiki_h1_2\">2</a></li></ul></div>"
 				+ "<a name=\"wiki_h1_1\" id=\"wiki_h1_1\"></a><h1>1</h1>"
@@ -64,6 +78,7 @@ public class WikiTest extends Assert {
 		Assert.assertTrue(toHtml("[[Wiki|Custom Text]] is cool").contains(">Custom Text</a>"));
 		Assert.assertTrue(toHtml("tsk15!").contains("<a "));
 		Assert.assertTrue(toHtml("(tsk15!), :-)").contains("<a "));
+		Assert.assertTrue(toHtml("tsk15:; :-)").contains("<a "));
 	}
 
 	@Test
@@ -116,9 +131,9 @@ public class WikiTest extends Assert {
 
 	@Test
 	public void preformated() {
-		Assert.assertEquals(toHtml(" preformated"), "<div class=\"codeBlock\"><pre> preformated</pre></div>");
-		Assert.assertEquals(toHtml("\tpreformated"), "<div class=\"codeBlock\"><pre>    preformated</pre></div>");
-		Assert.assertEquals(toHtml(" line 1\n line 2"), "<div class=\"codeBlock\"><pre> line 1\n line 2</pre></div>");
+		Assert.assertEquals(toHtml(" preformated"), "<pre class=\"codeBlock\"> preformated</pre>");
+		Assert.assertEquals(toHtml("\tpreformated"), "<pre class=\"codeBlock\">    preformated</pre>");
+		Assert.assertEquals(toHtml(" line 1\n line 2"), "<pre class=\"codeBlock\"> line 1\n line 2</pre>");
 	}
 
 	@Test
@@ -130,15 +145,21 @@ public class WikiTest extends Assert {
 
 	@Test
 	public void code() {
+		Assert.assertEquals(toHtml("some <code>code</code> is here."), "some <code>code</code> is here.");
 		Assert.assertEquals(toHtml("here is <code>code</code>."), "here is <code>code</code>.");
 		Assert.assertEquals(toHtml("here is <code>multiword code</code>."), "here is <code>multiword&nbsp;code</code>.");
 		Assert.assertEquals(toHtml("here is <code>multiline\ncode</code>."),
-			"<p>here is <div class=\"codeBlock\"><code>multiline<br>code</code></div>.</p>");
-		Assert.assertEquals(toHtml("simple line\n\n<code>code</code>"), "<p>simple line</p><p><code>code</code></p>");
+			"<p>here is <code class=\"codeBlock\">multiline<br>code</code>.</p>");
+		Assert.assertEquals(toHtml("simple line\n\n<code>code</code>"),
+			"<p>simple line</p><p><code class=\"codeBlock\">code</code></p>");
 		Assert.assertEquals(toHtml("<code>\n# enum\n# enum\n</code>"),
-			"<p><div class=\"codeBlock\"><code>#&nbsp;enum<br>#&nbsp;enum<br></code></div></p>");
-		Assert.assertEquals(toHtml("<code>a\n\nb</code>"),
-			"<p><div class=\"codeBlock\"><code>a<br><br>b</code></div></p>");
+			"<p><code class=\"codeBlock\">#&nbsp;enum<br>#&nbsp;enum<br></code></p>");
+		Assert.assertEquals(toHtml("<code>a\n\nb</code>"), "<p><code class=\"codeBlock\">a<br><br>b</code></p>");
+		Assert.assertEquals(toHtml("<code>simple block</code>"),
+			"<p><code class=\"codeBlock\">simple&nbsp;block</code></p>");
+		Assert.assertEquals(
+			toHtml("some <code>looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong code</code> is here."),
+			"some <code class=\"codeBlock\">looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong&nbsp;code</code> is here.");
 	}
 
 	@Test
@@ -196,6 +217,11 @@ public class WikiTest extends Assert {
 	}
 
 	static class TestHtmlContext implements HtmlContext {
+
+		@Override
+		public boolean isEntityReferenceAvailable(String reference) {
+			return true;
+		}
 
 		@Override
 		public String getEntityReferenceHrefOrOnclickAParameter(String reference) {

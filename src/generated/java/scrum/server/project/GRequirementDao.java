@@ -70,6 +70,8 @@ public abstract class GRequirementDao
         tasksOrderIdsCache = null;
         requirementsByThemeCache.clear();
         themesCache = null;
+        requirementsByEpicCache.clear();
+        epicsCache = null;
     }
 
     @Override
@@ -100,7 +102,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByProject(scrum.server.project.Project project) {
-        return requirementsByProjectCache.get(project);
+        return new HashSet<Requirement>(requirementsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -140,7 +142,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsBySprint(scrum.server.sprint.Sprint sprint) {
-        return requirementsBySprintCache.get(sprint);
+        return new HashSet<Requirement>(requirementsBySprintCache.get(sprint));
     }
     private Set<scrum.server.sprint.Sprint> sprintsCache;
 
@@ -180,7 +182,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByIssue(scrum.server.issues.Issue issue) {
-        return requirementsByIssueCache.get(issue);
+        return new HashSet<Requirement>(requirementsByIssueCache.get(issue));
     }
     private Set<scrum.server.issues.Issue> issuesCache;
 
@@ -220,7 +222,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByNumber(int number) {
-        return requirementsByNumberCache.get(number);
+        return new HashSet<Requirement>(requirementsByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -260,7 +262,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByQuality(scrum.server.project.Quality quality) {
-        return requirementsByQualityCache.get(quality);
+        return new HashSet<Requirement>(requirementsByQualityCache.get(quality));
     }
     private Set<scrum.server.project.Quality> qualitysCache;
 
@@ -300,7 +302,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByLabel(java.lang.String label) {
-        return requirementsByLabelCache.get(label);
+        return new HashSet<Requirement>(requirementsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -340,7 +342,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByDescription(java.lang.String description) {
-        return requirementsByDescriptionCache.get(description);
+        return new HashSet<Requirement>(requirementsByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -380,7 +382,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByTestDescription(java.lang.String testDescription) {
-        return requirementsByTestDescriptionCache.get(testDescription);
+        return new HashSet<Requirement>(requirementsByTestDescriptionCache.get(testDescription));
     }
     private Set<java.lang.String> testDescriptionsCache;
 
@@ -420,7 +422,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByEstimatedWork(java.lang.Float estimatedWork) {
-        return requirementsByEstimatedWorkCache.get(estimatedWork);
+        return new HashSet<Requirement>(requirementsByEstimatedWorkCache.get(estimatedWork));
     }
     private Set<java.lang.Float> estimatedWorksCache;
 
@@ -460,7 +462,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByRejectDate(ilarkesto.base.time.Date rejectDate) {
-        return requirementsByRejectDateCache.get(rejectDate);
+        return new HashSet<Requirement>(requirementsByRejectDateCache.get(rejectDate));
     }
     private Set<ilarkesto.base.time.Date> rejectDatesCache;
 
@@ -500,7 +502,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByClosed(boolean closed) {
-        return requirementsByClosedCache.get(closed);
+        return new HashSet<Requirement>(requirementsByClosedCache.get(closed));
     }
 
     private static class IsClosed implements Predicate<Requirement> {
@@ -529,7 +531,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByDirty(boolean dirty) {
-        return requirementsByDirtyCache.get(dirty);
+        return new HashSet<Requirement>(requirementsByDirtyCache.get(dirty));
     }
 
     private static class IsDirty implements Predicate<Requirement> {
@@ -558,7 +560,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByWorkEstimationVotingActive(boolean workEstimationVotingActive) {
-        return requirementsByWorkEstimationVotingActiveCache.get(workEstimationVotingActive);
+        return new HashSet<Requirement>(requirementsByWorkEstimationVotingActiveCache.get(workEstimationVotingActive));
     }
 
     private static class IsWorkEstimationVotingActive implements Predicate<Requirement> {
@@ -587,7 +589,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByWorkEstimationVotingShowoff(boolean workEstimationVotingShowoff) {
-        return requirementsByWorkEstimationVotingShowoffCache.get(workEstimationVotingShowoff);
+        return new HashSet<Requirement>(requirementsByWorkEstimationVotingShowoffCache.get(workEstimationVotingShowoff));
     }
 
     private static class IsWorkEstimationVotingShowoff implements Predicate<Requirement> {
@@ -616,7 +618,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByTasksOrderId(java.lang.String tasksOrderId) {
-        return requirementsByTasksOrderIdCache.get(tasksOrderId);
+        return new HashSet<Requirement>(requirementsByTasksOrderIdCache.get(tasksOrderId));
     }
     private Set<java.lang.String> tasksOrderIdsCache;
 
@@ -656,7 +658,7 @@ public abstract class GRequirementDao
             });
 
     public final Set<Requirement> getRequirementsByTheme(java.lang.String theme) {
-        return requirementsByThemeCache.get(theme);
+        return new HashSet<Requirement>(requirementsByThemeCache.get(theme));
     }
     private Set<java.lang.String> themesCache;
 
@@ -680,6 +682,46 @@ public abstract class GRequirementDao
 
         public boolean test(Requirement e) {
             return e.containsTheme(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - epic
+    // -----------------------------------------------------------
+
+    private final Cache<scrum.server.project.Requirement,Set<Requirement>> requirementsByEpicCache = new Cache<scrum.server.project.Requirement,Set<Requirement>>(
+            new Cache.Factory<scrum.server.project.Requirement,Set<Requirement>>() {
+                public Set<Requirement> create(scrum.server.project.Requirement epic) {
+                    return getEntities(new IsEpic(epic));
+                }
+            });
+
+    public final Set<Requirement> getRequirementsByEpic(scrum.server.project.Requirement epic) {
+        return new HashSet<Requirement>(requirementsByEpicCache.get(epic));
+    }
+    private Set<scrum.server.project.Requirement> epicsCache;
+
+    public final Set<scrum.server.project.Requirement> getEpics() {
+        if (epicsCache == null) {
+            epicsCache = new HashSet<scrum.server.project.Requirement>();
+            for (Requirement e : getEntities()) {
+                if (e.isEpicSet()) epicsCache.add(e.getEpic());
+            }
+        }
+        return epicsCache;
+    }
+
+    private static class IsEpic implements Predicate<Requirement> {
+
+        private scrum.server.project.Requirement value;
+
+        public IsEpic(scrum.server.project.Requirement value) {
+            this.value = value;
+        }
+
+        public boolean test(Requirement e) {
+            return e.isEpic(value);
         }
 
     }

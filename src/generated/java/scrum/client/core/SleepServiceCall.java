@@ -11,8 +11,8 @@ public class SleepServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().sleep(serviceCaller.getConversationNumber(), millis, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().sleep(serviceCaller.getConversationNumber(), millis, new DefaultCallback(this, returnHandler));
     }
 
     @Override

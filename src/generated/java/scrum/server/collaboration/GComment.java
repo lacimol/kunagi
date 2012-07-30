@@ -218,7 +218,7 @@ public abstract class GComment
     }
 
     protected java.lang.String prepareAuthorName(java.lang.String authorName) {
-        authorName = Str.removeUnreadableChars(authorName);
+        // authorName = Str.removeUnreadableChars(authorName);
         return authorName;
     }
 
@@ -254,7 +254,7 @@ public abstract class GComment
     }
 
     protected java.lang.String prepareAuthorEmail(java.lang.String authorEmail) {
-        authorEmail = Str.removeUnreadableChars(authorEmail);
+        // authorEmail = Str.removeUnreadableChars(authorEmail);
         return authorEmail;
     }
 
@@ -320,7 +320,7 @@ public abstract class GComment
     }
 
     protected java.lang.String prepareText(java.lang.String text) {
-        text = Str.removeUnreadableChars(text);
+        // text = Str.removeUnreadableChars(text);
         return text;
     }
 

@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum;
 
 import ilarkesto.base.Str;
@@ -7,6 +21,7 @@ import ilarkesto.base.time.Date;
 import ilarkesto.base.time.DateAndTime;
 import ilarkesto.base.time.Time;
 import ilarkesto.core.logging.Log;
+import ilarkesto.io.IO;
 import ilarkesto.persistence.AEntity;
 import ilarkesto.testng.ATest;
 
@@ -26,7 +41,9 @@ import scrum.server.impediments.Impediment;
 import scrum.server.issues.Issue;
 import scrum.server.pr.BlogEntry;
 import scrum.server.project.Project;
+import scrum.server.project.Quality;
 import scrum.server.project.Requirement;
+import scrum.server.release.Release;
 import scrum.server.risks.Risk;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
@@ -43,7 +60,10 @@ public class TestUtil {
 		Log.setDebugEnabled(false);
 		Sys.setHeadless(true);
 
-		KunagiRootConfig config = new KunagiRootConfig(new File(ATest.OUTPUT_DIR + "/runtimedata"), null);
+		File configFileOrig = new File(ATest.INPUT_DIR + "/config.properties");
+		File configFile = new File(ATest.OUTPUT_DIR + "/config.properties");
+		IO.copyFile(configFileOrig, configFile);
+		KunagiRootConfig config = new KunagiRootConfig(configFile, null);
 		app = new ScrumWebApplication(config);
 		app.start();
 
@@ -85,6 +105,23 @@ public class TestUtil {
 		return admin;
 	}
 
+	public static Release createRelease(Project project, int number) {
+		return createRelease(project, number, "0." + String.valueOf(number) + ".0", Date.inDays(number),
+			Str.generateRandomParagraph(), Str.generateRandomParagraph());
+	}
+
+	public static Release createRelease(Project project, int number, String label, Date releaseDate,
+			String releaseNotes, String note) {
+		Release release = app.getReleaseDao().newEntityInstance();
+		release.setProject(project);
+		release.setNumber(number);
+		release.setLabel(label);
+		release.setReleaseDate(releaseDate);
+		release.setReleaseNotes(releaseNotes);
+		release.setNote(note);
+		return release;
+	}
+
 	public static void createComments(AEntity parent, int count) {
 		for (int i = 0; i < count; i++) {
 			createComment(parent);
@@ -107,16 +144,23 @@ public class TestUtil {
 		return comment;
 	}
 
-	public static Task createTask(Requirement requirement, int number, int work) {
-		return createTask(requirement, number, Str.generateRandomSentence(2, 6), work);
+	public static void createTasks(Requirement requirement, int count) {
+		for (int i = 0; i < count; i++) {
+			createTask(requirement, i + 10, Utl.randomInt(0, 5), Utl.randomInt(0, 5));
+		}
 	}
 
-	public static Task createTask(Requirement requirement, int number, String label, int work) {
+	public static Task createTask(Requirement requirement, int number, int remainingWork, int burnedWork) {
+		return createTask(requirement, number, Str.generateRandomSentence(2, 6), remainingWork, burnedWork);
+	}
+
+	public static Task createTask(Requirement requirement, int number, String label, int remainingWork, int burnedWork) {
 		Task task = app.getTaskDao().newEntityInstance();
 		task.setRequirement(requirement);
 		task.setNumber(number);
 		task.setLabel(label);
-		task.setRemainingWork(work);
+		task.setRemainingWork(remainingWork);
+		task.setBurnedWork(burnedWork);
 		return task;
 	}
 
@@ -124,6 +168,13 @@ public class TestUtil {
 		User user = app.getUserDao().newEntityInstance();
 		user.setName(name);
 		return user;
+	}
+
+	public static Issue createBug(Project project, int number) {
+		Issue issue = createIssue(project, number);
+		issue.setAcceptDate(Date.today());
+		issue.setUrgent(true);
+		return issue;
 	}
 
 	public static Issue createIssue(Project project, int number) {
@@ -190,8 +241,8 @@ public class TestUtil {
 	}
 
 	public static Impediment createImpediment(Project project, int number) {
-		return createImpediment(project, Date.beforeDays(number), number, "Impediment #" + number, "Impediment #"
-				+ number + " description.");
+		return createImpediment(project, Date.beforeDays(number), number, Str.generateRandomSentence(3, 9),
+			Str.generateRandomParagraphs(2));
 	}
 
 	public static Impediment createImpediment(Project project, Date date, int number, String label, String description) {
@@ -235,6 +286,22 @@ public class TestUtil {
 	public static Requirement createRequirement(Project project, int number, String label, String description,
 			String testDescription) {
 		Requirement requirement = app.getRequirementDao().newEntityInstance();
+		requirement.setProject(project);
+		requirement.setNumber(number);
+		requirement.setLabel(label);
+		requirement.setDescription(description);
+		requirement.setTestDescription(testDescription);
+		return requirement;
+	}
+
+	public static Quality createQuality(Project project, int number) {
+		return createQuality(project, number, Str.generateRandomSentence(4, 5) + " (#" + number + ")",
+			Str.generateRandomParagraph(), Str.generateRandomParagraph());
+	}
+
+	public static Quality createQuality(Project project, int number, String label, String description,
+			String testDescription) {
+		Quality requirement = app.getQualityDao().newEntityInstance();
 		requirement.setProject(project);
 		requirement.setNumber(number);
 		requirement.setLabel(label);

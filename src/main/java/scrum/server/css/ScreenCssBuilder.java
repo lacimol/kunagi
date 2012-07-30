@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.css;
 
 import ilarkesto.base.Colors;
@@ -25,20 +39,23 @@ public class ScreenCssBuilder implements CssBuilder {
 	public static String cHeaderBackground = "#667B99";
 	public static String cHeaderLink = "#D6E4E1";
 
-	public static String cEstimationBar0 = cHeaderBackground;
+	public static String cEstimationBar0 = "#F99";
 	public static String cEstimationBar1 = "#669976";
 
 	public static String cLink = "#2956B2";
 	public static String cErrorBackground = "#FEE";
 	public static String cError = "darkred";
-	public static String cHeaderText = "white";
+	public static String cHeaderText = "#FFFFFF";
 
 	public static String cNavigatorSeparator = "#D9DEE6";
 	public static String cNavigatorLink = "#465B79";
 	public static String cNavigatorSelectedItemBackground = "#CCD5E6";
 	public static String cNavigatorHoverItemBackground = "#E9EEF6";
 
+	public static String cFieldBackground = "#FFFFFF";
+
 	public static String cBlockHeaderBackground = cNavigatorHoverItemBackground;
+	public static String cBlockBackground = "#FAFDFF";
 	public static String cBlockSelectionBorder = cHeaderBackground;
 	public static String cBlockHeaderHoverBackground = cBackground;
 	public static String cBlockHeaderDragHandleBackground = "#FBFBFF";
@@ -50,13 +67,11 @@ public class ScreenCssBuilder implements CssBuilder {
 	public static String cPagePanelHeader = "#FF6637";
 	public static String cPagePanelBorder = cNavigatorSeparator;
 
-	public static String cChatBackground = "white";
+	public static String cChatBackground = "#FFFFFF";
 	public static String cChatBorder = cPagePanelBorder;
 
 	public static String cTrashBackground = cNavigatorHoverItemBackground;
 	public static String cTrashBorder = cPagePanelBorder;
-
-	public static String cFieldBackground = "#FAFDFF";
 
 	public static String cWaitBackground = cFieldBackground;
 	public static String cWait = cLink;
@@ -139,6 +154,8 @@ public class ScreenCssBuilder implements CssBuilder {
 
 		css.style(".highlighted .ABlockWidget-title").border(1, cError);
 
+		css.style(".LockInfoWidget-icon").marginRight(10);
+
 		css.style(".WaitWidget").background(cWaitBackground).margin(200, 0, 200, 0).borderTop(1, cPagePanelBorder)
 				.borderBottom(1, cPagePanelBorder).fontSize(fontSize + 2);
 		css.style(".LoginWidget-errorMessage").background(cErrorBackground).color(cError).border(1, cError)
@@ -149,11 +166,11 @@ public class ScreenCssBuilder implements CssBuilder {
 		css.style(".AViewEditWidget-viewer").minWidth(16).minHeight(16).displayBlock().padding(3);
 		css.style(".AViewEditWidget-viewer-editable").background(cFieldBackground)
 				.border(1, "dotted", cNavigatorSelectedItemBackground).cursorPointer();
-		css.style(".ARichtextViewEditWidget-viewer .codeBlock").padding(5).margin(0, 10, 10, 10).border(1, "#EEE")
-				.background(Colors.lighten(cFieldBackground)).maxWidth(400).maxHeight(400).overflowAuto();
+		css.style(".ARichtextViewEditWidget-viewer .codeBlock").displayBlock().padding(5).margin(0, 10, 10, 10)
+				.border(1, "#EEE").background(Colors.lighten(cFieldBackground)).maxWidth(350).maxHeight(400)
+				.overflowScroll();
 		css.style(".ARichtextViewEditWidget-viewer div.toc").border(1, cPagePanelBorder).background("#EEE")
 				.floatRight().padding(10, 10, 3, 5).margin(10);
-		css.style(".codeBlock code, .codeBlock pre").margin(0, 0, 0, 0).padding(0, 0, 0, 0);
 		css.style(".ARichtextViewEditWidget-editor").border(1, cPagePanelBorder);
 		css.style(".ARichtextViewEditWidget-editor .html-editor-toolbar").displayNone();
 		css.style(".AEditableTextareaWidget-editorPanel").width100();
@@ -183,14 +200,21 @@ public class ScreenCssBuilder implements CssBuilder {
 		css.style("ul.toc");// .displayInline().floatRight();
 
 		css.style("a.reference, a.reference:visited").fontFamilyMonospace().color(cLink);
+		css.style("a.reference-unavailable").color("darkgray");
 
 		css.style("input.InputMandatory").border(1, "black");
 
 		css.style(".CreateTaskButtonWrapper").marginTop(5);
 		css.style(".CreateTaskButtonWrapper .ButtonWidget .gwt-Button").fontSize(fontSizeSmall).margin(0).padding(1);
 
-		css.style(".CreateStoryButtonWidget").marginTop(1);
-		css.style(".CreateStoryButtonWidget-dragHandle").marginTop(0).colorBlack();
+		css.style(".CreateStoryButtonWidget").marginTop(1).width(140);
+		css.style(".CreateStoryButtonWidget-dragHandle").marginTop(0).width(40).colorBlack();
+
+		css.style(".ReleaseWidget-script-running").fontFamilyMonospace().overflowHidden().color("red").fontWeightBold()
+				.textDecorationBlink();
+		css.style(".ReleaseWidget-script-ok").fontFamilyMonospace().overflowHidden();
+		css.style(".ReleaseWidget-script-empty").fontFamilyMonospace().overflowHidden();
+		css.style(".ReleaseWidget-script-failed").fontFamilyMonospace().overflowHidden().color("red");
 	}
 
 	private void loginPage(CssRenderer css) {
@@ -202,13 +226,20 @@ public class ScreenCssBuilder implements CssBuilder {
 		css.style(".loginPage .panel img").marginBottom(-20);
 		css.style(".loginPage .message").color("gold").fontWeightBold().marginBottom(10).fontSize(fontSizeTitle);
 		String labelColor = Colors.lighten(Colors.lighten(Colors.lighten(cHeaderBackground)));
-		css.style(".loginPage .inputButton").background(Colors.darken(cHeaderBackground)).marginRight(10)
-				.borderRadius(5).color(labelColor).fontWeightBold().padding(1, 10).cursorPointer();
-		css.style(".loginPage input:hover.inputButton").color(Colors.lighten(labelColor));
+
+		css.style(".loginPage .inputButton, .loginPage a.openid .button").background(Colors.darken(cHeaderBackground))
+				.border(1, cPagePanelBorder).borderRadius(5).color(labelColor).fontWeightBold().padding(1, 10)
+				.cursorPointer().textShadow(-1, -1, 0, "#444");
+		css.style(".loginPage .inputButton").marginRight(10);
+		css.style(".loginPage a.openid .button").margin(0, 5, 5, 0).floatLeft();
+		css.style(".loginPage input:hover.inputButton, .loginPage a.openid:hover .button").color(
+			Colors.lighten(labelColor));
+
 		css.style(".loginPage .inputCheckbox").marginLeft(0);
 		css.style(".loginPage .panel label").color(labelColor).marginRight(5);
 		css.style(".loginPage .panel .optionalLabel label").color(Colors.lighten(cHeaderBackground));
-		css.style(".loginPage h2").colorWhite().margin(30, 0, 20, 0).fontSize(fontSizeTitle + 4);
+		css.style(".loginPage h2").color("#fff").margin(30, 0, 20, 0).fontSize(fontSizeTitle + 4)
+				.textShadow(1, 1, 0, "#222");
 		css.style(".loginPage input").marginBottom(5);
 		css.style("#username, #email, #password").width(150).marginRight(10);
 		css.style("#openid").width(309).marginRight(10);
@@ -216,10 +247,6 @@ public class ScreenCssBuilder implements CssBuilder {
 		css.style(".loginPage .configMessage").colorWhite();
 		css.style(".loginPage .kunagiLink").textAlignRight().fontSize(fontSizeSmall).color(labelColor);
 		css.style(".loginPage .kunagiLink a").color(Colors.lighten(labelColor));
-		css.style(".loginPage a.openid .button").border(1, cPagePanelBorder)
-				.background(Colors.darken(cHeaderBackground)).margin(0, 5, 5, 0).borderRadius(5).color(labelColor)
-				.fontWeightBold().padding(1, 10).cursorPointer().floatLeft();
-		css.style(".loginPage a.openid:hover .button").color(Colors.lighten(labelColor));
 	}
 
 	private void planningPoker(CssRenderer css) {
@@ -229,8 +256,9 @@ public class ScreenCssBuilder implements CssBuilder {
 				.background("#5A5 url(pokertable_bg.jpg)").padding(40);
 		css.style(".PlanningPokerWidget-table-branding").color(cPlanningPokerTableLines).fontFamily("Times New Roman")
 				.fontWeightBold().fontSize(30).textAlignCenter().marginBottom(30);
-		css.style(".PlanningPokerWidget-table .HyperlinkWidget, .PlanningPokerWidget-table a").color(
-			cPlanningPokerTableLines);
+		css.style(
+			".PlanningPokerWidget-table .gwt-Hyperlink, .PlanningPokerWidget-table a, .PlanningPokerTableWidget-estimationHelp ul li a.reference")
+				.color(cPlanningPokerTableLines);
 
 		int cardWidth = 40;
 		int cardHeight = 60;
@@ -330,17 +358,17 @@ public class ScreenCssBuilder implements CssBuilder {
 	}
 
 	private void html(CssRenderer css) {
-		css.html().height100().padding(0).margin(0);
-		css.body().height100().padding(0).margin(0).background(cBackground).fontFamily(fontFamily).fontSize(fontSize)
+		css.html().padding(0).margin(0);
+		css.body().padding(0).margin(0).background(cBackground).fontFamily(fontFamily).fontSize(fontSize)
 				.lineHeight(lineHeight);
 		css.table().borderCollapseCollapse();
 		css.td().verticalAlignTop().fontFamily(fontFamily).fontSize(fontSize).lineHeight(lineHeight);
 		css.a().cursorPointer().color(cLink).textDecorationUnderline();
 		css.p().margin(0, 0, 10, 0);
-		css.h1().fontSize(fontSize + 4).lineHeight(lineHeight + 4).fontWeightBold().margin(5, 0, 5, 0);
-		css.h2().fontSize(fontSize + 2).lineHeight(lineHeight + 2).fontWeightBold().margin(5, 0, 5, 0);
-		css.h3().fontSize(fontSize + 1).lineHeight(lineHeight + 1).fontWeightBold().margin(0, 0, 5, 0);
-		css.h4().fontSize(fontSize).lineHeight(lineHeight).fontWeightBold().margin(0, 0, 5, 0);
+		css.h1().fontSize(fontSize + 6).lineHeight(lineHeight + 6).fontWeightBold().margin(5, 0, 5, 0);
+		css.h2().fontSize(fontSize + 4).lineHeight(lineHeight + 4).fontWeightBold().margin(5, 0, 5, 0);
+		css.h3().fontSize(fontSize + 2).lineHeight(lineHeight + 2).fontWeightBold().margin(0, 0, 5, 0);
+		css.h4().fontSize(fontSize + 1).lineHeight(lineHeight + 1).fontWeightBold().margin(0, 0, 5, 0);
 		css.pre().margin(0, 0, 10, 0).color(cHeaderBackground).fontSize(fontSize).lineHeight(lineHeight);
 		css.code().color(cHeaderBackground).fontSize(fontSize).lineHeight(lineHeight);
 		css.ul().margin(0, 0, 10, 0).padding(0, 0, 0, 20);
@@ -351,16 +379,19 @@ public class ScreenCssBuilder implements CssBuilder {
 	}
 
 	private void workspace(CssRenderer css) {
-		css.style(".Workspace").height100();
-		css.style(".Workspace-header").height(25).background(cHeaderBackground, "../header-bg.png");
-		css.style(".Workspace-body").height100();
-		css.style(".Workspace-body-west").floatLeft().width(200).height100().backgroundUrl("../sidebar-bg.png")
-				.overflowHidden();
-		css.style(".Workspace-body-center").height100();
-		css.style(".Workspace-body-center-content").padding(10).paddingBottom(1000);
-		css.style(".Workspace-body-west .PagePanel").padding(0);
-		css.style(".Workspace-body-west .PagePanel-header").color(cHeaderText);
-		css.style(".Workspace-body-west .PagePanel-content").border("0");
+		int headerHeight = 25;
+		css.style(".Workspace");
+
+		css.style(".Workspace-header").height(headerHeight).background(cHeaderBackground, "../header-bg.png")
+				.positionFixed().width100();
+
+		css.style(".Workspace-sidebar").overflowHidden().positionFixed(headerHeight + 10, 0).width(200);
+		css.style(".Workspace-sidebar .PagePanel").padding(0);
+		css.style(".Workspace-sidebar .PagePanel-header").color(cHeaderText);
+		css.style(".Workspace-sidebar .PagePanel-content").border("0");
+		css.style(".ProjectSidebarWidget").marginLeft(10);
+
+		css.style(".Workspace-workarea").marginTop(headerHeight + 10).marginRight(10).minHeight(2000);
 
 		css.style(".HeaderWidget-logo").marginLeft(5).marginRight(10); // .positionFixed().top(0).left(40).zIndex(100);
 		css.style(".HeaderWidget-title").color(cHeaderText).fontSize(12).fontWeightBold().paddingLeft(5).paddingTop(3);
@@ -376,7 +407,8 @@ public class ScreenCssBuilder implements CssBuilder {
 	}
 
 	private void systemMessage(CssRenderer css) {
-		css.style(".SystemMessageWidget-box").background(cErrorBackground).color(cError).border(1, cError).padding(10);
+		css.style(".SystemMessageWidget-box").background(cErrorBackground).color(cError).border(1, cError).padding(10)
+				.marginBottom(10);
 		css.style(".SystemMessageWidget-box-title").fontWeightBold().marginBottom(5);
 		css.style(".SystemMessageWidget-box-time").fontStyleItalic().marginTop(5).textAlignRight();
 	}
@@ -392,6 +424,7 @@ public class ScreenCssBuilder implements CssBuilder {
 	}
 
 	private void navigator(CssRenderer css) {
+		css.style(".NavigatorWidget");
 		css.style(".NavigatorWidget-head").borderBottom(1, cNavigatorSeparator).overflowHidden();
 		css.style(".NavigatorWidget-item-link").borderBottom(1, cNavigatorSeparator).overflowHidden();
 		css.style(".NavigatorWidget-item-link a").color(cNavigatorLink).displayBlock().padding(5, 3, 5, 3)
@@ -459,7 +492,7 @@ public class ScreenCssBuilder implements CssBuilder {
 
 	private void blockList(CssRenderer css) {
 		css.style(".ABlockWidget-extended").border(2, cBlockSelectionBorder).padding(3).backgroundWhite();
-		css.style(".ABlockWidget-body").padding(10).border(1, cBlockHeaderBackground);
+		css.style(".ABlockWidget-body").padding(10).border(1, cBlockHeaderBackground).background(cBlockBackground);
 
 		// css.style(".BlockListWidget").border(1, "yellow").minHeight(50, "px");
 		css.style(".BlockHeaderWidget").background(cBlockHeaderBackground, "../blockheader-bg.png", "repeat-x");
@@ -504,7 +537,7 @@ public class ScreenCssBuilder implements CssBuilder {
 				.background(cPagePanelHeaderBackground, "../page-header-bg.png").color(cPagePanelHeader);
 		css.style(".PagePanel-header .gwt-Button").fontSize(fontSizeSmall);
 		css.style(".PagePanel-header input").fontSize(fontSizeSmall);
-		css.style(".PagePanel-header .HyperlinkWidget").fontSize(fontSizeSmall);
+		css.style(".PagePanel-header .gwt-Hyperlink").fontSize(fontSizeSmall);
 		css.style(".PagePanel-section").margin(0, 10, 0, 10);
 		css.style(".PagePanel-spacer").height(10);
 	}

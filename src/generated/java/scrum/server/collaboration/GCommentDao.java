@@ -86,7 +86,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByParent(ilarkesto.persistence.AEntity parent) {
-        return commentsByParentCache.get(parent);
+        return new HashSet<Comment>(commentsByParentCache.get(parent));
     }
     private Set<ilarkesto.persistence.AEntity> parentsCache;
 
@@ -126,7 +126,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByAuthor(scrum.server.admin.User author) {
-        return commentsByAuthorCache.get(author);
+        return new HashSet<Comment>(commentsByAuthorCache.get(author));
     }
     private Set<scrum.server.admin.User> authorsCache;
 
@@ -166,7 +166,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByPublished(boolean published) {
-        return commentsByPublishedCache.get(published);
+        return new HashSet<Comment>(commentsByPublishedCache.get(published));
     }
 
     private static class IsPublished implements Predicate<Comment> {
@@ -195,7 +195,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByAuthorName(java.lang.String authorName) {
-        return commentsByAuthorNameCache.get(authorName);
+        return new HashSet<Comment>(commentsByAuthorNameCache.get(authorName));
     }
     private Set<java.lang.String> authorNamesCache;
 
@@ -235,7 +235,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByAuthorEmail(java.lang.String authorEmail) {
-        return commentsByAuthorEmailCache.get(authorEmail);
+        return new HashSet<Comment>(commentsByAuthorEmailCache.get(authorEmail));
     }
     private Set<java.lang.String> authorEmailsCache;
 
@@ -275,7 +275,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByAuthorNameVisible(boolean authorNameVisible) {
-        return commentsByAuthorNameVisibleCache.get(authorNameVisible);
+        return new HashSet<Comment>(commentsByAuthorNameVisibleCache.get(authorNameVisible));
     }
 
     private static class IsAuthorNameVisible implements Predicate<Comment> {
@@ -304,7 +304,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByText(java.lang.String text) {
-        return commentsByTextCache.get(text);
+        return new HashSet<Comment>(commentsByTextCache.get(text));
     }
     private Set<java.lang.String> textsCache;
 
@@ -344,7 +344,7 @@ public abstract class GCommentDao
             });
 
     public final Set<Comment> getCommentsByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
-        return commentsByDateAndTimeCache.get(dateAndTime);
+        return new HashSet<Comment>(commentsByDateAndTimeCache.get(dateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
 

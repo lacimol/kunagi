@@ -79,6 +79,7 @@ public abstract class GSimpleEvent
 
     public final SimpleEvent setLabel(java.lang.String label) {
         if (isLabel(label)) return (SimpleEvent)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (SimpleEvent)this;
@@ -193,20 +194,20 @@ public abstract class GSimpleEvent
 
     // --- date ---
 
-    private ilarkesto.gwt.client.Date date ;
+    private ilarkesto.core.time.Date date ;
 
-    public final ilarkesto.gwt.client.Date getDate() {
+    public final ilarkesto.core.time.Date getDate() {
         return this.date ;
     }
 
-    public final SimpleEvent setDate(ilarkesto.gwt.client.Date date) {
+    public final SimpleEvent setDate(ilarkesto.core.time.Date date) {
         if (isDate(date)) return (SimpleEvent)this;
         this.date = date ;
         propertyChanged("date", this.date);
         return (SimpleEvent)this;
     }
 
-    public final boolean isDate(ilarkesto.gwt.client.Date date) {
+    public final boolean isDate(ilarkesto.core.time.Date date) {
         return equals(this.date, date);
     }
 
@@ -227,17 +228,17 @@ public abstract class GSimpleEvent
         }
 
         @Override
-        public ilarkesto.gwt.client.Date getValue() {
+        public ilarkesto.core.time.Date getValue() {
             return getDate();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Date value) {
+        public void setValue(ilarkesto.core.time.Date value) {
             setDate(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Date oldValue, ilarkesto.gwt.client.Date newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Date oldValue, ilarkesto.core.time.Date newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -246,20 +247,20 @@ public abstract class GSimpleEvent
 
     // --- time ---
 
-    private ilarkesto.gwt.client.Time time ;
+    private ilarkesto.core.time.Time time ;
 
-    public final ilarkesto.gwt.client.Time getTime() {
+    public final ilarkesto.core.time.Time getTime() {
         return this.time ;
     }
 
-    public final SimpleEvent setTime(ilarkesto.gwt.client.Time time) {
+    public final SimpleEvent setTime(ilarkesto.core.time.Time time) {
         if (isTime(time)) return (SimpleEvent)this;
         this.time = time ;
         propertyChanged("time", this.time);
         return (SimpleEvent)this;
     }
 
-    public final boolean isTime(ilarkesto.gwt.client.Time time) {
+    public final boolean isTime(ilarkesto.core.time.Time time) {
         return equals(this.time, time);
     }
 
@@ -280,17 +281,17 @@ public abstract class GSimpleEvent
         }
 
         @Override
-        public ilarkesto.gwt.client.Time getValue() {
+        public ilarkesto.core.time.Time getValue() {
             return getTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.Time value) {
+        public void setValue(ilarkesto.core.time.Time value) {
             setTime(value);
         }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.Time oldValue, ilarkesto.gwt.client.Time newValue) {
+        protected void onChangeValue(ilarkesto.core.time.Time oldValue, ilarkesto.core.time.Time newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -532,9 +533,9 @@ public abstract class GSimpleEvent
         label  = (java.lang.String) props.get("label");
         number  = (Integer) props.get("number");
         String dateAsString = (String) props.get("date");
-        date  =  dateAsString == null ? null : new ilarkesto.gwt.client.Date(dateAsString);
+        date  =  dateAsString == null ? null : new ilarkesto.core.time.Date(dateAsString);
         String timeAsString = (String) props.get("time");
-        time  =  timeAsString == null ? null : new ilarkesto.gwt.client.Time(timeAsString);
+        time  =  timeAsString == null ? null : new ilarkesto.core.time.Time(timeAsString);
         location  = (java.lang.String) props.get("location");
         duration  = (java.lang.Integer) props.get("duration");
         agenda  = (java.lang.String) props.get("agenda");

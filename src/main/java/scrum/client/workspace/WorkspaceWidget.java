@@ -1,19 +1,32 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.workspace;
 
 import ilarkesto.core.logging.Log;
-import ilarkesto.gwt.client.FullscreenPanel;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.LockWidget;
 import ilarkesto.gwt.client.SwitcherWidget;
 import scrum.client.common.AScrumWidget;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class WorkspaceWidget extends AScrumWidget {
@@ -25,33 +38,30 @@ public class WorkspaceWidget extends AScrumWidget {
 	private LockWidget locker;
 	private LockInfoWidget lockInfo;
 	private SwitcherWidget sidebar;
-	private SwitcherWidget workarea = new SwitcherWidget(true);
+	private SwitcherWidget workarea = new SwitcherWidget(false);
 
 	@Override
 	protected Widget onInitialization() {
-		setHeight100();
 
 		lockInfo = new LockInfoWidget();
+
 		HeaderWidget header = new HeaderWidget();
-		sidebar = new SwitcherWidget(true);
-		workarea.setStyleName("Workspace-body-center-content");
+		SimplePanel workspaceHeader = Gwt.createDiv("Workspace-header", header);
 
-		ScrollPanel workareaScroller = new ScrollPanel(Gwt.createDiv("Workspace-body-center-content", workarea));
-		workareaScroller.getElement().setId("workarea-scroller");
-		workareaScroller.setHeight("100%");
-		workarea.setScrollPanel(workareaScroller);
+		sidebar = new SwitcherWidget(false);
+		sidebar.addStyleName("Workspace-sidebar");
 
-		FlowPanel body = new FlowPanel();
-		body.setStyleName("Workspace-body");
-		body.add(Gwt.createDiv("Workspace-body-west", sidebar));
-		body.add(Gwt.createDiv("Workspace-body-center", workareaScroller));
+		workarea.addStyleName("Workspace-workarea");
 
-		FlowPanel workspace = Gwt.createFlowPanel(Gwt.createDiv("Workspace-header", header), body);
+		HorizontalPanel workspaceBody = Gwt.createHorizontalPanel(10, sidebar, workarea);
+		workspaceBody.setCellWidth(sidebar, "200px");
+
+		FlowPanel workspace = Gwt.createFlowPanel(workspaceHeader, workspaceBody);
 		workspace.setStyleName("Workspace");
 
 		locker = new LockWidget(workspace);
 
-		return new FullscreenPanel(locker);
+		return locker;
 	}
 
 	@Override
@@ -60,29 +70,23 @@ public class WorkspaceWidget extends AScrumWidget {
 		super.onUpdate();
 	}
 
-	public void abort(String message) {
-		Log.DEBUG("Locking UI for ABORT:", message);
-		lockInfo.showBug(message + " Restarting your session...");
+	public void abort(String messageHtml) {
+		lockInfo.showBug(messageHtml);
 		locker.lock(lockInfo);
-		Gwt.runLater(20000, new Runnable() {
-
-			@Override
-			public void run() {
-				Window.Location.reload();
-			}
-
-		});
 	}
 
 	public void lock(String message) {
 		initialize();
-		Log.DEBUG("Locking UI:", message);
 		lockInfo.showWait(message);
 		locker.lock(lockInfo);
 	}
 
+	public void lock(Widget widget) {
+		initialize();
+		locker.lock(widget);
+	}
+
 	public void unlock() {
-		Log.DEBUG("Unlocking UI");
 		locker.unlock();
 	}
 

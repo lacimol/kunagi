@@ -1,5 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-
 #header("closedissues", "Closed issues - Kunagi", "List of closed issues in Kunagi", "Kunagi, bugs, issues, features")
 
 <div class="section">

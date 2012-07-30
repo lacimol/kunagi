@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client;
 
 import ilarkesto.core.base.Str;
@@ -5,6 +19,10 @@ import ilarkesto.core.logging.Log;
 import ilarkesto.core.scope.Scope;
 import ilarkesto.gwt.client.AGwtApplication;
 import ilarkesto.gwt.client.AGwtDao;
+import ilarkesto.gwt.client.ErrorWrapper;
+
+import java.util.List;
+
 import scrum.client.admin.Auth;
 import scrum.client.admin.LogoutServiceCall;
 import scrum.client.calendar.SimpleEvent;
@@ -25,7 +43,6 @@ import scrum.client.sprint.Task;
 import scrum.client.workspace.Ui;
 import scrum.client.workspace.WorkspaceWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -48,6 +65,7 @@ public class ScrumGwtApplication extends GScrumGwtApplication {
 		System.out.println("ScrumGwtApplication.onModuleLoad()");
 
 		ScrumScopeManager.initialize();
+
 		// if (true) {
 		// RootPanel.get().add(new WidgetsTesterWidget().update());
 		// return;
@@ -89,23 +107,37 @@ public class ScrumGwtApplication extends GScrumGwtApplication {
 
 			@Override
 			public void run() {
-				String url = GWT.getHostPageBaseURL();
-				if (!GWT.isScript()) url += "index.html?gwt.codesvr=localhost:9997";
-				Window.Location.replace(url);
+				Window.Location.replace(ScrumGwt.getLoginUrl());
 			}
 		});
 
 	}
 
 	@Override
-	public void handleCommunicationError(Throwable ex) {
-		Scope.get().getComponent(Ui.class).getWorkspace().abort(Str.formatException(ex));
+	public void handleServiceCallError(String serviceCall, List<ErrorWrapper> errors) {
+		for (ErrorWrapper error : errors) {
+			if ("ilarkesto.webapp.GwtConversationDoesNotExist".equals(error.getName())) {
+				Scope.get().getComponent(Ui.class).getWorkspace().abort("Session timed out.");
+				return;
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<strong>Server service call error</strong><br>");
+		sb.append("Calling service <em>").append(serviceCall).append("</em> failed.<br>");
+		for (ErrorWrapper error : errors) {
+			sb.append(Str.toHtml(error.toString())).append("<br>");
+		}
+		Scope.get().getComponent(Ui.class).getWorkspace().abort(sb.toString());
 	}
 
 	@Override
 	protected void handleUnexpectedError(Throwable ex) {
-		log.error("Unexpected error:", ex);
-		Scope.get().getComponent(Ui.class).getWorkspace().abort("Unexpected error: " + Str.formatException(ex));
+		log.error("Unexpected error", ex);
+		StringBuilder sb = new StringBuilder();
+		sb.append("<strong>Unexpected Error</strong><br>");
+		sb.append(Str.toHtml(Str.formatException(ex)));
+		Scope.get().getComponent(Ui.class).getWorkspace().abort(sb.toString());
 	}
 
 	@Override

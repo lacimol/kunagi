@@ -1,9 +1,24 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server;
 
 import ilarkesto.auth.WrongPasswordException;
 import ilarkesto.base.PermissionDeniedException;
 import ilarkesto.base.Str;
 import ilarkesto.base.time.Date;
+import ilarkesto.gwt.client.ErrorWrapper;
 import ilarkesto.persistence.AEntity;
 import ilarkesto.testng.ATest;
 
@@ -23,6 +38,7 @@ import scrum.client.DataTransferObject;
 import scrum.client.admin.SystemMessage;
 import scrum.server.admin.User;
 import scrum.server.collaboration.Comment;
+import scrum.server.collaboration.Subject;
 import scrum.server.estimation.RequirementEstimationVote;
 import scrum.server.issues.Issue;
 import scrum.server.journal.Change;
@@ -89,7 +105,7 @@ public class ScrumServiceImplTest extends ATest {
 		assertConversationWithoutErrors(conversation);
 		assertEquals(conversation.getNextData().getEntities().size(), 1);
 		Project project = getEntityByType(conversation, Project.class);
-		assertStartsWith(project.getLabel(), "Example Project");
+		assertStartsWith(project.getLabel(), "Project");
 		assertTrue(project.containsAdmin(duke));
 		assertTrue(project.containsParticipant(duke));
 		assertTrue(project.containsProductOwner(duke));
@@ -190,8 +206,8 @@ public class ScrumServiceImplTest extends ATest {
 
 	@Test
 	public void requestForum() {
-		app.getSubjectDao().newEntityInstance().setProject(project);
-		app.getCommentDao().newEntityInstance().setParent(project);
+		Subject subject = app.getSubjectDao().postSubject(project, "Test subject");
+		app.getCommentDao().postComment(subject, "hello world", "anonymous", null, true);
 		service.onRequestForum(conversation, true);
 		assertConversationWithoutErrors(conversation);
 		assertContainsEntities(conversation, project.getSubjects());
@@ -269,7 +285,7 @@ public class ScrumServiceImplTest extends ATest {
 
 	@Test
 	public void requestComments() {
-		Comment comment = app.getCommentDao().newEntityInstance();
+		Comment comment = app.getCommentDao().postComment(project, "test comment", "duke", "duke@kunagi.org", true);
 		comment.setParent(project);
 		service.onRequestComments(conversation, project.getId());
 		assertConversationWithoutErrors(conversation);
@@ -368,14 +384,14 @@ public class ScrumServiceImplTest extends ATest {
 		return entity;
 	}
 
-	private static void assertConversationError(GwtConversation conversation, String error) {
-		List<String> errors = conversation.getNextData().getErrors();
+	private static void assertConversationError(GwtConversation conversation, ErrorWrapper error) {
+		List<ErrorWrapper> errors = conversation.getNextData().getErrors();
 		assertTrue(errors != null && errors.contains(error),
 			"Conversation error not found: <" + error + "> in " + Str.format(errors));
 	}
 
 	private static void assertConversationWithoutErrors(GwtConversation conversation) {
-		List<String> errors = conversation.getNextData().getErrors();
+		List<ErrorWrapper> errors = conversation.getNextData().getErrors();
 		assertTrue(errors == null || errors.isEmpty(), "Conversation contains errors: " + Str.format(errors));
 	}
 

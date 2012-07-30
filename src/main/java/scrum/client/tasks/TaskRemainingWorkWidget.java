@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.tasks;
 
 import ilarkesto.gwt.client.AIntegerViewEditWidget;
@@ -17,6 +31,7 @@ public class TaskRemainingWorkWidget extends AWidget {
 	private HorizontalPanel panel;
 	private RemainingWorkWidget remainingWork;
 	private ToolbarWidget toolbar;
+	private boolean lastClosed = false;
 
 	public TaskRemainingWorkWidget(Task task) {
 		this.task = task;
@@ -24,13 +39,19 @@ public class TaskRemainingWorkWidget extends AWidget {
 
 	@Override
 	protected Widget onInitialization() {
+		lastClosed = task.isClosed();
+
 		remainingWork = new RemainingWorkWidget();
 		toolbar = new ToolbarWidget();
 
 		panel = new HorizontalPanel();
 		panel.setStyleName("TaskRemainingWorkWidget");
-		// panel.setWidth("100%");
-		panel.add(remainingWork);
+		if (task.isClosed()) {
+			// panel.add(new Label("-"));
+			panel.add(new SimpleValueWidget(task.getRemainingWork()));
+		} else {
+			panel.add(remainingWork);
+		}
 		panel.add(toolbar);
 		return panel;
 	}
@@ -50,6 +71,11 @@ public class TaskRemainingWorkWidget extends AWidget {
 			}
 		}
 		super.onUpdate();
+	}
+
+	@Override
+	protected boolean isResetRequired() {
+		return lastClosed != task.isClosed();
 	}
 
 	class RemainingWorkWidget extends AIntegerViewEditWidget {

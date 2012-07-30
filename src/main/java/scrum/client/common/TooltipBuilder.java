@@ -1,11 +1,27 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.common;
+
+import ilarkesto.core.base.Str;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TooltipBuilder {
 
-	private String mainTooltip;
+	private String text;
 	private List<String> remarks = new ArrayList<String>();
 
 	public static String NOT_TEAM = "You are not Team Member.";
@@ -17,8 +33,16 @@ public class TooltipBuilder {
 	public static String NOT_ADMIN = "You are not Project Admin.";
 	public static String NOT_SYS_ADMIN = "You are not System Admin.";
 
-	public TooltipBuilder(String mainTooltip) {
-		this.mainTooltip = mainTooltip;
+	public TooltipBuilder() {}
+
+	public void setText(String mainTooltip) {
+		this.text = mainTooltip;
+	}
+
+	public boolean isBlank() {
+		if (!Str.isBlank(text)) return false;
+		if (!remarks.isEmpty()) return false;
+		return true;
 	}
 
 	public void addRemark(String remark) {
@@ -27,7 +51,7 @@ public class TooltipBuilder {
 
 	public String getTooltip() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(mainTooltip);
+		sb.append(text);
 
 		if (remarks.size() > 0) {
 
@@ -47,7 +71,7 @@ public class TooltipBuilder {
 
 	public String getTooltipAsHtml() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<p>").append(mainTooltip).append("</p>");
+		sb.append("<p>").append(text).append("</p>");
 
 		if (remarks.size() > 0) {
 
@@ -65,6 +89,11 @@ public class TooltipBuilder {
 
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public String toString() {
+		return getTooltip();
 	}
 
 }

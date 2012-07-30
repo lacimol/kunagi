@@ -96,20 +96,21 @@ public abstract class GChange
 
     // --- dateAndTime ---
 
-    private ilarkesto.gwt.client.DateAndTime dateAndTime ;
+    private ilarkesto.core.time.DateAndTime dateAndTime ;
 
-    public final ilarkesto.gwt.client.DateAndTime getDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getDateAndTime() {
         return this.dateAndTime ;
     }
 
-    public final Change setDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final Change setDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         if (isDateAndTime(dateAndTime)) return (Change)this;
+        if (dateAndTime == null) throw new RuntimeException("Field is mandatory.");
         this.dateAndTime = dateAndTime ;
         propertyChanged("dateAndTime", this.dateAndTime);
         return (Change)this;
     }
 
-    public final boolean isDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final boolean isDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return equals(this.dateAndTime, dateAndTime);
     }
 
@@ -130,12 +131,12 @@ public abstract class GChange
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getDateAndTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setDateAndTime(value);
         }
 
@@ -143,7 +144,7 @@ public abstract class GChange
         public boolean isMandatory() { return true; }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -371,7 +372,7 @@ public abstract class GChange
         parentId = (String) props.get("parentId");
         userId = (String) props.get("userId");
         String dateAndTimeAsString = (String) props.get("dateAndTime");
-        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(dateAndTimeAsString);
+        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.core.time.DateAndTime(dateAndTimeAsString);
         key  = (java.lang.String) props.get("key");
         oldValue  = (java.lang.String) props.get("oldValue");
         newValue  = (java.lang.String) props.get("newValue");

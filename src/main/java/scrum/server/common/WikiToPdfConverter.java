@@ -1,5 +1,20 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.common;
 
+import ilarkesto.core.logging.Log;
 import ilarkesto.pdf.ACell;
 import ilarkesto.pdf.AImage;
 import ilarkesto.pdf.AParagraph;
@@ -25,10 +40,13 @@ import scrum.client.wiki.Table;
 import scrum.client.wiki.TableCell;
 import scrum.client.wiki.TableRow;
 import scrum.client.wiki.Text;
+import scrum.client.wiki.Toc;
 import scrum.client.wiki.WikiModel;
 import scrum.client.wiki.WikiParser;
 
 public class WikiToPdfConverter extends APdfCreator {
+
+	private static final Log log = Log.get(WikiToPdfConverter.class);
 
 	private WikiModel model;
 	private PdfContext pdfContext;
@@ -36,6 +54,7 @@ public class WikiToPdfConverter extends APdfCreator {
 	private boolean firstParagraph = true;
 
 	public WikiToPdfConverter(WikiModel model, PdfContext pdfContext) {
+		super(pdfContext.getProject());
 		this.model = model;
 		this.pdfContext = pdfContext;
 	}
@@ -72,7 +91,15 @@ public class WikiToPdfConverter extends APdfCreator {
 			processTable((Table) element, parent);
 			return;
 		}
+		if (element instanceof Toc) {
+			processToc((Toc) element, parent);
+			return;
+		}
 		throw new RuntimeException("Unsupported Wiki-Element: " + element.getClass().getName());
+	}
+
+	private void processToc(Toc element, APdfContainerElement parent) {
+		// TODO?
 	}
 
 	private void processTable(Table wikiTable, APdfContainerElement parent) {
@@ -164,7 +191,13 @@ public class WikiToPdfConverter extends APdfCreator {
 	}
 
 	private void processImage(Image image, AParagraph parent) {
-		AImage pdfImage = pdfContext.appendImage(parent, image);
+		AImage pdfImage;
+		try {
+			pdfImage = pdfContext.appendImage(parent, image);
+		} catch (Exception ex) {
+			log.warn("Image processing failed:", image, ex);
+			return;
+		}
 		if (pdfImage == null) return;
 
 		if (image.isThumb()) {

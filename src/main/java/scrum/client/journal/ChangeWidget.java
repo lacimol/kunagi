@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.journal;
 
 import ilarkesto.gwt.client.AAction;
@@ -5,6 +19,7 @@ import ilarkesto.gwt.client.ATextWidget;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.HyperlinkWidget;
 import ilarkesto.gwt.client.editor.RichtextEditorWidget;
+import scrum.client.admin.ProjectUserConfig;
 import scrum.client.admin.User;
 import scrum.client.collaboration.Wiki;
 import scrum.client.common.AScrumWidget;
@@ -28,10 +43,14 @@ public class ChangeWidget extends AScrumWidget {
 	@Override
 	protected Widget onInitialization() {
 		User changer = change.getUser();
-		Label changerLabel = new Label(changer.getName());
-		changerLabel.setStyleName("ChangeWidget-header-author");
-		String color = getCurrentProject().getUserConfig(changer).getColor();
-		changerLabel.getElement().getStyle().setProperty("color", color);
+		Label changerLabel = null;
+		if (changer != null) {
+			changerLabel = new Label(changer.getName());
+			changerLabel.setStyleName("ChangeWidget-header-author");
+			ProjectUserConfig userConfig = getCurrentProject().getUserConfig(changer);
+			String color = userConfig == null ? "darkgray" : userConfig.getColor();
+			changerLabel.getElement().getStyle().setProperty("color", color);
+		}
 
 		date = new Label();
 		date.setStyleName("ChangeWidget-header-date");
@@ -39,7 +58,7 @@ public class ChangeWidget extends AScrumWidget {
 		FlowPanel header = new FlowPanel();
 		header.setStyleName("ChangeWidget-header");
 		header.add(date);
-		header.add(changerLabel);
+		if (changerLabel != null) header.add(changerLabel);
 
 		FlowPanel panel = new FlowPanel();
 		panel.setStyleName("ChangeWidget");
@@ -67,15 +86,17 @@ public class ChangeWidget extends AScrumWidget {
 
 	public void expand() {
 		payloadPanel.clear();
-		ATextWidget diffWidget = new ATextWidget() {
+		if (change.isDiffAvailable()) {
+			ATextWidget diffWidget = new ATextWidget() {
 
-			@Override
-			protected void onUpdate() {
-				setHtml(change.getDiff());
-			}
-		};
-		diffWidget.addStyleName("ChangeWidget-diff");
-		payloadPanel.add(diffWidget);
+				@Override
+				protected void onUpdate() {
+					setHtml(change.getDiff());
+				}
+			};
+			diffWidget.addStyleName("ChangeWidget-diff");
+			payloadPanel.add(diffWidget);
+		}
 		payloadPanel.add(Gwt.createDiv("ChangeWidget-comment", new RichtextEditorWidget(change.getCommentModel())));
 		update();
 	}

@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server;
 
 import ilarkesto.auth.Auth;
@@ -8,7 +22,9 @@ import ilarkesto.base.Reflect;
 import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
 import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.scope.In;
 import ilarkesto.integration.ldap.Ldap;
 import ilarkesto.persistence.ADao;
 import ilarkesto.persistence.AEntity;
@@ -31,7 +47,6 @@ import scrum.server.admin.UserDao;
 import scrum.server.collaboration.ChatMessage;
 import scrum.server.collaboration.Comment;
 import scrum.server.collaboration.CommentDao;
-import scrum.server.collaboration.EmoticonDao;
 import scrum.server.collaboration.Subject;
 import scrum.server.collaboration.Wikipage;
 import scrum.server.common.Numbered;
@@ -42,10 +57,10 @@ import scrum.server.issues.Issue;
 import scrum.server.issues.IssueDao;
 import scrum.server.journal.Change;
 import scrum.server.journal.ChangeDao;
-import scrum.server.journal.ProjectEvent;
-import scrum.server.journal.ProjectEventDao;
 import scrum.server.pr.BlogEntry;
-import scrum.server.pr.BlogEntryDao;
+import scrum.server.pr.EmailHelper;
+import scrum.server.pr.EmailSender;
+import scrum.server.pr.SubscriptionService;
 import scrum.server.project.Project;
 import scrum.server.project.ProjectDao;
 import scrum.server.project.Requirement;
@@ -54,12 +69,14 @@ import scrum.server.release.Release;
 import scrum.server.release.ReleaseDao;
 import scrum.server.risks.Risk;
 import scrum.server.sprint.Sprint;
+import scrum.server.sprint.SprintReport;
+import scrum.server.sprint.SprintReportDao;
 import scrum.server.sprint.Task;
 import scrum.server.task.TaskDaySnapshot;
 
 public class ScrumServiceImpl extends GScrumServiceImpl {
 
-	private static final Log LOG = Log.get(ScrumServiceImpl.class);
+	private static final Log log = Log.get(ScrumServiceImpl.class);
 	private static final long serialVersionUID = 1;
 
 	// --- dependencies ---
@@ -71,10 +88,16 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	private transient ReleaseDao releaseDao;
 	private transient CommentDao commentDao;
 	private transient ScrumWebApplication webApplication;
-	private transient ProjectEventDao projectEventDao;
-	private transient EmoticonDao emoticonDao;
 	private transient ChangeDao changeDao;
-	private transient BlogEntryDao blogEntryDao;
+
+	@In
+	private transient SubscriptionService subscriptionService;
+
+	@In
+	private transient SprintReportDao sprintReportDao;
+
+	@In
+	private transient EmailSender emailSender;
 
 	public void setReleaseDao(ReleaseDao releaseDao) {
 		this.releaseDao = releaseDao;
@@ -82,14 +105,6 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 	public void setChangeDao(ChangeDao changeDao) {
 		this.changeDao = changeDao;
-	}
-
-	public void setEmoticonDao(EmoticonDao emoticonDao) {
-		this.emoticonDao = emoticonDao;
-	}
-
-	public void setProjectEventDao(ProjectEventDao projectEventDao) {
-		this.projectEventDao = projectEventDao;
 	}
 
 	public void setWebApplication(ScrumWebApplication webApplication) {
@@ -116,10 +131,6 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		this.commentDao = commentDao;
 	}
 
-	public void setBlogEntryDao(BlogEntryDao blogEntryDao) {
-		this.blogEntryDao = blogEntryDao;
-	}
-
 	// --- ---
 
 	private void onStartConversation(GwtConversation conversation) {
@@ -133,11 +144,64 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	}
 
 	@Override
+	public void onRequestHistory(GwtConversation conversation) {
+		assertProjectSelected(conversation);
+		Project project = conversation.getProject();
+		Set<SprintReport> reports = project.getSprintReports();
+		Set<AEntity> entities = new HashSet<AEntity>();
+		entities.addAll(reports);
+		for (SprintReport report : reports) {
+			entities.addAll(getAssociatedEntities(report));
+		}
+		conversation.sendToClient(entities);
+	}
+
+	@Override
+	public void onPullStoryToSprint(GwtConversation conversation, String storyId) {
+		assertProjectSelected(conversation);
+		Requirement story = requirementDao.getById(storyId);
+		Project project = conversation.getProject();
+		Sprint sprint = project.getCurrentSprint();
+		User currentUser = conversation.getSession().getUser();
+
+		sprint.pullRequirement(story, currentUser);
+
+		postProjectEvent(conversation, currentUser.getName() + " pulled " + story.getReferenceAndLabel()
+				+ " to current sprint", story);
+
+		sendToClients(conversation, sprint);
+		sendToClients(conversation, story);
+		sendToClients(conversation, story.getTasksInSprint());
+	}
+
+	@Override
+	public void onKickStoryFromSprint(GwtConversation conversation, String storyId) {
+		assertProjectSelected(conversation);
+		Requirement story = requirementDao.getById(storyId);
+		Sprint sprint = story.getSprint();
+		User currentUser = conversation.getSession().getUser();
+
+		sprint.kickRequirement(story, currentUser);
+
+		postProjectEvent(conversation, currentUser.getName() + " kicked " + story.getReferenceAndLabel()
+				+ " from current sprint", story);
+
+		sendToClients(conversation, story.getTasksInSprint());
+		sendToClients(conversation, story);
+		sendToClients(conversation, sprint);
+		sendToClients(conversation, sprint.getProject());
+	}
+
+	@Override
 	public void onSendIssueReplyEmail(GwtConversation conversation, String issueId, String from, String to,
 			String subject, String text) {
 		assertProjectSelected(conversation);
 		Issue issue = issueDao.getById(issueId);
-		webApplication.sendEmail(from, to, subject, text);
+		if (Str.isEmail(from)) {
+			emailSender.sendEmail(conversation.getProject(), to, subject, text);
+		} else {
+			emailSender.sendEmail(from, to, subject, text);
+		}
 		User user = conversation.getSession().getUser();
 		postProjectEvent(conversation, user.getName() + " emailed a response to " + issue.getReferenceAndLabel(), issue);
 		Change change = changeDao.postChange(issue, user, "@reply", null, text);
@@ -156,7 +220,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		Project project = conversation.getProject();
 		if (project == null) return;
 		List<AEntity> foundEntities = project.search(text);
-		LOG.debug("Found entities for search", "\"" + text + "\"", "->", foundEntities);
+		log.debug("Found entities for search", "\"" + text + "\"", "->", foundEntities);
 		conversation.sendToClient(foundEntities);
 	}
 
@@ -187,11 +251,11 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	@Override
 	public void onChangePassword(GwtConversation conversation, String oldPassword, String newPassword) {
 		User user = conversation.getSession().getUser();
-		if (!user.isAdmin() && user.matchesPassword(oldPassword) == false) throw new WrongPasswordException();
+		if (!user.matchesPassword(oldPassword)) throw new WrongPasswordException();
 
 		user.setPassword(newPassword);
 
-		LOG.info("password changed by", user);
+		log.info("password changed by", user);
 	}
 
 	@Override
@@ -256,15 +320,32 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			blogEntry.addAuthor(currentUser);
 		}
 
+		if (entity instanceof Change) {
+			Change change = (Change) entity;
+			change.setDateAndTime(DateAndTime.now());
+			change.setUser(currentUser);
+		}
+
 		if (!(entity instanceof Transient)) dao.saveEntity(entity);
 
 		sendToClients(conversation, entity);
 
-		if (entity instanceof Task || entity instanceof Requirement || entity instanceof Wikipage
-				|| entity instanceof Risk || entity instanceof Impediment || entity instanceof Issue
-				|| entity instanceof BlogEntry) {
-			User user = currentUser;
-			Change change = changeDao.postChange(entity, user, "@created", null, null);
+		if (entity instanceof Requirement) {
+			Requirement requirement = (Requirement) entity;
+			Requirement epic = requirement.getEpic();
+			String value = null;
+			if (epic != null) {
+				value = epic.getReferenceAndLabel();
+				Change change = changeDao.postChange(epic, currentUser, "@split", null, requirement.getReference());
+				conversation.sendToClient(change);
+			}
+			Change change = changeDao.postChange(requirement, currentUser, "@created", null, value);
+			conversation.sendToClient(change);
+		}
+
+		if (entity instanceof Task || entity instanceof Wikipage || entity instanceof Risk
+				|| entity instanceof Impediment || entity instanceof Issue || entity instanceof BlogEntry) {
+			Change change = changeDao.postChange(entity, currentUser, "@created", null, null);
 			conversation.sendToClient(change);
 		}
 
@@ -286,8 +367,15 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			file.deleteFile();
 		}
 
+		if (entity instanceof Task) {
+			// update sprint day snapshot before delete
+			conversation.getProject().getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
+		}
+
 		ADao dao = getDaoService().getDao(entity);
 		dao.deleteEntity(entity);
+
+		if (entity instanceof Task) onTaskDeleted(conversation, (Task) entity);
 
 		Project project = conversation.getProject();
 		if (project != null) {
@@ -303,6 +391,18 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		}
 	}
 
+	private void onTaskDeleted(GwtConversation conversation, Task task) {
+		// update sprint day snapshot after delete
+		conversation.getProject().getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
+		Requirement requirement = task.getRequirement();
+		if (requirement.isInCurrentSprint()) {
+			if (task.isOwnerSet()) {
+				postProjectEvent(conversation,
+					conversation.getSession().getUser().getName() + " deleted " + task.getReferenceAndLabel(), task);
+			}
+		}
+	}
+
 	@Override
 	public void onChangeProperties(GwtConversation conversation, String entityId, Map properties) {
 		AEntity entity = getDaoService().getEntityById(entityId);
@@ -312,16 +412,23 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		Sprint previousRequirementSprint = entity instanceof Requirement ? ((Requirement) entity).getSprint() : null;
 
 		if (entity instanceof Requirement) {
+			postChangeIfChanged(conversation, entity, properties, currentUser, "label");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "description");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "testDescription");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "sprintId");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "closed");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "issueId");
 		}
+		Project project = conversation.getProject();
 		if (entity instanceof Task) {
 			// update sprint day snapshot before change
-			conversation.getProject().getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
-			((Task) entity).getDaySnapshot(Date.today()).updateWithCurrentTask();
+			if (project.isCurrentSprintSet()) {
+				project.getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
+				((Task) entity).getDaySnapshot(Date.today()).updateWithCurrentTask();
+			}
+
+			postChangeIfChanged(conversation, entity, properties, currentUser, "label");
+			postChangeIfChanged(conversation, entity, properties, currentUser, "description");
 		}
 		if (entity instanceof Wikipage) {
 			postChangeIfChanged(conversation, entity, properties, currentUser, "text");
@@ -356,10 +463,11 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		if (entity instanceof Impediment) onImpedimentChanged(conversation, (Impediment) entity, properties);
 		if (entity instanceof Issue) onIssueChanged(conversation, (Issue) entity, properties);
 		if (entity instanceof BlogEntry) onBlogEntryChanged(conversation, (BlogEntry) entity, properties);
-		if (entity instanceof Comment) onCommentChanged(conversation, (Comment) entity);
+		if (entity instanceof Comment) onCommentChanged(conversation, (Comment) entity, properties);
 		if (entity instanceof SystemConfig) onSystemConfigChanged(conversation, (SystemConfig) entity, properties);
+		if (entity instanceof Wikipage) onWikipageChanged(conversation, (Wikipage) entity, properties);
 
-		Project currentProject = conversation.getProject();
+		Project currentProject = project;
 		if (currentUser != null && currentProject != null) {
 			ProjectUserConfig config = currentProject.getUserConfig(currentUser);
 			config.touch();
@@ -376,8 +484,12 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		}
 	}
 
-	private void onCommentChanged(GwtConversation conversation, Comment comment) {
+	private void onCommentChanged(GwtConversation conversation, Comment comment, Map properties) {
 		conversation.getProject().updateHomepage(comment.getParent(), false);
+		if (comment.isPublished() && properties.containsKey("published")) {
+			subscriptionService.notifySubscribers(comment.getParent(),
+				"New comment posted by " + comment.getAuthorLabel(), conversation.getProject(), null);
+		}
 	}
 
 	private void onBlogEntryChanged(GwtConversation conversation, BlogEntry blogEntry, Map properties) {
@@ -396,6 +508,10 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		}
 	}
 
+	private void onWikipageChanged(GwtConversation conversation, Wikipage wikipage, Map properties) {
+		wikipage.getProject().updateHomepage();
+	}
+
 	private void onIssueChanged(GwtConversation conversation, Issue issue, Map properties) {
 		User currentUser = conversation.getSession().getUser();
 
@@ -403,19 +519,23 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			if (issue.isClosed()) {
 				issue.setCloseDate(Date.today());
 				postProjectEvent(conversation, currentUser.getName() + " closed " + issue.getReferenceAndLabel(), issue);
+				subscriptionService.notifySubscribers(issue, "Issue closed", conversation.getProject(), null);
 			} else {
 				postProjectEvent(conversation, currentUser.getName() + " reopened " + issue.getReferenceAndLabel(),
 					issue);
+				subscriptionService.notifySubscribers(issue, "Issue reopened", conversation.getProject(), null);
 			}
 		}
 
 		if (properties.containsKey("ownerId") && issue.isOwnerSet()) {
-			postProjectEvent(conversation, currentUser.getName() + " claimed " + issue.getReferenceAndLabel(), issue);
+			if (!issue.isFixed()) {
+				postProjectEvent(conversation, currentUser.getName() + " claimed " + issue.getReferenceAndLabel(),
+					issue);
+			}
 
 			Release nextRelease = issue.getProject().getNextRelease();
-			if (issue.isFixReleasesEmpty() && nextRelease != null) {
+			if (nextRelease != null && issue.isFixReleasesEmpty()) {
 				issue.setFixReleases(Collections.singleton(nextRelease));
-				sendToClients(conversation, issue);
 			}
 		}
 
@@ -433,8 +553,15 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 				Release currentRelease = issue.getProject().getCurrentRelease();
 				if (issue.isAffectedReleasesEmpty() && currentRelease != null) {
 					issue.setAffectedReleases(Collections.singleton(currentRelease));
-					sendToClients(conversation, issue);
 				}
+			}
+		}
+
+		if (properties.containsKey("acceptDate")) {
+			if (issue.isIdea() || issue.isBug()) {
+				postProjectEvent(conversation, currentUser.getName() + " accepted " + issue.getReferenceAndLabel(),
+					issue);
+				subscriptionService.notifySubscribers(issue, "Issue accepted", conversation.getProject(), null);
 			}
 		}
 
@@ -443,10 +570,15 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 	private void onImpedimentChanged(GwtConversation conversation, Impediment impediment, Map properties) {
 		User currentUser = conversation.getSession().getUser();
-		if (impediment.isClosed() && properties.containsKey("closed")) {
-			impediment.setDate(Date.today());
-			postProjectEvent(conversation, currentUser.getName() + " closed " + impediment.getReferenceAndLabel(),
-				impediment);
+		if (properties.containsKey("closed")) {
+			if (impediment.isClosed()) {
+				impediment.setDate(Date.today());
+				postProjectEvent(conversation, currentUser.getName() + " closed " + impediment.getReferenceAndLabel(),
+					impediment);
+			} else {
+				postProjectEvent(conversation,
+					currentUser.getName() + " reopened " + impediment.getReferenceAndLabel(), impediment);
+			}
 		}
 	}
 
@@ -479,10 +611,14 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 					postProjectEvent(conversation,
 						currentUser.getName() + " pulled " + requirement.getReferenceAndLabel() + " to current sprint",
 						requirement);
+					subscriptionService.notifySubscribers(requirement, "Story pulled to current Sprint",
+						conversation.getProject(), null);
 				} else {
 					postProjectEvent(conversation,
 						currentUser.getName() + " kicked " + requirement.getReferenceAndLabel()
 								+ " from current sprint", requirement);
+					subscriptionService.notifySubscribers(requirement, "Story kicked from current Sprint",
+						conversation.getProject(), null);
 				}
 			}
 		}
@@ -501,7 +637,6 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	private void onTaskChanged(GwtConversation conversation, Task task, Map properties) {
 		// update sprint day snapshot after change
 		conversation.getProject().getCurrentSprint().getDaySnapshot(Date.today()).updateWithCurrentSprint();
-		// update and send back task day snapshot
 		TaskDaySnapshot taskDaySnapshot = task.getDaySnapshot(Date.today());
 		taskDaySnapshot.updateWithCurrentTask();
 		sendToClients(conversation, taskDaySnapshot);
@@ -543,11 +678,15 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 		conversation.sendToClient(project);
 		conversation.sendToClient(project.getSprints());
+		conversation.sendToClient(project.getSprintReports());
 		conversation.sendToClient(project.getParticipants());
-		Set<Requirement> requirements = project.getRequirements();
-		conversation.sendToClient(requirements);
-		for (Requirement requirement : requirements) {
+		for (Requirement requirement : project.getProductBacklogRequirements()) {
+			conversation.sendToClient(requirement);
 			conversation.sendToClient(requirement.getEstimationVotes());
+		}
+		for (Requirement requirement : project.getCurrentSprint().getRequirements()) {
+			conversation.sendToClient(requirement);
+			conversation.sendToClient(requirement.getTasksInSprint());
 		}
 		conversation.sendToClient(project.getQualitys());
 		conversation.sendToClient(project.getTasks());
@@ -555,7 +694,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		conversation.sendToClient(project.getWikipages());
 		conversation.sendToClient(project.getImpediments());
 		conversation.sendToClient(project.getRisks());
-		conversation.sendToClient(project.getLatestProjectEvents());
+		conversation.sendToClient(project.getLatestProjectEvents(5));
 		conversation.sendToClient(project.getCalendarEvents());
 		conversation.sendToClient(project.getFiles());
 		conversation.sendToClient(project.getOpenIssues());
@@ -641,7 +780,9 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			if (!Auth.isVisible(entity, conversation.getSession().getUser())) throw new PermissionDeniedException();
 			// TODO check if entity is from project
 			conversation.sendToClient(entity);
+			conversation.sendToClient(getAssociatedEntities(entity));
 		} catch (EntityDoesNotExistException ex) {
+			log.info("Requested entity not found:", entityId);
 			// nop
 		}
 	}
@@ -653,10 +794,45 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 		AEntity entity = project.getEntityByReference(reference);
 		if (entity == null) {
-			LOG.info("Requested entity not found:", reference);
+			log.info("Requested entity not found:", reference);
 		} else {
 			conversation.sendToClient(entity);
+			conversation.sendToClient(getAssociatedEntities(entity));
 		}
+	}
+
+	private Set<AEntity> getAssociatedEntities(AEntity entity) {
+		Set<AEntity> ret = new HashSet<AEntity>();
+
+		if (entity instanceof Task) {
+			Task task = (Task) entity;
+			Set<SprintReport> reports = sprintReportDao.getSprintReportsByClosedTask(task);
+			reports.addAll(sprintReportDao.getSprintReportsByOpenTask(task));
+			for (SprintReport report : reports) {
+				ret.addAll(getAssociatedEntities(report));
+			}
+		}
+
+		if (entity instanceof Requirement) {
+			Requirement requirement = (Requirement) entity;
+			Set<SprintReport> reports = sprintReportDao.getSprintReportsByCompletedRequirement(requirement);
+			reports.addAll(sprintReportDao.getSprintReportsByRejectedRequirement(requirement));
+			for (SprintReport report : reports) {
+				ret.addAll(getAssociatedEntities(report));
+			}
+		}
+
+		if (entity instanceof SprintReport) {
+			SprintReport report = (SprintReport) entity;
+			ret.add(report.getSprint());
+			ret.addAll(report.getCompletedRequirements());
+			ret.addAll(report.getRejectedRequirements());
+			ret.addAll(report.getSprintSwitchRequirementChanges());
+			ret.addAll(report.getClosedTasks());
+			ret.addAll(report.getOpenTasks());
+		}
+
+		return ret;
 	}
 
 	@Override
@@ -701,10 +877,13 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 				sendToClients(conversation, requirement);
 			}
 		}
-		project.switchToNextSprint();
+		Sprint newSprint = project.switchToNextSprint();
+		postProjectEvent(conversation, conversation.getSession().getUser() + " switched to next sprint ", newSprint);
 		sendToClients(conversation, project.getSprints());
+		sendToClients(conversation, project.getSprintReports());
 		sendToClients(conversation, project.getRequirements());
-		sendToClients(conversation, project.getTasks());
+		sendToClients(conversation, project.getTasks()); // TODO optimize: no history tasks
+		sendToClients(conversation, oldSprint.getReleases());
 		sendToClients(conversation, project);
 	}
 
@@ -717,7 +896,8 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 	@Override
 	public void onSendTestEmail(GwtConversation conversation) {
-		webApplication.sendEmail(null, null, "Kunagi email test", "Kunagi email test");
+		// if (true) throw new GwtConversationDoesNotExist(666); // TODO remove!!!!!
+		emailSender.sendEmail((String) null, null, "Kunagi email test", "Kunagi email test");
 	}
 
 	@Override
@@ -737,6 +917,14 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	}
 
 	@Override
+	public void onPublishRelease(GwtConversation conversation, String releaseId) {
+		Project project = conversation.getProject();
+		Release release = (Release) getDaoService().getEntityById(releaseId);
+		if (!release.isProject(project)) throw new PermissionDeniedException();
+		release.release(project, conversation.getSession().getUser(), webApplication);
+	}
+
+	@Override
 	public void onPing(GwtConversation conversation) {
 		// nop
 	}
@@ -750,7 +938,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 	@Override
 	public DataTransferObject startConversation(int conversationNumber) {
-		LOG.debug("startConversation");
+		log.debug("startConversation");
 		WebSession session = (WebSession) getSession();
 		GwtConversation conversation = session.getGwtConversation(-1);
 		ilarkesto.di.Context context = ilarkesto.di.Context.get();
@@ -758,19 +946,16 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		context.bindCurrentThread();
 		try {
 			onStartConversation(conversation);
+			onServiceMethodExecuted(context);
 		} catch (Throwable t) {
 			handleServiceMethodException(conversation.getNumber(), "startSession", t);
-			throw new RuntimeException(t);
 		}
-		scrum.client.DataTransferObject ret = (scrum.client.DataTransferObject) conversation.popNextData();
-		onServiceMethodExecuted(context);
-		return ret;
+		return (scrum.client.DataTransferObject) conversation.popNextData();
 	}
 
 	private void postChangeIfChanged(GwtConversation conversation, AEntity entity, Map properties, User user,
 			String property) {
 		if (properties.containsKey(property)) {
-			boolean reference = property.endsWith("Id");
 			Object oldValue = Reflect.getProperty(entity, property);
 			Object newValue = properties.get(property);
 			Change change = changeDao.postChange(entity, user, property, oldValue, newValue);
@@ -780,9 +965,34 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 	private void postProjectEvent(GwtConversation conversation, String message, AEntity subject) {
 		assertProjectSelected(conversation);
-		ProjectEvent event = projectEventDao.postEvent(conversation.getProject(), message, subject);
-		sendToClients(conversation, event);
-		sendToClients(conversation, event.createChatMessage());
+		Project project = conversation.getProject();
+		webApplication.postProjectEvent(project, message, subject);
+
+		try {
+			sendProjectEventEmails(message, subject, project, conversation.getSession().getUser().getEmail());
+		} catch (Throwable ex) {
+			log.error("Sending project event notification emails failed.", ex);
+		}
+	}
+
+	public void sendProjectEventEmails(String message, AEntity subject, Project project, String exceptionEmail) {
+		if (exceptionEmail != null) exceptionEmail = exceptionEmail.toLowerCase();
+		String subjectText = EmailHelper.createSubject(project, message);
+		String emailText = createProjectEventEmailText(project, message, subject);
+		for (ProjectUserConfig config : project.getUserConfigs()) {
+			if (!config.isReceiveEmailsOnProjectEvents()) continue;
+			String email = config.getUser().getEmail();
+			if (!Str.isEmail(email)) continue;
+			if (email.toLowerCase().equals(exceptionEmail)) continue;
+			emailSender.sendEmail(project, email, subjectText, emailText);
+		}
+	}
+
+	private String createProjectEventEmailText(Project project, String message, AEntity subject) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(message).append("\n");
+		sb.append(webApplication.createUrl(project, subject)).append("\n");
+		return sb.toString();
 	}
 
 	private void sendToClients(GwtConversation conversation, Collection<? extends AEntity> entities) {
@@ -792,8 +1002,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	}
 
 	private void sendToClients(GwtConversation conversation, AEntity entity) {
-		conversation.sendToClient(entity);
-		webApplication.sendToOtherConversationsByProject(conversation, entity);
+		webApplication.sendToConversationsByProject(conversation, entity);
 	}
 
 	private void assertProjectSelected(GwtConversation conversation) {
@@ -814,8 +1023,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	public void onConvertIssueToStory(GwtConversation conversation, String issueId) {
 		Issue issue = issueDao.getById(issueId);
 		Requirement story = requirementDao.postRequirement(issue);
-		issue.setStatement(issue.getStatement() + "\n\n" + "Created Story " + story.getReference()
-				+ " in Product Backlog.");
+		issue.appendToStatement("Created Story " + story.getReference() + " in Product Backlog.");
 		issue.setCloseDate(Date.today());
 		sendToClients(conversation, story);
 		sendToClients(conversation, issue);
@@ -824,5 +1032,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			currentUser.getName() + " created " + story.getReference() + " from " + issue.getReferenceAndLabel(), issue);
 		changeDao.postChange(issue, currentUser, "storyId", null, story.getId());
 		changeDao.postChange(story, currentUser, "issueId", null, issue.getId());
+		subscriptionService.copySubscribers(issue, story);
+		subscriptionService.notifySubscribers(story, "Story created from " + issue, conversation.getProject(), null);
 	}
 }

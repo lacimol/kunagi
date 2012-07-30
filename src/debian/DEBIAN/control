@@ -1,0 +1,15 @@
+Package: kunagi
+Version: 0.23.1
+Section: devel
+Depends: tomcat6
+Recommends: msttcorefonts
+Priority: optional
+Architecture: all
+Maintainer: Kunagi Team <support@kunagi.org>
+Installed-Size: 50000
+Description: Web based SCRUM project management
+ Kunagi offers integrated project management, supplementing Scrum by a
+ selection of other best practices to cover all project management needs.
+ It does not only offer management of basic Scrum documents, but also a
+ variety of additional data. Furthermore, it includes several features for
+ the ease of use and collaboration.

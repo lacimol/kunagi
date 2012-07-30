@@ -1,5 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-
 #header("search", "Search Results - Kunagi", "Kunagi Hompage Search Results", "")
 
 <div class="section">

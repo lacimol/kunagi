@@ -81,6 +81,7 @@ public abstract class GProjectEvent
 
     public final ProjectEvent setLabel(java.lang.String label) {
         if (isLabel(label)) return (ProjectEvent)this;
+        if (ilarkesto.core.base.Str.isBlank(label)) throw new RuntimeException("Field is mandatory.");
         this.label = label ;
         propertyChanged("label", this.label);
         return (ProjectEvent)this;
@@ -157,20 +158,21 @@ public abstract class GProjectEvent
 
     // --- dateAndTime ---
 
-    private ilarkesto.gwt.client.DateAndTime dateAndTime ;
+    private ilarkesto.core.time.DateAndTime dateAndTime ;
 
-    public final ilarkesto.gwt.client.DateAndTime getDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getDateAndTime() {
         return this.dateAndTime ;
     }
 
-    public final ProjectEvent setDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final ProjectEvent setDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         if (isDateAndTime(dateAndTime)) return (ProjectEvent)this;
+        if (dateAndTime == null) throw new RuntimeException("Field is mandatory.");
         this.dateAndTime = dateAndTime ;
         propertyChanged("dateAndTime", this.dateAndTime);
         return (ProjectEvent)this;
     }
 
-    public final boolean isDateAndTime(ilarkesto.gwt.client.DateAndTime dateAndTime) {
+    public final boolean isDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return equals(this.dateAndTime, dateAndTime);
     }
 
@@ -191,12 +193,12 @@ public abstract class GProjectEvent
         }
 
         @Override
-        public ilarkesto.gwt.client.DateAndTime getValue() {
+        public ilarkesto.core.time.DateAndTime getValue() {
             return getDateAndTime();
         }
 
         @Override
-        public void setValue(ilarkesto.gwt.client.DateAndTime value) {
+        public void setValue(ilarkesto.core.time.DateAndTime value) {
             setDateAndTime(value);
         }
 
@@ -207,7 +209,7 @@ public abstract class GProjectEvent
         public boolean isEditable() { return GProjectEvent.this.isEditable(); }
 
         @Override
-        protected void onChangeValue(ilarkesto.gwt.client.DateAndTime oldValue, ilarkesto.gwt.client.DateAndTime newValue) {
+        protected void onChangeValue(ilarkesto.core.time.DateAndTime oldValue, ilarkesto.core.time.DateAndTime newValue) {
             super.onChangeValue(oldValue, newValue);
             addUndo(this, oldValue);
         }
@@ -221,7 +223,7 @@ public abstract class GProjectEvent
         label  = (java.lang.String) props.get("label");
         subjectId = (String) props.get("subjectId");
         String dateAndTimeAsString = (String) props.get("dateAndTime");
-        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.gwt.client.DateAndTime(dateAndTimeAsString);
+        dateAndTime  =  dateAndTimeAsString == null ? null : new ilarkesto.core.time.DateAndTime(dateAndTimeAsString);
         updateLocalModificationTime();
     }
 

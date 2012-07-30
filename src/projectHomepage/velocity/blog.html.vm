@@ -1,5 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-
 #header("blog", "Blog - Kunagi", "Kunagi Blog. Announcements, releases and other infos.", "Kunagi, blog")
 
 #blogRssLink()

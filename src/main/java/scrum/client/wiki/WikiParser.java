@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.wiki;
 
 import ilarkesto.core.base.Str;
@@ -68,7 +82,7 @@ public class WikiParser {
 				String suffix = text.substring(end + 7);
 				if (content.trim().length() > 0) {
 					appendText(p, prefix);
-					p.add(new Code(content));
+					p.add(new Code(content, false));
 					appendText(p, suffix);
 					return p;
 				}
@@ -305,7 +319,7 @@ public class WikiParser {
 			if (endIdx > 0) {
 				String code = input.substring(6, endIdx);
 				Paragraph p = new Paragraph(true);
-				p.add(new Code(code));
+				p.add(new Code(code, true));
 				model.add(p);
 				burn(endIdx + 8);
 				return;
@@ -459,9 +473,9 @@ public class WikiParser {
 		}
 
 		// toc
-		if (input.startsWith("TOC")) {
+		if (input.startsWith("__TOC__")) {
 			String line = getNextLine();
-			if (line.equals("TOC")) {
+			if (line.equals("__TOC__")) {
 				burn(line.length() + 1);
 				model.add(new Toc(model));
 				return;
@@ -492,7 +506,7 @@ public class WikiParser {
 	}
 
 	private boolean isIgnorableWordSuffix(char c) {
-		return c == '.' || c == ',' || c == '!' || c == '?' || c == ')';
+		return c == '.' || c == ',' || c == '!' || c == '?' || c == ')' || c == ':' || c == ';';
 	}
 
 	private boolean isUrl(String s) {

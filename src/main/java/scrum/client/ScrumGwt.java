@@ -1,27 +1,55 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client;
 
 import ilarkesto.core.base.Str;
 import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.gwt.client.AGwtEntity;
-import ilarkesto.gwt.client.DateAndTime;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.TableBuilder;
 
 import java.util.Collection;
 
+import scrum.client.admin.User;
 import scrum.client.collaboration.CommentsWidget;
 import scrum.client.collaboration.EmoticonSelectorWidget;
 import scrum.client.common.AScrumGwtEntity;
 import scrum.client.common.LabelSupport;
 import scrum.client.common.ReferenceSupport;
 import scrum.client.project.Project;
+import scrum.client.project.Requirement;
 import scrum.client.workspace.Navigator;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ScrumGwt extends Gwt {
+
+	public static String getLoginUrl() {
+		return GWT.getHostPageBaseURL() + "login.html";
+	}
+
+	public static boolean isCurrentUserProductOwner() {
+		Scope scope = Scope.get();
+		Project project = scope.getComponent(Project.class);
+		User user = scope.getComponent(User.class);
+		return project.isProductOwner(user);
+	}
 
 	public static String getEstimationAsString(Float estimation, String suffix) {
 		String s = getEstimationAsString(estimation);
@@ -30,8 +58,25 @@ public class ScrumGwt extends Gwt {
 
 	public static String getEstimationAsString(Float estimation) {
 		if (estimation == null) return null;
+		if (estimation < 0.0f) return "?";
+		if (estimation == 0f) return "0";
 		if (estimation <= 0.5f) return estimation.toString();
 		return String.valueOf(estimation.intValue());
+	}
+
+	public static Float getNextEstimationValue(Float value) {
+		for (Float f : Requirement.WORK_ESTIMATION_FLOAT_VALUES) {
+			if (f >= value) { return f; }
+		}
+		throw new IllegalArgumentException("No next value for " + value);
+	}
+
+	public static Float getPrevEstimationValue(Float value) {
+		for (int i = Requirement.WORK_ESTIMATION_FLOAT_VALUES.length - 1; i > 0; i--) {
+			Float f = Requirement.WORK_ESTIMATION_FLOAT_VALUES[i];
+			if (f <= value) { return f; }
+		}
+		throw new IllegalArgumentException("No previous value for " + value);
 	}
 
 	public static String getReferenceAndLabel(AGwtEntity entity) {

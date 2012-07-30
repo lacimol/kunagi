@@ -78,7 +78,7 @@ public abstract class GRequirementEstimationVoteDao
             });
 
     public final Set<RequirementEstimationVote> getRequirementEstimationVotesByRequirement(scrum.server.project.Requirement requirement) {
-        return requirementEstimationVotesByRequirementCache.get(requirement);
+        return new HashSet<RequirementEstimationVote>(requirementEstimationVotesByRequirementCache.get(requirement));
     }
     private Set<scrum.server.project.Requirement> requirementsCache;
 
@@ -118,7 +118,7 @@ public abstract class GRequirementEstimationVoteDao
             });
 
     public final Set<RequirementEstimationVote> getRequirementEstimationVotesByUser(scrum.server.admin.User user) {
-        return requirementEstimationVotesByUserCache.get(user);
+        return new HashSet<RequirementEstimationVote>(requirementEstimationVotesByUserCache.get(user));
     }
     private Set<scrum.server.admin.User> usersCache;
 
@@ -158,7 +158,7 @@ public abstract class GRequirementEstimationVoteDao
             });
 
     public final Set<RequirementEstimationVote> getRequirementEstimationVotesByEstimatedWork(java.lang.Float estimatedWork) {
-        return requirementEstimationVotesByEstimatedWorkCache.get(estimatedWork);
+        return new HashSet<RequirementEstimationVote>(requirementEstimationVotesByEstimatedWorkCache.get(estimatedWork));
     }
     private Set<java.lang.Float> estimatedWorksCache;
 

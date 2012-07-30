@@ -1,6 +1,27 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.core;
 
+import ilarkesto.core.base.Str;
 import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.Tm;
+import ilarkesto.gwt.client.ErrorWrapper;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import scrum.client.Dao;
 import scrum.client.DataTransferObject;
 import scrum.client.ScrumGwtApplication;
@@ -11,10 +32,13 @@ import scrum.client.communication.ServerDataReceivedEvent;
 
 public class ServiceCaller extends GServiceCaller {
 
-	private int activeServiceCallCount;
+	private static final long MAX_FAILURE_TIME = 30 * Tm.SECOND;
+
+	private List<AServiceCall> activeServiceCalls = new LinkedList<AServiceCall>();
 	private AScrumWidget statusWidget;
 	private ScrumServiceAsync scrumService;
 	protected int conversationNumber = -1;
+	private long lastSuccessfullServiceCallTime;
 
 	public final ScrumServiceAsync getService() {
 		if (scrumService == null) {
@@ -26,7 +50,7 @@ public class ServiceCaller extends GServiceCaller {
 	}
 
 	public void onServiceCallSuccess(DataTransferObject data) {
-		onServiceCallReturn();
+		lastSuccessfullServiceCallTime = System.currentTimeMillis();
 
 		if (data.conversationNumber != null) {
 			conversationNumber = data.conversationNumber;
@@ -46,28 +70,39 @@ public class ServiceCaller extends GServiceCaller {
 		new ServerDataReceivedEvent(data).fireInCurrentScope();
 	}
 
-	public void onServiceCallFailure(AServiceCall serviceCall, Throwable ex) {
-		if (serviceCall.isDispensable()) {
-			log.warn("Dispensable service call failed:", serviceCall);
+	public void onServiceCallFailure(AServiceCall serviceCall, List<ErrorWrapper> errors) {
+		long timeFromLastSuccess = System.currentTimeMillis() - lastSuccessfullServiceCallTime;
+		if (serviceCall.isDispensable() && timeFromLastSuccess < MAX_FAILURE_TIME) {
+			log.warn("Dispensable service call failed:", serviceCall, errors);
 			return;
 		}
-		log.error("Service call failed:", serviceCall);
-		ScrumGwtApplication.get().handleCommunicationError(ex);
+		log.error("Service call failed:", serviceCall, errors);
+		String serviceCallName = Str.getSimpleName(serviceCall.getClass());
+		serviceCallName = Str.removeSuffix(serviceCallName, "ServiceCall");
+		ScrumGwtApplication.get().handleServiceCallError(serviceCallName, errors);
 	}
 
-	public void onServiceCall() {
-		activeServiceCallCount++;
+	public void onServiceCall(AServiceCall call) {
+		activeServiceCalls.add(call);
 		if (statusWidget != null) statusWidget.update();
 	}
 
-	public void onServiceCallReturn() {
-		activeServiceCallCount--;
-		if (activeServiceCallCount < 0) activeServiceCallCount = 0;
+	public void onServiceCallReturn(AServiceCall call) {
+		activeServiceCalls.remove(call);
 		if (statusWidget != null) statusWidget.update();
 	}
 
-	public int getActiveServiceCallCount() {
-		return activeServiceCallCount;
+	public List<AServiceCall> getActiveServiceCalls() {
+		return activeServiceCalls;
+	}
+
+	public boolean containsServiceCall(Class<? extends AServiceCall> type) {
+		String name = Str.getSimpleName(type);
+		for (AServiceCall call : activeServiceCalls) {
+			String callName = Str.getSimpleName(call.getClass());
+			if (callName.equals(name)) return true;
+		}
+		return false;
 	}
 
 	public int getConversationNumber() {

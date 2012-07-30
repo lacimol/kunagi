@@ -40,6 +40,7 @@ public abstract class GSprintDaySnapshot
         properties.put("date", this.date == null ? null : this.date.toString());
         properties.put("remainingWork", this.remainingWork);
         properties.put("burnedWork", this.burnedWork);
+        properties.put("burnedWorkFromDeleted", this.burnedWorkFromDeleted);
     }
 
     public int compareTo(SprintDaySnapshot other) {
@@ -198,6 +199,36 @@ public abstract class GSprintDaySnapshot
         setBurnedWork((Integer)value);
     }
 
+    // -----------------------------------------------------------
+    // - burnedWorkFromDeleted
+    // -----------------------------------------------------------
+
+    private int burnedWorkFromDeleted;
+
+    public final int getBurnedWorkFromDeleted() {
+        return burnedWorkFromDeleted;
+    }
+
+    public final void setBurnedWorkFromDeleted(int burnedWorkFromDeleted) {
+        burnedWorkFromDeleted = prepareBurnedWorkFromDeleted(burnedWorkFromDeleted);
+        if (isBurnedWorkFromDeleted(burnedWorkFromDeleted)) return;
+        this.burnedWorkFromDeleted = burnedWorkFromDeleted;
+        updateLastModified();
+        fireModified("burnedWorkFromDeleted="+burnedWorkFromDeleted);
+    }
+
+    protected int prepareBurnedWorkFromDeleted(int burnedWorkFromDeleted) {
+        return burnedWorkFromDeleted;
+    }
+
+    public final boolean isBurnedWorkFromDeleted(int burnedWorkFromDeleted) {
+        return this.burnedWorkFromDeleted == burnedWorkFromDeleted;
+    }
+
+    protected final void updateBurnedWorkFromDeleted(Object value) {
+        setBurnedWorkFromDeleted((Integer)value);
+    }
+
     public void updateProperties(Map<?, ?> properties) {
         for (Map.Entry entry : properties.entrySet()) {
             String property = (String) entry.getKey();
@@ -207,6 +238,7 @@ public abstract class GSprintDaySnapshot
             if (property.equals("date")) updateDate(value);
             if (property.equals("remainingWork")) updateRemainingWork(value);
             if (property.equals("burnedWork")) updateBurnedWork(value);
+            if (property.equals("burnedWorkFromDeleted")) updateBurnedWorkFromDeleted(value);
         }
     }
 

@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.project;
 
 import ilarkesto.base.time.Date;
@@ -32,10 +46,22 @@ public class ProjectDao extends GProjectDao {
 
 	public Project postProject(User admin) {
 		Project project = newEntityInstance();
-		project.setLabel("New Project");
+		project.setLabel(createProjectLabel("Project"));
 		project.addAdmin(admin);
 		saveEntity(project);
 		return project;
+	}
+
+	private String createProjectLabel(String labelPrefix) {
+		int count = 1;
+		String label = labelPrefix + " " + count;
+		Project project = getProjectByLabel(label);
+		while (project != null) {
+			count++;
+			label = labelPrefix + " " + count;
+			project = getProjectByLabel(label);
+		}
+		return label;
 	}
 
 	public void scanFiles() {
@@ -53,23 +79,19 @@ public class ProjectDao extends GProjectDao {
 		// team.remove(sm);
 
 		Project project = postProject(owner);
-		project.setLabel("Example Project # " + DateAndTime.now());
 		project.setBegin(Date.today().addMonths(-2));
 		project.setEnd(Date.today().addMonths(5));
 		project.setSupportEmail("support@kunagi.org");
 		project.setIssueReplyTemplate("Hello ${issuer.name},\n" + "\n"
 				+ "Thank you for your feedback. You can check the status of your issue here: "
 				+ "${homepage.url}/${issue.reference}.html" + "\n" + "\nKind regards,\n" + "${user.name}");
-		project.setFreeDays(65);
 
 		project.addAdmin(owner);
 		project.addProductOwner(po);
 		project.addProductOwner(owner);
 		project.addScrumMaster(sm);
 		project.addScrumMaster(owner);
-		for (User user : team) {
-			project.addTeamMember(user);
-		}
+		project.addTeamMember(owner);
 		project.addParticipants(project.getAdmins());
 		project.addParticipants(project.getTeamMembers());
 		project.addParticipants(project.getProductOwners());
@@ -83,6 +105,7 @@ public class ProjectDao extends GProjectDao {
 		project.addTestIssues();
 		project.addTestEvents();
 		project.addTestSimpleEvents();
+		project.addTestReleases();
 
 		project.getCurrentSprint().burndownTasksRandomly(Date.beforeDays(15), Date.today().addDays(-1));
 

@@ -1,9 +1,24 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.admin;
 
 import ilarkesto.core.scope.Scope;
-import ilarkesto.gwt.client.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.TimePeriod;
+import ilarkesto.core.time.Tm;
 import ilarkesto.gwt.client.Gwt;
-import ilarkesto.gwt.client.TimePeriod;
 import scrum.client.common.AScrumWidget;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -47,9 +62,7 @@ public class SystemMessageWidget extends AScrumWidget {
 					TimePeriod period = expiration.getPeriodFromNow();
 					if (period.isPositive()) {
 						updater = new Updater();
-						Gwt
-								.runLater(period.toMillis() > TimePeriod.MINUTE ? TimePeriod.SECOND * 10
-										: TimePeriod.SECOND, updater);
+						Gwt.runLater(period.toMillis() > Tm.MINUTE ? Tm.SECOND * 10 : Tm.SECOND, updater);
 					}
 				}
 			}
@@ -62,6 +75,7 @@ public class SystemMessageWidget extends AScrumWidget {
 
 	private class Updater implements Runnable {
 
+		@Override
 		public void run() {
 			updater = null;
 			update();

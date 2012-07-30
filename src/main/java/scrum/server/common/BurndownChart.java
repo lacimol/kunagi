@@ -155,8 +155,8 @@ public class BurndownChart extends Chart {
 			setDate(firstDay);
 			while (true) {
 				if (!workFinished) {
-					burned = snapshot.getBurnedWork() - totalBurned;
-					totalBurned = snapshot.getBurnedWork();
+					burned = snapshot.getBurnedWorkTotal() - totalBurned;
+					totalBurned = snapshot.getBurnedWorkTotal();
 					totalAfter = snapshot.getRemainingWork();
 					jump = totalAfter - totalBefore + burned;
 				}

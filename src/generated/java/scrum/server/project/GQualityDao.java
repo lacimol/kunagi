@@ -82,7 +82,7 @@ public abstract class GQualityDao
             });
 
     public final Set<Quality> getQualitysByProject(scrum.server.project.Project project) {
-        return qualitysByProjectCache.get(project);
+        return new HashSet<Quality>(qualitysByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -122,7 +122,7 @@ public abstract class GQualityDao
             });
 
     public final Set<Quality> getQualitysByNumber(int number) {
-        return qualitysByNumberCache.get(number);
+        return new HashSet<Quality>(qualitysByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -162,7 +162,7 @@ public abstract class GQualityDao
             });
 
     public final Set<Quality> getQualitysByLabel(java.lang.String label) {
-        return qualitysByLabelCache.get(label);
+        return new HashSet<Quality>(qualitysByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -202,7 +202,7 @@ public abstract class GQualityDao
             });
 
     public final Set<Quality> getQualitysByDescription(java.lang.String description) {
-        return qualitysByDescriptionCache.get(description);
+        return new HashSet<Quality>(qualitysByDescriptionCache.get(description));
     }
     private Set<java.lang.String> descriptionsCache;
 
@@ -242,7 +242,7 @@ public abstract class GQualityDao
             });
 
     public final Set<Quality> getQualitysByTestDescription(java.lang.String testDescription) {
-        return qualitysByTestDescriptionCache.get(testDescription);
+        return new HashSet<Quality>(qualitysByTestDescriptionCache.get(testDescription));
     }
     private Set<java.lang.String> testDescriptionsCache;
 

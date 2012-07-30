@@ -1,12 +1,28 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.project;
 
 import ilarkesto.gwt.client.AAction;
-import ilarkesto.gwt.client.AFieldValueWidget;
+import ilarkesto.gwt.client.AWidget;
 import ilarkesto.gwt.client.ButtonWidget;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.TableBuilder;
 import ilarkesto.gwt.client.animation.AnimatingFlowPanel.InsertCallback;
+import ilarkesto.gwt.client.editor.AFieldModel;
 import ilarkesto.gwt.client.editor.IntegerEditorWidget;
+import ilarkesto.gwt.client.editor.TextOutputWidget;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,18 +58,21 @@ public class ProductBacklogWidget extends AScrumWidget {
 		headerWrapper = new SimplePanel();
 		filterToggleAction = new FilterToggleAction();
 
-		Widget createStoryButtonWidget = getCurrentProject().isProductOwner(getCurrentUser()) ? new CreateStoryButtonWidget()
-				: new ButtonWidget(new CreateRequirementAction());
-
 		PagePanel page = new PagePanel();
-		page.addHeader("Product Backlog", createStoryButtonWidget, new ButtonWidget(filterToggleAction));
+		page.addHeader("Product Backlog", createCreateStoryButtons(), new ButtonWidget(filterToggleAction));
 		page.addSection(headerWrapper);
 		page.addSection(Gwt.createFlowPanel(list));
+		page.addSection(createCreateStoryButtons());
 		page.addSection(ScrumGwt.createPdfLink("Download as PDF", "productBacklog", getCurrentProject()));
 		page.addSection(new UserGuideWidget(getLocalizer().views().productBacklog(), getCurrentProject()
 				.getProductBacklogRequirements().size() < 5, getCurrentUser().getHideUserGuideProductBacklogModel()));
 
 		return page;
+	}
+
+	public AWidget createCreateStoryButtons() {
+		return getCurrentProject().isProductOwner(getCurrentUser()) ? new CreateStoryButtonWidget(filterToggleAction)
+				: new ButtonWidget(new CreateRequirementAction(filterToggleAction));
 	}
 
 	@Override
@@ -94,6 +113,15 @@ public class ProductBacklogWidget extends AScrumWidget {
 	private Widget getVelocityWidget() {
 		if (velocityWidget == null) {
 			TableBuilder tb = ScrumGwt.createFieldTable();
+			tb.addField("In current Sprint", new TextOutputWidget(new AFieldModel<String>() {
+
+				@Override
+				public String getValue() {
+					Float work = getCurrentSprint().getEstimatedRequirementWork();
+					if (work == null) return "nothing";
+					return (work < 1 ? work.toString() : String.valueOf(work.intValue())) + " SP";
+				}
+			}));
 			tb.addField("Assumed Velocity", new IntegerEditorWidget(getCurrentProject().getVelocityModel()) {
 
 				@Override
@@ -115,14 +143,15 @@ public class ProductBacklogWidget extends AScrumWidget {
 				}
 
 			});
-			tb.addField("Velocity History", new AFieldValueWidget() {
-
-				@Override
-				protected void onUpdate() {
-					setText(getCurrentProject().getVelocitiesFromLastSprints());
-					super.onUpdate();
-				}
-			});
+			// tb.addField("Velocity History", new AFieldValueWidget() {
+			//
+			// @Override
+			// protected void onUpdate() {
+			// setText(getCurrentProject().getVelocitiesFromLastSprints());
+			// super.onUpdate();
+			// }
+			// });
+			tb.addField("Velocity History", new VelocityHistoryWidget());
 			velocityWidget = tb.createTable();
 		}
 		return velocityWidget;
@@ -153,7 +182,6 @@ public class ProductBacklogWidget extends AScrumWidget {
 			} else {
 				getCurrentProject().updateRequirementsOrder(requirements);
 			}
-			update();
 		}
 
 	}

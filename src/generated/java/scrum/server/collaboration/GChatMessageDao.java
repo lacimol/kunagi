@@ -80,7 +80,7 @@ public abstract class GChatMessageDao
             });
 
     public final Set<ChatMessage> getChatMessagesByProject(scrum.server.project.Project project) {
-        return chatMessagesByProjectCache.get(project);
+        return new HashSet<ChatMessage>(chatMessagesByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -120,7 +120,7 @@ public abstract class GChatMessageDao
             });
 
     public final Set<ChatMessage> getChatMessagesByAuthor(scrum.server.admin.User author) {
-        return chatMessagesByAuthorCache.get(author);
+        return new HashSet<ChatMessage>(chatMessagesByAuthorCache.get(author));
     }
     private Set<scrum.server.admin.User> authorsCache;
 
@@ -160,7 +160,7 @@ public abstract class GChatMessageDao
             });
 
     public final Set<ChatMessage> getChatMessagesByText(java.lang.String text) {
-        return chatMessagesByTextCache.get(text);
+        return new HashSet<ChatMessage>(chatMessagesByTextCache.get(text));
     }
     private Set<java.lang.String> textsCache;
 
@@ -200,7 +200,7 @@ public abstract class GChatMessageDao
             });
 
     public final Set<ChatMessage> getChatMessagesByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
-        return chatMessagesByDateAndTimeCache.get(dateAndTime);
+        return new HashSet<ChatMessage>(chatMessagesByDateAndTimeCache.get(dateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
 

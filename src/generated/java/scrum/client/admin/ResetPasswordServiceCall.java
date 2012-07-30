@@ -11,8 +11,8 @@ public class ResetPasswordServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().resetPassword(serviceCaller.getConversationNumber(), userId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().resetPassword(serviceCaller.getConversationNumber(), userId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

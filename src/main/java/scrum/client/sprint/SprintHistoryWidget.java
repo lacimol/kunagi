@@ -1,33 +1,108 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.sprint;
 
+import ilarkesto.core.base.ChangeIndicator;
+import ilarkesto.gwt.client.Gwt;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import scrum.client.common.AScrumWidget;
-import scrum.client.common.BlockListWidget;
+import scrum.client.project.Requirement;
 import scrum.client.workspace.PagePanel;
 
 import com.google.gwt.user.client.ui.Widget;
 
 public class SprintHistoryWidget extends AScrumWidget {
 
-	private BlockListWidget<Sprint> sprintList;
+	private static final int MAX_SPRINTS_IN_HISTORY_VIEW = 3;
+	private Map<Sprint, SprintHistorySprintWidget> sprintWidgets = new HashMap<Sprint, SprintHistorySprintWidget>();
+	private ChangeIndicator changeIndicator = new ChangeIndicator();
+	private PagePanel page = new PagePanel();
 
 	@Override
 	protected Widget onInitialization() {
-		sprintList = new BlockListWidget<Sprint>(SprintBlock.FACTORY);
-		sprintList.setAutoSorter(Sprint.END_DATE_COMPARATOR);
+		new RequestHistoryServiceCall().execute(new Runnable() {
 
-		PagePanel page = new PagePanel();
-		page.addHeader("Sprint history");
-		page.addSection(sprintList);
+			@Override
+			public void run() {
+				getCurrentProject().historyLoaded = true;
+				update();
+			}
+		});
 		return page;
 	}
 
 	@Override
 	protected void onUpdate() {
-		sprintList.setObjects(getCurrentProject().getCompletedSprints());
+		List<Sprint> sprints = getCurrentProject().getCompletedSprintsInReverseOrder();
+		List<Sprint> sprintsToView = sprints.subList(0, Math.min(sprints.size(), MAX_SPRINTS_IN_HISTORY_VIEW));
+		if (changeIndicator.update(sprintsToView)) {
+			page.clear();
+			for (Sprint sprint : sprintsToView) {
+				page.addHeader(sprint.getFullLabel());
+
+				SprintHistorySprintWidget widget = sprintWidgets.get(sprint);
+				if (widget == null) {
+					widget = new SprintHistorySprintWidget(sprint);
+					sprintWidgets.put(sprint, widget);
+				}
+
+				page.addSection(widget);
+			}
+		}
 		super.onUpdate();
 	}
 
+	private Sprint getSprint(Requirement requirement) {
+		List<Sprint> sprints = new ArrayList<Sprint>(getDao().getSprints());
+		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		for (Sprint sprint : sprints) {
+			SprintReport report = sprint.getSprintReport();
+			if (report == null) {
+				continue; // TODO legacy workaround
+			}
+			if (report.containsCompletedRequirement(requirement) || report.containsRejectedRequirement(requirement))
+				return sprint;
+		}
+		return null;
+	}
+
+	public boolean select(Task task) {
+		Sprint sprint = getSprint(task.getRequirement());
+		if (sprint == null) return false;
+
+		SprintHistorySprintWidget sprintHistorySprintWidget = sprintWidgets.get(sprint);
+		return sprintHistorySprintWidget.selectTask(task);
+	}
+
+	public boolean select(Requirement requirement) {
+		Sprint sprint = getSprint(requirement);
+		if (sprint == null) return false;
+
+		SprintHistorySprintWidget sprintHistorySprintWidget = sprintWidgets.get(sprint);
+		return sprintHistorySprintWidget.selectRequirement(requirement);
+	}
+
 	public boolean select(Sprint sprint) {
-		return sprintList.showObject(sprint);
+		update();
+		Gwt.scrollTo(sprintWidgets.get(sprint));
+		return true;
 	}
 }

@@ -87,7 +87,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByProject(scrum.server.project.Project project) {
-        return blogEntrysByProjectCache.get(project);
+        return new HashSet<BlogEntry>(blogEntrysByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -127,7 +127,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByNumber(int number) {
-        return blogEntrysByNumberCache.get(number);
+        return new HashSet<BlogEntry>(blogEntrysByNumberCache.get(number));
     }
     private Set<Integer> numbersCache;
 
@@ -167,7 +167,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByAuthor(scrum.server.admin.User author) {
-        return blogEntrysByAuthorCache.get(author);
+        return new HashSet<BlogEntry>(blogEntrysByAuthorCache.get(author));
     }
     private Set<scrum.server.admin.User> authorsCache;
 
@@ -207,7 +207,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByTitle(java.lang.String title) {
-        return blogEntrysByTitleCache.get(title);
+        return new HashSet<BlogEntry>(blogEntrysByTitleCache.get(title));
     }
     private Set<java.lang.String> titlesCache;
 
@@ -247,7 +247,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByText(java.lang.String text) {
-        return blogEntrysByTextCache.get(text);
+        return new HashSet<BlogEntry>(blogEntrysByTextCache.get(text));
     }
     private Set<java.lang.String> textsCache;
 
@@ -287,7 +287,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
-        return blogEntrysByDateAndTimeCache.get(dateAndTime);
+        return new HashSet<BlogEntry>(blogEntrysByDateAndTimeCache.get(dateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
 
@@ -327,7 +327,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByRelease(scrum.server.release.Release release) {
-        return blogEntrysByReleaseCache.get(release);
+        return new HashSet<BlogEntry>(blogEntrysByReleaseCache.get(release));
     }
     private Set<scrum.server.release.Release> releasesCache;
 
@@ -367,7 +367,7 @@ public abstract class GBlogEntryDao
             });
 
     public final Set<BlogEntry> getBlogEntrysByPublished(boolean published) {
-        return blogEntrysByPublishedCache.get(published);
+        return new HashSet<BlogEntry>(blogEntrysByPublishedCache.get(published));
     }
 
     private static class IsPublished implements Predicate<BlogEntry> {

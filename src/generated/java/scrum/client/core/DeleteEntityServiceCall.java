@@ -11,8 +11,8 @@ public class DeleteEntityServiceCall extends scrum.client.core.AServiceCall {
     }
 
     public void execute(Runnable returnHandler) {
-        serviceCaller.onServiceCall();
-        serviceCaller.getService().deleteEntity(serviceCaller.getConversationNumber(), entityId, new DefaultCallback(returnHandler));
+        serviceCaller.onServiceCall(this);
+        serviceCaller.getService().deleteEntity(serviceCaller.getConversationNumber(), entityId, new DefaultCallback(this, returnHandler));
     }
 
     @Override

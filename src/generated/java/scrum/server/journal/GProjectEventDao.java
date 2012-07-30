@@ -80,7 +80,7 @@ public abstract class GProjectEventDao
             });
 
     public final Set<ProjectEvent> getProjectEventsByProject(scrum.server.project.Project project) {
-        return projectEventsByProjectCache.get(project);
+        return new HashSet<ProjectEvent>(projectEventsByProjectCache.get(project));
     }
     private Set<scrum.server.project.Project> projectsCache;
 
@@ -120,7 +120,7 @@ public abstract class GProjectEventDao
             });
 
     public final Set<ProjectEvent> getProjectEventsByLabel(java.lang.String label) {
-        return projectEventsByLabelCache.get(label);
+        return new HashSet<ProjectEvent>(projectEventsByLabelCache.get(label));
     }
     private Set<java.lang.String> labelsCache;
 
@@ -160,7 +160,7 @@ public abstract class GProjectEventDao
             });
 
     public final Set<ProjectEvent> getProjectEventsBySubject(ilarkesto.persistence.AEntity subject) {
-        return projectEventsBySubjectCache.get(subject);
+        return new HashSet<ProjectEvent>(projectEventsBySubjectCache.get(subject));
     }
     private Set<ilarkesto.persistence.AEntity> subjectsCache;
 
@@ -200,7 +200,7 @@ public abstract class GProjectEventDao
             });
 
     public final Set<ProjectEvent> getProjectEventsByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
-        return projectEventsByDateAndTimeCache.get(dateAndTime);
+        return new HashSet<ProjectEvent>(projectEventsByDateAndTimeCache.get(dateAndTime));
     }
     private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
 

@@ -1,17 +1,15 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-
-#header("home", "Message - Kunagi", "Kunagi Message", "Kunagi")
+#header("message", "Message - Kunagi", "Kunagi Message", "Kunagi")
 
 <div class="section">
-    <span id="messageOutput">test</span>
+    <span id="messageOutput"></span>
 </div>
 
 <script type="text/javascript">
 #literal()
 
     message = window.location.hash;
-    if (message != null && message.startsWith("#")) message = message.substring(1);
-    $("messageOutput").innerHTML = unescape(message);
+    if (message != null) message = message.substring(1);
+    $('\#messageOutput').append(unescape(message));
     
 #end
 </script>

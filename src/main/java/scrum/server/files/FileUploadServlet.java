@@ -1,3 +1,17 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.server.files;
 
 import gwtupload.server.UploadAction;
@@ -72,8 +86,8 @@ public class FileUploadServlet extends UploadAction {
 
 	private String insertSuffix(String name, int count) {
 		int idx = name.lastIndexOf('.');
-		if (idx > 0) return name.substring(0, idx) + "#" + count + name.substring(idx);
-		return name + "#" + count;
+		if (idx > 0) return name.substring(0, idx) + "_" + count + name.substring(idx);
+		return name + "_" + count;
 	}
 
 	private String getFilename(String name) {

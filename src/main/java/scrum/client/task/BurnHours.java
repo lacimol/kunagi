@@ -15,7 +15,7 @@
 
 package scrum.client.task;
 
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
 
 import java.util.Comparator;
 

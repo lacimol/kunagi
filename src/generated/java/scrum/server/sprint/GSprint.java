@@ -43,7 +43,6 @@ public abstract class GSprint
         properties.put("begin", this.begin == null ? null : this.begin.toString());
         properties.put("end", this.end == null ? null : this.end.toString());
         properties.put("velocity", this.velocity);
-        properties.put("completedRequirementLabels", this.completedRequirementLabels);
         properties.put("completedRequirementsData", this.completedRequirementsData);
         properties.put("incompletedRequirementsData", this.incompletedRequirementsData);
         properties.put("planningNote", this.planningNote);
@@ -67,6 +66,14 @@ public abstract class GSprint
         return projectDao.getProjectsByNextSprint((Sprint)this);
     }
 
+    public final java.util.Set<scrum.server.sprint.SprintDaySnapshot> getSprintDaySnapshots() {
+        return sprintDaySnapshotDao.getSprintDaySnapshotsBySprint((Sprint)this);
+    }
+
+    public final scrum.server.sprint.SprintReport getSprintReport() {
+        return sprintReportDao.getSprintReportBySprint((Sprint)this);
+    }
+
     public final java.util.Set<scrum.server.project.Requirement> getRequirements() {
         return requirementDao.getRequirementsBySprint((Sprint)this);
     }
@@ -75,8 +82,8 @@ public abstract class GSprint
         return releaseDao.getReleasesBySprint((Sprint)this);
     }
 
-    public final java.util.Set<scrum.server.sprint.SprintDaySnapshot> getSprintDaySnapshots() {
-        return sprintDaySnapshotDao.getSprintDaySnapshotsBySprint((Sprint)this);
+    public final java.util.Set<scrum.server.sprint.Task> getClosedTasksInPasts() {
+        return taskDao.getTasksByClosedInPastSprint((Sprint)this);
     }
 
     public final scrum.server.project.ProjectSprintSnapshot getProjectSprintSnapshot() {
@@ -203,7 +210,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareLabel(java.lang.String label) {
-        label = Str.removeUnreadableChars(label);
+        // label = Str.removeUnreadableChars(label);
         return label;
     }
 
@@ -239,7 +246,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareGoal(java.lang.String goal) {
-        goal = Str.removeUnreadableChars(goal);
+        // goal = Str.removeUnreadableChars(goal);
         return goal;
     }
 
@@ -364,42 +371,6 @@ public abstract class GSprint
     }
 
     // -----------------------------------------------------------
-    // - completedRequirementLabels
-    // -----------------------------------------------------------
-
-    private java.lang.String completedRequirementLabels;
-
-    public final java.lang.String getCompletedRequirementLabels() {
-        return completedRequirementLabels;
-    }
-
-    public final void setCompletedRequirementLabels(java.lang.String completedRequirementLabels) {
-        completedRequirementLabels = prepareCompletedRequirementLabels(completedRequirementLabels);
-        if (isCompletedRequirementLabels(completedRequirementLabels)) return;
-        this.completedRequirementLabels = completedRequirementLabels;
-        updateLastModified();
-        fireModified("completedRequirementLabels="+completedRequirementLabels);
-    }
-
-    protected java.lang.String prepareCompletedRequirementLabels(java.lang.String completedRequirementLabels) {
-        completedRequirementLabels = Str.removeUnreadableChars(completedRequirementLabels);
-        return completedRequirementLabels;
-    }
-
-    public final boolean isCompletedRequirementLabelsSet() {
-        return this.completedRequirementLabels != null;
-    }
-
-    public final boolean isCompletedRequirementLabels(java.lang.String completedRequirementLabels) {
-        if (this.completedRequirementLabels == null && completedRequirementLabels == null) return true;
-        return this.completedRequirementLabels != null && this.completedRequirementLabels.equals(completedRequirementLabels);
-    }
-
-    protected final void updateCompletedRequirementLabels(Object value) {
-        setCompletedRequirementLabels((java.lang.String)value);
-    }
-
-    // -----------------------------------------------------------
     // - completedRequirementsData
     // -----------------------------------------------------------
 
@@ -418,7 +389,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareCompletedRequirementsData(java.lang.String completedRequirementsData) {
-        completedRequirementsData = Str.removeUnreadableChars(completedRequirementsData);
+        // completedRequirementsData = Str.removeUnreadableChars(completedRequirementsData);
         return completedRequirementsData;
     }
 
@@ -454,7 +425,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareIncompletedRequirementsData(java.lang.String incompletedRequirementsData) {
-        incompletedRequirementsData = Str.removeUnreadableChars(incompletedRequirementsData);
+        // incompletedRequirementsData = Str.removeUnreadableChars(incompletedRequirementsData);
         return incompletedRequirementsData;
     }
 
@@ -490,7 +461,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String preparePlanningNote(java.lang.String planningNote) {
-        planningNote = Str.removeUnreadableChars(planningNote);
+        // planningNote = Str.removeUnreadableChars(planningNote);
         return planningNote;
     }
 
@@ -526,7 +497,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareReviewNote(java.lang.String reviewNote) {
-        reviewNote = Str.removeUnreadableChars(reviewNote);
+        // reviewNote = Str.removeUnreadableChars(reviewNote);
         return reviewNote;
     }
 
@@ -562,7 +533,7 @@ public abstract class GSprint
     }
 
     protected java.lang.String prepareRetrospectiveNote(java.lang.String retrospectiveNote) {
-        retrospectiveNote = Str.removeUnreadableChars(retrospectiveNote);
+        // retrospectiveNote = Str.removeUnreadableChars(retrospectiveNote);
         return retrospectiveNote;
     }
 
@@ -954,7 +925,6 @@ public abstract class GSprint
             if (property.equals("begin")) updateBegin(value);
             if (property.equals("end")) updateEnd(value);
             if (property.equals("velocity")) updateVelocity(value);
-            if (property.equals("completedRequirementLabels")) updateCompletedRequirementLabels(value);
             if (property.equals("completedRequirementsData")) updateCompletedRequirementsData(value);
             if (property.equals("incompletedRequirementsData")) updateIncompletedRequirementsData(value);
             if (property.equals("planningNote")) updatePlanningNote(value);
@@ -1043,6 +1013,18 @@ public abstract class GSprint
         GSprint.sprintDao = sprintDao;
     }
 
+    static scrum.server.sprint.SprintDaySnapshotDao sprintDaySnapshotDao;
+
+    public static final void setSprintDaySnapshotDao(scrum.server.sprint.SprintDaySnapshotDao sprintDaySnapshotDao) {
+        GSprint.sprintDaySnapshotDao = sprintDaySnapshotDao;
+    }
+
+    static scrum.server.sprint.SprintReportDao sprintReportDao;
+
+    public static final void setSprintReportDao(scrum.server.sprint.SprintReportDao sprintReportDao) {
+        GSprint.sprintReportDao = sprintReportDao;
+    }
+
     static scrum.server.project.RequirementDao requirementDao;
 
     public static final void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
@@ -1055,10 +1037,10 @@ public abstract class GSprint
         GSprint.releaseDao = releaseDao;
     }
 
-    static scrum.server.sprint.SprintDaySnapshotDao sprintDaySnapshotDao;
+    static scrum.server.sprint.TaskDao taskDao;
 
-    public static final void setSprintDaySnapshotDao(scrum.server.sprint.SprintDaySnapshotDao sprintDaySnapshotDao) {
-        GSprint.sprintDaySnapshotDao = sprintDaySnapshotDao;
+    public static final void setTaskDao(scrum.server.sprint.TaskDao taskDao) {
+        GSprint.taskDao = taskDao;
     }
 
     static scrum.server.project.ProjectSprintSnapshotDao projectSprintSnapshotDao;

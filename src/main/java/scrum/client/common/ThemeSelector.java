@@ -66,9 +66,9 @@ public class ThemeSelector {
 
 	public boolean isThemesContains(String word) {
 		boolean result = false;
+		List<String> themes = model.getThemes();
 		if (word != null
-				&& (model.getThemes().contains(word) || model.getThemes().contains(word.toLowerCase()) || model
-						.getThemes().contains(word.toUpperCase()))) {
+				&& (themes.contains(word) || themes.contains(word.toLowerCase()) || themes.contains(word.toUpperCase()))) {
 			result = true;
 		}
 		return result;

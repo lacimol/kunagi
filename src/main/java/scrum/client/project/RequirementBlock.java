@@ -1,6 +1,21 @@
+/*
+ * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package scrum.client.project;
 
-import ilarkesto.gwt.client.Date;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.TimePeriod;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
@@ -17,6 +32,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RequirementBlock extends ABlockWidget<Requirement> implements TrashSupport {
+
+	public RequirementBlock() {}
 
 	private SimplePanel statusIcon;
 	private SprintSwitchIndicatorWidget sprintBorderIndicator;
@@ -37,6 +54,7 @@ public class RequirementBlock extends ABlockWidget<Requirement> implements Trash
 		header.addMenuAction(new SetRequirementDirtyAction(requirement));
 		header.addMenuAction(new SetRequirementCleanAction(requirement));
 		header.addMenuAction(new StartRequirementEstimationVotingAction(requirement));
+		header.addMenuAction(new SplitRequirementAction(requirement));
 		header.addMenuAction(new ActivateChangeHistoryAction(requirement));
 		header.addMenuAction(new DeleteRequirementAction(requirement));
 	}
@@ -71,13 +89,18 @@ public class RequirementBlock extends ABlockWidget<Requirement> implements Trash
 		if (previous != null && sprintBorder) {
 			if (sprintBorderIndicator == null) {
 				sprintBorderIndicator = new SprintSwitchIndicatorWidget();
-				Sprint sprint = getCurrentProject().getCurrentSprint();
-				int sprints = previous.getEstimationBar().getEndSprintOffset() + 2;
-				sprintBorderIndicator.updateLabel(sprints,
-					sprint.getLength().multiplyBy(sprints).subtract(sprint.getBegin().getPeriodTo(Date.today()).abs()));
 				getPreHeaderPanel().add(sprintBorderIndicator);
-				requirement.updateLocalModificationTime();
 			}
+			Sprint sprint = getCurrentProject().getNextSprint();
+			int sprints = previous.getEstimationBar().getEndSprintOffset();
+			TimePeriod sprintLength = sprint.getLength();
+			int sprintLengthInDays = sprintLength == null ? 14 : sprintLength.toDays();
+			Date begin = sprint.getBegin();
+			if (begin == null || begin.isPast()) begin = new Date();
+			int totalLength = sprintLengthInDays * (sprints + 1);
+			Date date = begin.addDays(totalLength);
+			sprintBorderIndicator.updateLabel(sprints + 1, date);
+			requirement.updateLocalModificationTime();
 		} else {
 			if (sprintBorderIndicator != null) {
 				getPreHeaderPanel().remove(sprintBorderIndicator);
@@ -89,7 +112,7 @@ public class RequirementBlock extends ABlockWidget<Requirement> implements Trash
 
 	@Override
 	protected Widget onExtendedInitialization() {
-		return new RequirementWidget(getObject(), true, true, false, true, true, true, false);
+		return new RequirementWidget(getObject(), true, false, false, true, true, true, false);
 	}
 
 	@Override
