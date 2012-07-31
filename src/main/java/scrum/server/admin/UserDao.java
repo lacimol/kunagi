@@ -18,11 +18,28 @@ import ilarkesto.auth.OpenId;
 import ilarkesto.base.Str;
 import ilarkesto.base.time.DateAndTime;
 import ilarkesto.core.logging.Log;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import scrum.server.ScrumWebApplication;
+import scrum.server.common.Chart;
 
 public class UserDao extends GUserDao {
 
 	private static Log log = Log.get(UserDao.class);
+
+	public static List<String> userNames = new ArrayList<String>();
+	static {
+		userNames.add("Doc");
+		userNames.add("Dopey");
+		userNames.add("Grumpy");
+		userNames.add("Sleepy");
+		userNames.add("Sneezy");
+		userNames.add("Bashful");
+		userNames.add("Happy");
+	}
 
 	@Override
 	public User postUser(String name, String password) {
@@ -95,6 +112,26 @@ public class UserDao extends GUserDao {
 		User user = getUserByName(name);
 		if (user == null) user = postUserWithDefaultPassword(name);
 		return user;
+	}
+
+	public List<User> getExampleUsers() {
+		List<User> users = new ArrayList<User>();
+		User user = null;
+		Iterator<String> colors = Chart.userColors.keySet().iterator();
+		colors.next();
+		int userNr = 7;
+		for (int x = 0; x < userNr; x++) {
+			String name = userNames.get(x);
+			user = getUserByName(name);
+			if (user == null) user = postUserWithDefaultPassword(name);
+			user.setEmail(name + "@kunagi.org");
+			user.setEmailVerified(true);
+			if (colors.hasNext()) {
+				user.setColor(colors.next());
+			}
+			users.add(user);
+		}
+		return users;
 	}
 
 }

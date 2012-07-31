@@ -35,7 +35,9 @@ import ilarkesto.webapp.AWebSession;
 import ilarkesto.webapp.DestroyTimeoutedSessionsTask;
 import ilarkesto.webapp.Servlet;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -210,7 +212,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		if (!getSystemConfig().isVersionCheckEnabled() || updateTryNr >= MAX_UPDATE_TRY_NR) return null;
 		if (currentRelease == null) {
 			String url = "http://kunagi.org/current-release.properties";
-			log.info("Checking current release:", url, "Trying: ", updateTryNr++);
+			log.info("Checking current release:", url, "Trying: ", ++updateTryNr);
 			try {
 				Properties currentReleaseProperties = IO.loadPropertiesFromUrl(url, IO.UTF_8);
 				currentRelease = currentReleaseProperties.getProperty("currentRelease");
@@ -297,13 +299,16 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private void createTestData() {
 		log.warn("Creating test data");
 
-		getUserDao().postUserWithDefaultPassword("homer");
-		getUserDao().postUserWithDefaultPassword("cartman");
-		getUserDao().postUserWithDefaultPassword("duke");
-		getUserDao().postUserWithDefaultPassword("spinne");
+		List<User> users = new ArrayList<User>();
+		User po = getUserDao().postUserWithDefaultPassword("cartman");
+		users.add(po);
+		users.add(getUserDao().postUserWithDefaultPassword("homer"));
+		users.add(getUserDao().postUserWithDefaultPassword("duke"));
+		users.add(getUserDao().postUserWithDefaultPassword("spinne"));
 
-		getProjectDao().postExampleProject(getUserDao().getUserByName("admin"), getUserDao().getUserByName("cartman"),
-			getUserDao().getUserByName("admin"));
+		User admin = getUserDao().getUserByName("admin");
+		User sm = admin;
+		getProjectDao().postExampleProject(admin, po, sm, users);
 
 		getTransactionService().commit();
 	}

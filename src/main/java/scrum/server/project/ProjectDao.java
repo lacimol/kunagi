@@ -73,10 +73,7 @@ public class ProjectDao extends GProjectDao {
 
 	// --- test data ---
 
-	public Project postExampleProject(User owner, User po, User sm) {
-		Collection<User> team = userDao.getEntities();
-		// team.remove(po);
-		// team.remove(sm);
+	public Project postExampleProject(User owner, User po, User sm, Collection<User> users) {
 
 		Project project = postProject(owner);
 		project.setBegin(Date.today().addMonths(-2));
@@ -91,7 +88,11 @@ public class ProjectDao extends GProjectDao {
 		project.addProductOwner(owner);
 		project.addScrumMaster(sm);
 		project.addScrumMaster(owner);
-		project.addTeamMember(owner);
+		project.addTeamMember(sm);
+		for (User u : users) {
+			project.addTeamMember(u);
+		}
+
 		project.addParticipants(project.getAdmins());
 		project.addParticipants(project.getTeamMembers());
 		project.addParticipants(project.getProductOwners());

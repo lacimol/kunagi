@@ -211,7 +211,8 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	@Override
 	public void onCreateExampleProject(GwtConversation conversation) {
 		User user = conversation.getSession().getUser();
-		Project project = projectDao.postExampleProject(user, user, user);
+		List<User> users = userDao.getExampleUsers();
+		Project project = projectDao.postExampleProject(user, user, user, users);
 		conversation.sendToClient(project);
 	}
 
