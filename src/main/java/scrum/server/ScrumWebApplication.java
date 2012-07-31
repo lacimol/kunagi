@@ -71,6 +71,9 @@ public class ScrumWebApplication extends GScrumWebApplication {
 
 	private static final int DATA_VERSION = 33;
 
+	private static final int MAX_UPDATE_TRY_NR = 3;
+	private static int updateTryNr = 0;
+
 	private static final Log log = Log.get(ScrumWebApplication.class);
 
 	private BurndownChart burndownChart;
@@ -204,10 +207,10 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private String currentRelease;
 
 	public String getCurrentRelease() {
-		if (!getSystemConfig().isVersionCheckEnabled()) return null;
+		if (!getSystemConfig().isVersionCheckEnabled() || updateTryNr >= MAX_UPDATE_TRY_NR) return null;
 		if (currentRelease == null) {
 			String url = "http://kunagi.org/current-release.properties";
-			log.info("Checking current release:", url);
+			log.info("Checking current release:", url, "Trying: ", updateTryNr++);
 			try {
 				Properties currentReleaseProperties = IO.loadPropertiesFromUrl(url, IO.UTF_8);
 				currentRelease = currentReleaseProperties.getProperty("currentRelease");
