@@ -90,6 +90,10 @@ public abstract class GUser
         return issueDao.getIssuesByCreator((User)this);
     }
 
+    public final java.util.Set<scrum.server.sprint.TeamMemberSnapshot> getTeamMemberSnapshots() {
+        return teamMemberSnapshotDao.getTeamMemberSnapshotsByTeamMember((User)this);
+    }
+
     public final java.util.Set<scrum.server.sprint.Task> getTasks() {
         return taskDao.getTasksByOwner((User)this);
     }
@@ -1148,6 +1152,12 @@ public abstract class GUser
 
     public static final void setIssueDao(scrum.server.issues.IssueDao issueDao) {
         GUser.issueDao = issueDao;
+    }
+
+    static scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao;
+
+    public static final void setTeamMemberSnapshotDao(scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao) {
+        GUser.teamMemberSnapshotDao = teamMemberSnapshotDao;
     }
 
     static scrum.server.sprint.TaskDao taskDao;

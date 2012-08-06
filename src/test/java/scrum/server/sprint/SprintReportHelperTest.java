@@ -27,33 +27,37 @@ import scrum.server.project.Requirement;
 
 public class SprintReportHelperTest extends ATest {
 
+	private static final String taskLine = "tsk1;6;1;Laci;Task.X :-D";
+	private static final String storyLine = "sto1;13;Story .x";
+
 	@Test
 	public void encodeRequirement() {
 		Requirement req = TestUtil.createRequirement(TestUtil.createProject(), 1);
 		req.setLabel("Story ;x");
 		req.setEstimatedWork(13f);
-		assertEquals(SprintHistoryHelper.encodeRequirement(req), "sto1;13;Story ;x");
+		assertEquals(SprintHistoryHelper.encodeRequirement(req), storyLine);
 	}
 
 	@Test
 	public void decodeRequirement() {
-		String[] req = SprintHistoryHelper.decodeRequirement("sto1;13;Story ;x");
-		assertEquals(req, new String[] { "sto1", "13", "Story ;x" });
+		String[] req = SprintHistoryHelper.decodeRequirement(storyLine);
+		assertEquals(req, new String[] { "sto1", "13", "Story .x" });
 	}
 
 	@Test
 	public void encodeTask() {
 		Requirement req = TestUtil.createRequirement(TestUtil.createProject(), 2);
 		Task tsk = TestUtil.createTask(req, 1, 1, 0);
-		tsk.setLabel("Task;X :-D");
+		tsk.setLabel("Task.X :-D");
 		tsk.setBurnedWork(6);
-		assertEquals(SprintHistoryHelper.encodeTask(tsk), "tsk1;6;1;Task;X :-D");
+		tsk.setOwner(TestUtil.createUser("Laci"));
+		assertEquals(SprintHistoryHelper.encodeTask(tsk), taskLine);
 	}
 
 	@Test
 	public void decodeTask() {
-		String[] req = SprintHistoryHelper.decodeTask("tsk1;6;1;Task;X :-D");
-		assertEquals(req, new String[] { "tsk1", "6", "1", "Task;X :-D" });
+		String[] req = SprintHistoryHelper.decodeTask(taskLine);
+		assertEquals(req, new String[] { "tsk1", "6", "1", "Laci", "Task.X :-D" });
 	}
 
 	@Test

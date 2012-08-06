@@ -135,6 +135,39 @@ public abstract class GSprintReport
     }
 
 
+    // --- teamMemberStatistics ---
+
+    private Set<String> teamMemberStatisticsIds = new HashSet<String>();
+
+    public final java.util.Set<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberStatistics() {
+        if ( teamMemberStatisticsIds.isEmpty()) return Collections.emptySet();
+        return getDao().getTeamMemberSnapshots(this.teamMemberStatisticsIds);
+    }
+
+    public final void setTeamMemberStatistics(Collection<scrum.client.sprint.TeamMemberSnapshot> values) {
+        teamMemberStatisticsIds = ilarkesto.gwt.client.Gwt.getIdsAsSet(values);
+        propertyChanged("teamMemberStatisticsIds", this.teamMemberStatisticsIds);
+    }
+
+    public final void addTeamMemberStatistic(scrum.client.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        String id = teamMemberStatistic.getId();
+        if (teamMemberStatisticsIds.contains(id)) return;
+        teamMemberStatisticsIds.add(id);
+        propertyChanged("teamMemberStatisticsIds", this.teamMemberStatisticsIds);
+    }
+
+    public final void removeTeamMemberStatistic(scrum.client.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        String id = teamMemberStatistic.getId();
+        if (!teamMemberStatisticsIds.contains(id)) return;
+        teamMemberStatisticsIds.remove(id);
+        propertyChanged("teamMemberStatisticsIds", this.teamMemberStatisticsIds);
+    }
+
+    public final boolean containsTeamMemberStatistic(scrum.client.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        return teamMemberStatisticsIds.contains(teamMemberStatistic.getId());
+    }
+
+
     // --- requirementsOrderIds ---
 
     private java.util.List<java.lang.String> requirementsOrderIds = new java.util.ArrayList<java.lang.String>();
@@ -290,6 +323,7 @@ public abstract class GSprintReport
         sprintId = (String) props.get("sprintId");
         completedRequirementsIds = (Set<String>) props.get("completedRequirementsIds");
         rejectedRequirementsIds = (Set<String>) props.get("rejectedRequirementsIds");
+        teamMemberStatisticsIds = (Set<String>) props.get("teamMemberStatisticsIds");
         requirementsOrderIds  = (java.util.List<java.lang.String>) props.get("requirementsOrderIds");
         closedTasksIds = (Set<String>) props.get("closedTasksIds");
         openTasksIds = (Set<String>) props.get("openTasksIds");
@@ -303,6 +337,7 @@ public abstract class GSprintReport
         properties.put("sprintId", this.sprintId);
         properties.put("completedRequirementsIds", this.completedRequirementsIds);
         properties.put("rejectedRequirementsIds", this.rejectedRequirementsIds);
+        properties.put("teamMemberStatisticsIds", this.teamMemberStatisticsIds);
         properties.put("requirementsOrderIds", this.requirementsOrderIds);
         properties.put("closedTasksIds", this.closedTasksIds);
         properties.put("openTasksIds", this.openTasksIds);

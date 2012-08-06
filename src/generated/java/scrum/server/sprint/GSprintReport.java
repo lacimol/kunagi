@@ -39,6 +39,7 @@ public abstract class GSprintReport
         properties.put("sprintId", this.sprintId);
         properties.put("completedRequirementsIds", this.completedRequirementsIds);
         properties.put("rejectedRequirementsIds", this.rejectedRequirementsIds);
+        properties.put("teamMemberStatisticsIds", this.teamMemberStatisticsIds);
         properties.put("requirementsOrderIds", this.requirementsOrderIds);
         properties.put("closedTasksIds", this.closedTasksIds);
         properties.put("openTasksIds", this.openTasksIds);
@@ -283,6 +284,96 @@ public abstract class GSprintReport
     protected final void updateRejectedRequirements(Object value) {
         Collection<String> ids = (Collection<String>) value;
         setRejectedRequirements((java.util.Set) requirementDao.getByIdsAsSet(ids));
+    }
+
+    // -----------------------------------------------------------
+    // - teamMemberStatistics
+    // -----------------------------------------------------------
+
+    private java.util.Set<String> teamMemberStatisticsIds = new java.util.HashSet<String>();
+
+    public final java.util.Set<scrum.server.sprint.TeamMemberSnapshot> getTeamMemberStatistics() {
+        return (java.util.Set) teamMemberSnapshotDao.getByIdsAsSet(this.teamMemberStatisticsIds);
+    }
+
+    public final void setTeamMemberStatistics(Collection<scrum.server.sprint.TeamMemberSnapshot> teamMemberStatistics) {
+        teamMemberStatistics = prepareTeamMemberStatistics(teamMemberStatistics);
+        if (teamMemberStatistics == null) teamMemberStatistics = Collections.emptyList();
+        java.util.Set<String> ids = getIdsAsSet(teamMemberStatistics);
+        if (this.teamMemberStatisticsIds.equals(ids)) return;
+        this.teamMemberStatisticsIds = ids;
+        updateLastModified();
+        fireModified("teamMemberStatistics="+Str.format(teamMemberStatistics));
+    }
+
+    protected Collection<scrum.server.sprint.TeamMemberSnapshot> prepareTeamMemberStatistics(Collection<scrum.server.sprint.TeamMemberSnapshot> teamMemberStatistics) {
+        return teamMemberStatistics;
+    }
+
+    protected void repairDeadTeamMemberStatisticReference(String entityId) {
+        if (this.teamMemberStatisticsIds.remove(entityId)) fireModified("teamMemberStatistics-=" + entityId);
+    }
+
+    public final boolean containsTeamMemberStatistic(scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        if (teamMemberStatistic == null) return false;
+        return this.teamMemberStatisticsIds.contains(teamMemberStatistic.getId());
+    }
+
+    public final int getTeamMemberStatisticsCount() {
+        return this.teamMemberStatisticsIds.size();
+    }
+
+    public final boolean isTeamMemberStatisticsEmpty() {
+        return this.teamMemberStatisticsIds.isEmpty();
+    }
+
+    public final boolean addTeamMemberStatistic(scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        if (teamMemberStatistic == null) throw new IllegalArgumentException("teamMemberStatistic == null");
+        boolean added = this.teamMemberStatisticsIds.add(teamMemberStatistic.getId());
+        if (added) updateLastModified();
+        if (added) fireModified("teamMemberStatistics+=" + teamMemberStatistic);
+        return added;
+    }
+
+    public final boolean addTeamMemberStatistics(Collection<scrum.server.sprint.TeamMemberSnapshot> teamMemberStatistics) {
+        if (teamMemberStatistics == null) throw new IllegalArgumentException("teamMemberStatistics == null");
+        boolean added = false;
+        for (scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic : teamMemberStatistics) {
+            added = added | this.teamMemberStatisticsIds.add(teamMemberStatistic.getId());
+        }
+        return added;
+    }
+
+    public final boolean removeTeamMemberStatistic(scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        if (teamMemberStatistic == null) throw new IllegalArgumentException("teamMemberStatistic == null");
+        if (this.teamMemberStatisticsIds == null) return false;
+        boolean removed = this.teamMemberStatisticsIds.remove(teamMemberStatistic.getId());
+        if (removed) updateLastModified();
+        if (removed) fireModified("teamMemberStatistics-=" + teamMemberStatistic);
+        return removed;
+    }
+
+    public final boolean removeTeamMemberStatistics(Collection<scrum.server.sprint.TeamMemberSnapshot> teamMemberStatistics) {
+        if (teamMemberStatistics == null) return false;
+        if (teamMemberStatistics.isEmpty()) return false;
+        boolean removed = false;
+        for (scrum.server.sprint.TeamMemberSnapshot _element: teamMemberStatistics) {
+            removed = removed | removeTeamMemberStatistic(_element);
+        }
+        return removed;
+    }
+
+    public final boolean clearTeamMemberStatistics() {
+        if (this.teamMemberStatisticsIds.isEmpty()) return false;
+        this.teamMemberStatisticsIds.clear();
+        updateLastModified();
+        fireModified("teamMemberStatistics cleared");
+        return true;
+    }
+
+    protected final void updateTeamMemberStatistics(Object value) {
+        Collection<String> ids = (Collection<String>) value;
+        setTeamMemberStatistics((java.util.Set) teamMemberSnapshotDao.getByIdsAsSet(ids));
     }
 
     // -----------------------------------------------------------
@@ -596,6 +687,7 @@ public abstract class GSprintReport
             if (property.equals("sprintId")) updateSprint(value);
             if (property.equals("completedRequirementsIds")) updateCompletedRequirements(value);
             if (property.equals("rejectedRequirementsIds")) updateRejectedRequirements(value);
+            if (property.equals("teamMemberStatisticsIds")) updateTeamMemberStatistics(value);
             if (property.equals("requirementsOrderIds")) updateRequirementsOrderIds(value);
             if (property.equals("closedTasksIds")) updateClosedTasks(value);
             if (property.equals("openTasksIds")) updateOpenTasks(value);
@@ -610,6 +702,8 @@ public abstract class GSprintReport
         repairDeadCompletedRequirementReference(entityId);
         if (this.rejectedRequirementsIds == null) this.rejectedRequirementsIds = new java.util.HashSet<String>();
         repairDeadRejectedRequirementReference(entityId);
+        if (this.teamMemberStatisticsIds == null) this.teamMemberStatisticsIds = new java.util.HashSet<String>();
+        repairDeadTeamMemberStatisticReference(entityId);
         if (this.requirementsOrderIds == null) this.requirementsOrderIds = new java.util.ArrayList<java.lang.String>();
         if (this.closedTasksIds == null) this.closedTasksIds = new java.util.HashSet<String>();
         repairDeadClosedTaskReference(entityId);
@@ -651,6 +745,16 @@ public abstract class GSprintReport
                 repairDeadRejectedRequirementReference(entityId);
             }
         }
+        if (this.teamMemberStatisticsIds == null) this.teamMemberStatisticsIds = new java.util.HashSet<String>();
+        Set<String> teamMemberStatistics = new HashSet<String>(this.teamMemberStatisticsIds);
+        for (String entityId : teamMemberStatistics) {
+            try {
+                teamMemberSnapshotDao.getById(entityId);
+            } catch (EntityDoesNotExistException ex) {
+                LOG.info("Repairing dead teamMemberStatistic reference");
+                repairDeadTeamMemberStatisticReference(entityId);
+            }
+        }
         if (this.requirementsOrderIds == null) this.requirementsOrderIds = new java.util.ArrayList<java.lang.String>();
         if (this.closedTasksIds == null) this.closedTasksIds = new java.util.HashSet<String>();
         Set<String> closedTasks = new HashSet<String>(this.closedTasksIds);
@@ -689,6 +793,12 @@ public abstract class GSprintReport
 
     public static final void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
         GSprintReport.requirementDao = requirementDao;
+    }
+
+    static scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao;
+
+    public static final void setTeamMemberSnapshotDao(scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao) {
+        GSprintReport.teamMemberSnapshotDao = teamMemberSnapshotDao;
     }
 
     static scrum.server.sprint.TaskDao taskDao;

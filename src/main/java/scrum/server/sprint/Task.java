@@ -49,6 +49,28 @@ public class Task extends GTask implements Numbered, ReferenceSupport, LabelSupp
 		return getRemainingWork() == 0;
 	}
 
+	public String getOwnerName() {
+		return getOwner() == null ? "Not claimed yet" : getOwner().getName();
+	}
+
+	public String getFullLabel() {
+		return this.getLabel() + getWorkLabel();
+	}
+
+	public String getWorkLabel() {
+		return "Owner: " + this.getOwnerName() + ", estimated: " + getInitialWork() + " hrs, burned: "
+				+ this.getBurnedWork() + " hrs, efficiency: " + (int) (getEfficiency() * 100) + "%";
+	}
+
+	public Float getEfficiency() {
+		if (getInitialWork() == 0 || getBurnedWork() == 0) return 0f;
+		return Float.valueOf(getInitialWork()) / this.getBurnedWork();
+	}
+
+	public int getEfficiencyRate() {
+		return (int) (getEfficiency() * 100);
+	}
+
 	public boolean isSprint(Sprint sprint) {
 		if (isClosedInPastSprintSet()) return false;
 		return getRequirement().isSprint(sprint);
@@ -108,6 +130,10 @@ public class Task extends GTask implements Numbered, ReferenceSupport, LabelSupp
 			}
 		}
 		return end;
+	}
+
+	public boolean isOwnersTask(String userName) {
+		return (getOwner() != null && userName.equals(getOwner().getName()));
 	}
 
 }

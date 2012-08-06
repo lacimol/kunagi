@@ -80,8 +80,6 @@ public abstract class Chart {
 	protected static final Color COLOR_PROJECTION_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownProjectionLine);
 	protected static final Color COLOR_OPTIMUM_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownOptimalLine);
 
-	protected static final String TEAM = "team";
-
 	// --- dependencies ---
 
 	protected SprintDao sprintDao;
@@ -100,7 +98,7 @@ public abstract class Chart {
 
 	// --- ---
 
-	public static Map<String, Color> userColors = new HashMap<String, Color>();
+	public static final Map<String, Color> userColors = new HashMap<String, Color>();
 	static {
 		userColors.put("team", Color.decode("#006000"));
 		userColors.put("black", Color.BLACK);
@@ -423,7 +421,7 @@ public abstract class Chart {
 
 	private Paint[] getColors(final CategoryDataset dataset, Sprint sprint) {
 		List<Paint> colors = new ArrayList<Paint>();
-		colors.add(userColors.get(TEAM));
+		colors.add(userColors.get(Sprint.TEAM));
 		for (User user : sprint.getProject().getTeamMembers()) {
 			colors.add(userColors.get(user.getColor()));
 		}

@@ -1,13 +1,13 @@
 /*
  * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
  * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
- * License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
- * for more details.
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
  * 
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
@@ -65,6 +65,7 @@ public class ScrumModeller extends Starter {
 			Node nPackage = nScrum.getChildOrCreate(NodeTypes.Package, packageName);
 			Node nEntity = nPackage.getChildOrCreate("Entity", entity.getName());
 			for (PropertyModel property : entity.getProperties()) {
+				log.info(" * property:", property.getName(), property.getType());
 				Node nProperty;
 				if (property.isReference()) {
 					nProperty = nEntity.getChildOrCreate(NodeTypes.ReferenceProperty, property.getName());
@@ -89,7 +90,7 @@ public class ScrumModeller extends Starter {
 				} else if (property.getType().equals(DateAndTime.class.getName())) {
 					nProperty = nEntity.getChildOrCreate(NodeTypes.DateAndTimeProperty, property.getName());
 				} else {
-					log.error("Unsupported type:", property.getType());
+					log.error("Unsupported type:", property.getName(), property.getType());
 					continue;
 				}
 			}
@@ -98,6 +99,7 @@ public class ScrumModeller extends Starter {
 
 	static class LegacyGeneration implements ModelProcessor {
 
+		@Override
 		public void processModel(Model model) {
 			scrumModelApplication.generateClasses().shutdown();
 		}
@@ -106,6 +108,7 @@ public class ScrumModeller extends Starter {
 
 	static class TextGeneration implements ModelProcessor {
 
+		@Override
 		public void processModel(Model model) {
 			List<Node> nodes = model.getRoot().getChildrenByTypeRecursive(NodeTypes.EN);
 			for (Node n : nodes) {

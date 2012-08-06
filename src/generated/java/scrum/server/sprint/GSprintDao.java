@@ -60,6 +60,8 @@ public abstract class GSprintDao
         completedRequirementsDatasCache = null;
         sprintsByIncompletedRequirementsDataCache.clear();
         incompletedRequirementsDatasCache = null;
+        sprintsByTeamMembersDataCache.clear();
+        teamMembersDatasCache = null;
         sprintsByPlanningNoteCache.clear();
         planningNotesCache = null;
         sprintsByReviewNoteCache.clear();
@@ -448,6 +450,46 @@ public abstract class GSprintDao
 
         public boolean test(Sprint e) {
             return e.isIncompletedRequirementsData(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - teamMembersData
+    // -----------------------------------------------------------
+
+    private final Cache<java.lang.String,Set<Sprint>> sprintsByTeamMembersDataCache = new Cache<java.lang.String,Set<Sprint>>(
+            new Cache.Factory<java.lang.String,Set<Sprint>>() {
+                public Set<Sprint> create(java.lang.String teamMembersData) {
+                    return getEntities(new IsTeamMembersData(teamMembersData));
+                }
+            });
+
+    public final Set<Sprint> getSprintsByTeamMembersData(java.lang.String teamMembersData) {
+        return new HashSet<Sprint>(sprintsByTeamMembersDataCache.get(teamMembersData));
+    }
+    private Set<java.lang.String> teamMembersDatasCache;
+
+    public final Set<java.lang.String> getTeamMembersDatas() {
+        if (teamMembersDatasCache == null) {
+            teamMembersDatasCache = new HashSet<java.lang.String>();
+            for (Sprint e : getEntities()) {
+                if (e.isTeamMembersDataSet()) teamMembersDatasCache.add(e.getTeamMembersData());
+            }
+        }
+        return teamMembersDatasCache;
+    }
+
+    private static class IsTeamMembersData implements Predicate<Sprint> {
+
+        private java.lang.String value;
+
+        public IsTeamMembersData(java.lang.String value) {
+            this.value = value;
+        }
+
+        public boolean test(Sprint e) {
+            return e.isTeamMembersData(value);
         }
 
     }

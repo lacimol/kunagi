@@ -678,6 +678,31 @@ public abstract class GScrumWebApplication
         taskDaySnapshotDao = null;
     }
 
+    // --- teamMemberSnapshotDao ---
+
+    private scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao;
+
+    public final scrum.server.sprint.TeamMemberSnapshotDao getTeamMemberSnapshotDao() {
+        if (teamMemberSnapshotDao == null) {
+            teamMemberSnapshotDao = createTeamMemberSnapshotDao();
+            initializeTeamMemberSnapshotDao(teamMemberSnapshotDao);
+        }
+        return teamMemberSnapshotDao;
+    }
+
+    protected scrum.server.sprint.TeamMemberSnapshotDao createTeamMemberSnapshotDao() {
+        return teamMemberSnapshotDao = ilarkesto.base.Reflect.newInstance(scrum.server.sprint.TeamMemberSnapshotDao.class);
+    }
+
+    protected void initializeTeamMemberSnapshotDao(scrum.server.sprint.TeamMemberSnapshotDao bean) {
+        autowire(bean);
+        ilarkesto.base.Reflect.invokeInitializeIfThere(bean);
+    }
+
+    public final void resetTeamMemberSnapshotDao() {
+        teamMemberSnapshotDao = null;
+    }
+
     // --- wikipageDao ---
 
     private scrum.server.collaboration.WikipageDao wikipageDao;

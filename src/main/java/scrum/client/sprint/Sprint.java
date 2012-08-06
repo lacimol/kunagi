@@ -477,12 +477,9 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 				StringBuilder sb = new StringBuilder();
 				List<StoryInfo> stories = SprintHistoryHelper.parseRequirementsAndTasks(getCompletedRequirementsData());
 				for (StoryInfo story : stories) {
-					sb.append("\n* ").append(story.getReference()).append(" ").append(story.getLabel());
-					sb.append(" ''").append(story.getEstimatedWorkAsString()).append(", ")
-							.append(story.getBurnedWorkAsString()).append("''");
+					sb.append(story.createView());
 					for (TaskInfo task : story.getTasks()) {
-						sb.append("\n  * ").append(task.getReference()).append(" ").append(task.getLabel());
-						sb.append(" ''").append(task.getBurnedWork()).append(" hrs.''");
+						sb.append(task.createView());
 					}
 				}
 				return sb.toString();

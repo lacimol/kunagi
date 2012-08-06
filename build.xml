@@ -121,7 +121,7 @@
             	  <exclude name="**/mysql-*.jar" />
             </fileset>
         </copy>
-		<war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp">
+		<!--war destfile="${build.dir}/kunagi.war" basedir="${build.dir}/webapp">
 			<manifest>
 				<attribute name="Implementation-Title" value="Kunagi" />
 				<attribute name="Implementation-Version" value="${release.label}" />
@@ -131,7 +131,7 @@
 				<attribute name="Built-Date" value="${build.tstamp}" />
 				<attribute name="Java-version" value="${java.version}" />
 			</manifest>
-		</war>
+		</war-->
     </target>
 
     <target name="package" depends="webapp">

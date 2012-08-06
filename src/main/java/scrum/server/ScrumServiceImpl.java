@@ -783,7 +783,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			conversation.sendToClient(entity);
 			conversation.sendToClient(getAssociatedEntities(entity));
 		} catch (EntityDoesNotExistException ex) {
-			log.info("Requested entity not found:", entityId);
+			log.info("Requested entity not found by id:", entityId);
 			// nop
 		}
 	}
@@ -795,7 +795,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 
 		AEntity entity = project.getEntityByReference(reference);
 		if (entity == null) {
-			log.info("Requested entity not found:", reference);
+			log.info("Requested entity not found by ref:", reference);
 		} else {
 			conversation.sendToClient(entity);
 			conversation.sendToClient(getAssociatedEntities(entity));

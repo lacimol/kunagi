@@ -133,6 +133,8 @@ public abstract class APdfCreator {
 			rowHeader.cell().setFontStyle(referenceFont).text(task.getReference());
 			rowHeader.cell().setFontStyle(new FontStyle(defaultFont).setBold(true)).text(task.getLabel());
 
+			if (task.isOwnerSet()) richtextRow(table, "Owner info", task.getWorkLabel());
+
 			if (task.isDescriptionSet()) richtextRow(table, "Description", task.getDescription());
 
 			Impediment impediment = task.getImpediment();

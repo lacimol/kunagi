@@ -15,7 +15,9 @@
 package scrum.server.sprint;
 
 import java.util.Collection;
+import java.util.Set;
 
+import scrum.server.admin.User;
 import scrum.server.project.Requirement;
 
 public class SprintHistoryHelper extends scrum.client.sprint.SprintHistoryHelper {
@@ -45,7 +47,23 @@ public class SprintHistoryHelper extends scrum.client.sprint.SprintHistoryHelper
 		sb.append(tsk.getReference()).append(SEPARATOR);
 		sb.append(tsk.getBurnedWork()).append(SEPARATOR);
 		sb.append(tsk.getRemainingWork()).append(SEPARATOR);
-		sb.append(tsk.getLabel());
+		sb.append(tsk.getLabel()).append(SEPARATOR);
+		sb.append(tsk.getOwner());
+		return sb.toString();
+	}
+
+	public static String encodeTeamMemberData(Sprint sprint, Set<User> teamMembers) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(PREFIX).append(VERSION).append("\n");
+		for (User user : teamMembers) {
+			String name = user.getName();
+			UserEfficiency userEfficiency = sprint.getUserEfficiency(name);
+			sb.append(name).append(SEPARATOR);
+			sb.append(userEfficiency.getInitialBurnableHours()).append(SEPARATOR);
+			sb.append(userEfficiency.getAllBurnedHours()).append(SEPARATOR);
+			sb.append(userEfficiency.getEfficiency()).append(SEPARATOR);
+			sb.append("\n");
+		}
 		return sb.toString();
 	}
 

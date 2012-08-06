@@ -141,7 +141,12 @@ public class SprintReportPdfCreator extends APdfCreator {
 			AParagraph p = tasksCell.paragraph();
 			p.text(tsk.getReference(), referenceFont);
 			p.text(" " + tsk.getLabel() + " ", defaultFont);
-			p.text(tsk.getBurnedWork() + " hrs.", referenceFont);
+			p.text(tsk.getBurnedWork() + " hrs", referenceFont);
+			if (tsk.isClaimed()) {
+				p.text(" (" + tsk.getOwnerName() + ").", defaultFont);
+			} else {
+				p.text(".", referenceFont);
+			}
 		}
 
 		table.createCellBorders(Color.GRAY, 0.2f);

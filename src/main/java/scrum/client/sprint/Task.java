@@ -126,12 +126,12 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		getRequirement().setClosed(false);
 	}
 
-	public boolean isClaimed() {
-		return !isClosed() && isOwnerSet();
-	}
-
 	public boolean isClosed() {
 		return getRemainingWork() == 0;
+	}
+
+	public String getOwnerName() {
+		return getOwner() == null ? "Not claimed yet" : getOwner().getName();
 	}
 
 	public String getWorkText() {
@@ -141,7 +141,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 			work = String.valueOf(burned);
 		} else {
 			int remaining = getRemainingWork();
-			if (isClaimed()) {
+			if (isOwnerSet()) {
 				int total = remaining + burned;
 				work = burned + " of " + total;
 			} else {
@@ -247,25 +247,14 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		return workTextModel;
 	}
 
-	public List<TaskDaySnapshot> getTaskDaySnapshotsInSprint2(Date date, Sprint sprint) {
-
-		List<TaskDaySnapshot> results = new ArrayList<TaskDaySnapshot>();
-		for (TaskDaySnapshot snapshot : getTaskDaySnapshots()) {
-			if ((date == null || date.equals(snapshot.getDate()))
-					&& snapshot.getDate().isSameOrAfter(sprint.getBegin())) {
-				results.add(snapshot);
-			}
-		}
-		Collections.sort(results, TaskDaySnapshot.DATE_COMPARATOR);
-
-		return results;
-	}
-
+	/**
+	 * XXX duplicated UserBurndownCahrt.getUserBurnedHours
+	 */
 	public List<BurnHours> getTaskDaySnapshotsInSprint(Date date, Sprint sprint) {
 
 		List<BurnHours> results = new ArrayList<BurnHours>();
-		List<TaskDaySnapshot> taskDaySnapshots = getTaskDaySnapshots();
-		Collections.sort(taskDaySnapshots, TaskDaySnapshot.DATE_COMPARATOR);
+		List<TaskDaySnapshot> taskDaySnapshots = getCurrentTaskDaySnapshots(sprint);
+
 		int previousSnapshotBurn = 0;
 		int burnedWork;
 		BurnHours burnHours = null;
@@ -296,8 +285,37 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		return newSnapshot;
 	}
 
-	public String getOwnerName() {
-		return getOwner() == null ? null : getOwner().getName();
+	public List<TaskDaySnapshot> getCurrentTaskDaySnapshots(Sprint sprint) {
+		List<TaskDaySnapshot> currentTaskDaySnapshots = new ArrayList<TaskDaySnapshot>();
+		for (TaskDaySnapshot t : getTaskDaySnapshots()) {
+			if (sprint.getBegin().isSameOrBefore(t.getDate())) {
+				currentTaskDaySnapshots.add(t);
+			}
+		}
+		Collections.sort(currentTaskDaySnapshots, TaskDaySnapshot.DATE_COMPARATOR);
+		return currentTaskDaySnapshots;
+	}
+
+	public boolean containsAndBurned(List<BurnHours> taskDaySnapshots) {
+		boolean isInBurnList = false;
+		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
+			int burnedWork = taskDaySnapshot.getBurnedWork();
+			if (burnedWork > 0) {
+				if (taskDaySnapshot.getTask().equals(this)) {
+					isInBurnList = true;
+				}
+			}
+		}
+		return isInBurnList;
+	}
+
+	public Float getEfficiency() {
+		if (getInitialWork() == 0 || getBurnedWork() == 0) return 0f;
+		return Float.valueOf(getInitialWork()) / this.getBurnedWork();
+	}
+
+	public int getEfficiencyRate() {
+		return (int) (getEfficiency() * 100);
 	}
 
 }

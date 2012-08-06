@@ -50,11 +50,22 @@ public class TaskWidget extends AScrumWidget {
 
 		tb.addFieldRow("Description", task.getDescriptionModel(), 3);
 
-		if (inCurrentSprint) appendCurrentSprintFields(tb);
+		if (inCurrentSprint) {
+			appendCurrentSprintFields(tb);
+		} else {
+			appendOldSprintFields(tb);
+		}
 
 		Widget comments = inCurrentSprint ? ScrumGwt.createEmoticonsAndComments(task) : new CommentsWidget(task);
 		ChangeHistoryWidget changeHistory = new ChangeHistoryWidget(task);
 		return Gwt.createFlowPanel(tb.createTable(), comments, Gwt.createSpacer(1, 10), changeHistory);
+	}
+
+	private void appendOldSprintFields(TableBuilder tb) {
+		tb.addField("Owner", new SimpleValueWidget(task.getOwnerName()));
+		tb.addField("Estimated", new SimpleValueWidget(task.getInitialWork() + " hrs"));
+		tb.addField("Burned", new SimpleValueWidget(task.getBurnedWork() + " hrs"));
+		tb.addFieldRow("Efficiency", new SimpleValueWidget(task.getEfficiencyRate() + "%"));
 	}
 
 	private void appendCurrentSprintFields(TableBuilder tb) {

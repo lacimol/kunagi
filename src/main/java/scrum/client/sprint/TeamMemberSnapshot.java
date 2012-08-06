@@ -13,25 +13,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package scrum.client.statistics;
+package scrum.client.sprint;
 
-import scrum.client.sprint.Sprint;
+import java.util.Map;
 
-public class EfficiencyWidget extends ChartWidget {
+public class TeamMemberSnapshot extends GTeamMemberSnapshot {
 
-	Sprint sprint = null;
-
-	public EfficiencyWidget() {
-		sprint = getCurrentSprint();
-	}
-
-	public EfficiencyWidget(Sprint sprint) {
-		this.sprint = sprint;
-	}
-
-	@Override
-	String getChartUrl(int width) {
-		return sprint.getEfficiencyChartUrl(width, TEAM_CHART_HEIGHT);
+	public TeamMemberSnapshot(Map data) {
+		super(data);
 	}
 
 }

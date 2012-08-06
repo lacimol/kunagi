@@ -2663,6 +2663,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.sprint.Sprint> getSprintsByTeamMembersData(java.lang.String teamMembersData) {
+        List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
+        for (scrum.client.sprint.Sprint entity : sprints.values()) {
+            if (entity.isTeamMembersData(teamMembersData)) ret.add(entity);
+        }
+        return ret;
+    }
+
     public final List<scrum.client.sprint.Sprint> getSprintsByPlanningNote(java.lang.String planningNote) {
         List<scrum.client.sprint.Sprint> ret = new ArrayList<scrum.client.sprint.Sprint>();
         for (scrum.client.sprint.Sprint entity : sprints.values()) {
@@ -2800,6 +2808,14 @@ public abstract class GDao
         List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
         for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
             if (entity.containsRejectedRequirement(rejectedRequirement)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.SprintReport> getSprintReportsByTeamMemberStatistic(scrum.client.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        List<scrum.client.sprint.SprintReport> ret = new ArrayList<scrum.client.sprint.SprintReport>();
+        for (scrum.client.sprint.SprintReport entity : sprintReports.values()) {
+            if (entity.containsTeamMemberStatistic(teamMemberStatistic)) ret.add(entity);
         }
         return ret;
     }
@@ -3577,6 +3593,108 @@ public abstract class GDao
         return ret;
     }
 
+    // --- TeamMemberSnapshot ---
+
+    protected Map<String, scrum.client.sprint.TeamMemberSnapshot> teamMemberSnapshots = new HashMap<String, scrum.client.sprint.TeamMemberSnapshot>();
+
+    public final void clearTeamMemberSnapshots() {
+        ilarkesto.core.logging.Log.DEBUG("Clearing TeamMemberSnapshots");
+        teamMemberSnapshots.clear();
+    }
+
+    public final boolean containsTeamMemberSnapshot(scrum.client.sprint.TeamMemberSnapshot teamMemberSnapshot) {
+        return teamMemberSnapshots.containsKey(teamMemberSnapshot.getId());
+    }
+
+    public final void deleteTeamMemberSnapshot(scrum.client.sprint.TeamMemberSnapshot teamMemberSnapshot) {
+        teamMemberSnapshots.remove(teamMemberSnapshot.getId());
+        entityDeleted(teamMemberSnapshot);
+    }
+
+    public final void createTeamMemberSnapshot(scrum.client.sprint.TeamMemberSnapshot teamMemberSnapshot, Runnable successAction) {
+        teamMemberSnapshots.put(teamMemberSnapshot.getId(), teamMemberSnapshot);
+        entityCreated(teamMemberSnapshot, successAction);
+    }
+
+    public final void createTeamMemberSnapshot(scrum.client.sprint.TeamMemberSnapshot teamMemberSnapshot) {
+        teamMemberSnapshots.put(teamMemberSnapshot.getId(), teamMemberSnapshot);
+        entityCreated(teamMemberSnapshot, null);
+    }
+
+    protected scrum.client.sprint.TeamMemberSnapshot updateTeamMemberSnapshot(Map data) {
+        String id = (String) data.get("id");
+        scrum.client.sprint.TeamMemberSnapshot entity = teamMemberSnapshots.get(id);
+        if (entity == null) {
+            entity = new scrum.client.sprint.TeamMemberSnapshot(data);
+            teamMemberSnapshots.put(id, entity);
+            ilarkesto.core.logging.Log.DEBUG("TeamMemberSnapshot received: " + entity.getId() + " ("+entity+")");
+        } else {
+            entity.updateProperties(data);
+            ilarkesto.core.logging.Log.DEBUG("TeamMemberSnapshot updated: " + entity);
+        }
+        return entity;
+    }
+
+    public final scrum.client.sprint.TeamMemberSnapshot getTeamMemberSnapshot(String id) {
+        scrum.client.sprint.TeamMemberSnapshot ret = teamMemberSnapshots.get(id);
+        if (ret == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+        return ret;
+    }
+
+    public final Set<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshots(Collection<String> ids) {
+        Set<scrum.client.sprint.TeamMemberSnapshot> ret = new HashSet<scrum.client.sprint.TeamMemberSnapshot>();
+        for (String id : ids) {
+            scrum.client.sprint.TeamMemberSnapshot entity = teamMemberSnapshots.get(id);
+            if (entity == null) throw new ilarkesto.gwt.client.EntityDoesNotExistException(id);
+            ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshots() {
+        return new ArrayList<scrum.client.sprint.TeamMemberSnapshot>(teamMemberSnapshots.values());
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshotsBySprint(scrum.client.sprint.Sprint sprint) {
+        List<scrum.client.sprint.TeamMemberSnapshot> ret = new ArrayList<scrum.client.sprint.TeamMemberSnapshot>();
+        for (scrum.client.sprint.TeamMemberSnapshot entity : teamMemberSnapshots.values()) {
+            if (entity.isSprint(sprint)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshotsByTeamMember(scrum.client.admin.User teamMember) {
+        List<scrum.client.sprint.TeamMemberSnapshot> ret = new ArrayList<scrum.client.sprint.TeamMemberSnapshot>();
+        for (scrum.client.sprint.TeamMemberSnapshot entity : teamMemberSnapshots.values()) {
+            if (entity.isTeamMember(teamMember)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshotsByInitialWork(int initialWork) {
+        List<scrum.client.sprint.TeamMemberSnapshot> ret = new ArrayList<scrum.client.sprint.TeamMemberSnapshot>();
+        for (scrum.client.sprint.TeamMemberSnapshot entity : teamMemberSnapshots.values()) {
+            if (entity.isInitialWork(initialWork)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshotsByBurnedWork(int burnedWork) {
+        List<scrum.client.sprint.TeamMemberSnapshot> ret = new ArrayList<scrum.client.sprint.TeamMemberSnapshot>();
+        for (scrum.client.sprint.TeamMemberSnapshot entity : teamMemberSnapshots.values()) {
+            if (entity.isBurnedWork(burnedWork)) ret.add(entity);
+        }
+        return ret;
+    }
+
+    public final List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshotsByEfficiency(java.lang.Float efficiency) {
+        List<scrum.client.sprint.TeamMemberSnapshot> ret = new ArrayList<scrum.client.sprint.TeamMemberSnapshot>();
+        for (scrum.client.sprint.TeamMemberSnapshot entity : teamMemberSnapshots.values()) {
+            if (entity.isEfficiency(efficiency)) ret.add(entity);
+        }
+        return ret;
+    }
+
     // --- User ---
 
     protected Map<String, scrum.client.admin.User> users = new HashMap<String, scrum.client.admin.User>();
@@ -3970,6 +4088,7 @@ public abstract class GDao
             clearSystemConfigs();
             clearTasks();
             clearTaskDaySnapshots();
+            clearTeamMemberSnapshots();
             clearUsers();
             clearWikipages();
     }
@@ -4004,6 +4123,7 @@ public abstract class GDao
             entityMaps.add(systemConfigs);
             entityMaps.add(tasks);
             entityMaps.add(taskDaySnapshots);
+            entityMaps.add(teamMemberSnapshots);
             entityMaps.add(users);
             entityMaps.add(wikipages);
         }
@@ -4084,6 +4204,9 @@ public abstract class GDao
         if (type.equals(scrum.client.task.TaskDaySnapshot.ENTITY_TYPE)) {
             return updateTaskDaySnapshot(data);
         }
+        if (type.equals(scrum.client.sprint.TeamMemberSnapshot.ENTITY_TYPE)) {
+            return updateTeamMemberSnapshot(data);
+        }
         if (type.equals(scrum.client.admin.User.ENTITY_TYPE)) {
             return updateUser(data);
         }
@@ -4120,6 +4243,7 @@ public abstract class GDao
         ret.put("SystemConfig", systemConfigs.size());
         ret.put("Task", tasks.size());
         ret.put("TaskDaySnapshot", taskDaySnapshots.size());
+        ret.put("TeamMemberSnapshot", teamMemberSnapshots.size());
         ret.put("User", users.size());
         ret.put("Wikipage", wikipages.size());
         return ret;

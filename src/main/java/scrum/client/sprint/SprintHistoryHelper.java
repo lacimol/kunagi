@@ -17,15 +17,18 @@ package scrum.client.sprint;
 import ilarkesto.core.base.Str;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class SprintHistoryHelper {
 
-	protected static final char SEPARATOR = ';';
-	protected static final String PREFIX = "#encoded-requirements ";
-	protected static final int VERSION = 1; // reference;work;label
+	protected static final String SEPARATOR = ";";
+	protected static final String PREFIX = "#encoded-data ";
+	// Story: reference;work;label
+	// Task: reference;burnedWork;remainingWork;ownerName;label
+	protected static final int VERSION = 2;
 
 	public static List<StoryInfo> parseRequirementsAndTasks(String s) {
 		List<StoryInfo> ret = new ArrayList<SprintHistoryHelper.StoryInfo>();
@@ -45,23 +48,14 @@ public class SprintHistoryHelper {
 
 	public static List<String> parseLines(String s) {
 		if (s == null) return Collections.emptyList();
-		LinkedList<String> ll = new LinkedList<String>();
-		int idx = s.indexOf('\n');
-		while (idx >= 0) {
-			String line = s.substring(0, idx);
-			s = s.substring(idx + 1);
-			ll.add(line);
-			idx = s.indexOf('\n');
-		}
-		ll.add(s);
-		return ll;
+		return new LinkedList<String>(Arrays.asList(s.split("\n")));
 	}
 
-	static List<String[]> decodeRequirementsAndTasks(String s) {
+	public static List<String[]> decodeRequirementsAndTasks(String s) {
 		List<String> lines = parseLines(s);
-		if (lines.isEmpty()) return Collections.emptyList();
+		if (lines.isEmpty() || !isDecodable(lines.get(0))) return Collections.emptyList();
 		List<String[]> records = new ArrayList<String[]>();
-		if (!lines.get(0).startsWith(PREFIX + VERSION)) throw new RuntimeException("Illegal format: " + s);
+		// if (!isDecodable(lines.get(0))) throw new RuntimeException("Illegal format: " + s);
 		lines.remove(0);
 		for (String line : lines) {
 			if (line.startsWith(scrum.client.project.Requirement.REFERENCE_PREFIX)) {
@@ -70,37 +64,21 @@ public class SprintHistoryHelper {
 				records.add(decodeTask(line));
 			}
 		}
+
 		return records;
 	}
 
-	boolean isDecodable(String s) {
+	private static boolean isDecodable(String s) {
 		if (Str.isBlank(s)) return true;
-		return s.startsWith(PREFIX);
+		return s.startsWith(PREFIX + VERSION);
 	}
 
 	public static String[] decodeRequirement(String s) {
-		String[] ret = new String[3];
-		int idx = s.indexOf(SEPARATOR);
-		ret[0] = s.substring(0, idx);
-		s = s.substring(idx + 1);
-		idx = s.indexOf(SEPARATOR);
-		ret[1] = s.substring(0, idx);
-		ret[2] = s.substring(idx + 1);
-		return ret;
+		return s.split(SEPARATOR);
 	}
 
 	public static String[] decodeTask(String s) {
-		String[] ret = new String[4];
-		int idx = s.indexOf(SEPARATOR);
-		ret[0] = s.substring(0, idx);
-		s = s.substring(idx + 1);
-		idx = s.indexOf(SEPARATOR);
-		ret[1] = s.substring(0, idx);
-		s = s.substring(idx + 1);
-		idx = s.indexOf(SEPARATOR);
-		ret[2] = s.substring(0, idx);
-		ret[3] = s.substring(idx + 1);
-		return ret;
+		return s.split(SEPARATOR);
 	}
 
 	public static class StoryInfo {
@@ -154,6 +132,14 @@ public class SprintHistoryHelper {
 			String suffix = work == 1 ? " hr." : " hrs.";
 			return String.valueOf(work) + suffix;
 		}
+
+		public String createView() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("\n* ").append(this.getReference()).append(" ").append(this.getLabel());
+			sb.append(" ''").append(this.getEstimatedWorkAsString()).append(", ").append(this.getBurnedWorkAsString())
+					.append("''");
+			return sb.toString();
+		}
 	}
 
 	public static class TaskInfo {
@@ -162,12 +148,19 @@ public class SprintHistoryHelper {
 		private int burnedWork;
 		private int remainingWork;
 		private String label;
+		private String ownerName;
 
 		public TaskInfo(String[] record) {
-			reference = record[0];
-			burnedWork = Integer.parseInt(record[1]);
-			remainingWork = Integer.parseInt(record[2]);
-			label = record[3];
+			try {
+				reference = record[0];
+				burnedWork = Integer.parseInt(record[1]);
+				remainingWork = Integer.parseInt(record[2]);
+				label = record[3];
+				ownerName = record[4];
+			} catch (ArrayIndexOutOfBoundsException ex) {
+				// XXX older version compatibility
+				// ex.printStackTrace();
+			}
 		}
 
 		public String getReference() {
@@ -184,6 +177,24 @@ public class SprintHistoryHelper {
 
 		public String getLabel() {
 			return label;
+		}
+
+		public String getOwnerName() {
+			return ownerName;
+		}
+
+		public boolean isClaimed() {
+			return ownerName != null && !"null".equals(ownerName) && !ownerName.trim().isEmpty();
+		}
+
+		public String createView() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("\n  * ").append(this.getReference()).append(" ").append(this.getLabel());
+			sb.append(" ''").append(this.getBurnedWork()).append(" hrs ''");
+			if (this.isClaimed()) {
+				sb.append(" (").append(this.getOwnerName()).append(")");
+			}
+			return sb.toString();
 		}
 
 	}

@@ -19,17 +19,22 @@ import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import scrum.client.common.WeekdaySelector;
 import scrum.client.journal.Change;
 import scrum.server.admin.User;
+import scrum.server.common.BurndownSnapshot;
 import scrum.server.common.Numbered;
 import scrum.server.issues.Issue;
 import scrum.server.journal.ChangeDao;
@@ -37,12 +42,12 @@ import scrum.server.project.Project;
 import scrum.server.project.Requirement;
 import scrum.server.release.Release;
 import scrum.server.task.TaskDaySnapshot;
-import scrum.client.common.WeekdaySelector;
-import scrum.server.common.BurndownSnapshot;
 
 public class Sprint extends GSprint implements Numbered {
 
 	private static final Log log = Log.get(Sprint.class);
+
+	public static final String TEAM = "team";
 
 	// --- dependencies ---
 
@@ -111,6 +116,8 @@ public class Sprint extends GSprint implements Numbered {
 	}
 
 	public void close() {
+
+		Project project = getProject();
 		SprintReport report = sprintReportDao.postSprintReport(this);
 		report.setRequirementsOrderIds(getRequirementsOrderIds());
 		report.setBurnedWork(getBurnedWork());
@@ -120,8 +127,11 @@ public class Sprint extends GSprint implements Numbered {
 		releaseNotes.append("'''Stories from ").append(getReferenceAndLabel()).append("'''\n\n");
 		Collection<Requirement> completedRequirements = new ArrayList<Requirement>();
 		Collection<Requirement> incompletedRequirements = new ArrayList<Requirement>();
+		Collection<TeamMemberSnapshot> teamMemberStatistics = new ArrayList<TeamMemberSnapshot>();
+
 		List<Requirement> requirements = new ArrayList<Requirement>(getRequirements());
 		Collections.sort(requirements, getRequirementsOrderComparator());
+
 		for (Requirement requirement : requirements) {
 			releaseNotes.append("* " + (requirement.isClosed() ? "" : "(UNFINISHED) "))
 					.append(requirement.getReferenceAndLabel()).append("\n");
@@ -137,7 +147,7 @@ public class Sprint extends GSprint implements Numbered {
 				changeDao
 						.postChange(requirement, null, Change.REQ_COMPLETED_IN_SPRINT, requirement.getLabel(), getId());
 			} else {
-				getProject().addRequirementsOrderId(incompletedRequirements.size(), requirement.getId());
+				project.addRequirementsOrderId(incompletedRequirements.size(), requirement.getId());
 				incompletedRequirements.add(requirement);
 				changeDao.postChange(requirement, null, Change.REQ_REJECTED_IN_SPRINT, requirement.getLabel(), getId());
 			}
@@ -145,9 +155,16 @@ public class Sprint extends GSprint implements Numbered {
 
 		report.setCompletedRequirements(completedRequirements);
 		report.setRejectedRequirements(incompletedRequirements);
+		// create and persist
+		for (User user : project.getTeamMembers()) {
+			TeamMemberSnapshot snapshot = teamMemberSnapshotDao.getSnapshot(this, user, true);
+			teamMemberStatistics.add(snapshot);
+		}
+		report.setTeamMemberStatistics(teamMemberStatistics);
 
 		setCompletedRequirementsData(SprintHistoryHelper.encodeRequirementsAndTasks(completedRequirements));
 		setIncompletedRequirementsData(SprintHistoryHelper.encodeRequirementsAndTasks(incompletedRequirements));
+		setTeamMembersData(SprintHistoryHelper.encodeTeamMemberData(this, project.getTeamMembers()));
 
 		for (Requirement requirement : requirements) {
 			List<Task> tasks = new ArrayList<Task>(requirement.getTasksInSprint());
@@ -184,7 +201,7 @@ public class Sprint extends GSprint implements Numbered {
 			release.setReleaseNotes(sb.toString());
 		}
 		setVelocity(velocity);
-		Project project = getProject();
+
 		setProductOwners(project.getProductOwners());
 		setScrumMasters(project.getScrumMasters());
 		setTeamMembers(project.getTeamMembers());
@@ -432,5 +449,38 @@ public class Sprint extends GSprint implements Numbered {
 		}
 
 	};
+
+	public UserEfficiency getTeamEfficiency() {
+		return getUserEfficiency(TEAM);
+	}
+
+	public UserEfficiency getUserEfficiency(String userName) {
+
+		UserEfficiency result = new UserEfficiency();
+		Float efficiency = 0.00f;
+		Integer allBurnedHours = 0;
+		Integer initialBurnableHours = 0;
+		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
+		List<Task> sprintTasks = new LinkedList<Task>(this.getTasks());
+		int initialWork = 0;
+
+		for (Task task : sprintTasks) {
+			if ((userName.equals(TEAM) || task.isOwnersTask(userName)) && task.isClosed()) {
+				allBurnedHours += task.getBurnedWork();
+				initialWork = task.getInitialWork();
+				initialBurnableHours += initialWork == 0 ? task.getBurnedWork() : initialWork;
+			}
+		}
+		if (allBurnedHours > 0 && initialBurnableHours > 0) {
+			efficiency = initialBurnableHours.floatValue() / allBurnedHours.floatValue();
+		}
+		log.debug(userName + "'s UserEfficiency: " + efficiency + "(" + initialBurnableHours + "/" + allBurnedHours
+				+ ")");
+		result.setEfficiency(BigDecimal.valueOf(efficiency).setScale(2, RoundingMode.HALF_UP).floatValue());
+		result.setAllBurnedHours(allBurnedHours);
+		result.setInitialBurnableHours(initialBurnableHours);
+		result.setBurnedHoursPerInitial(" (" + initialBurnableHours + "/" + allBurnedHours + ")");
+		return result;
+	}
 
 }

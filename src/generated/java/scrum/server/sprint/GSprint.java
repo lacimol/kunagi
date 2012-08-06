@@ -45,6 +45,7 @@ public abstract class GSprint
         properties.put("velocity", this.velocity);
         properties.put("completedRequirementsData", this.completedRequirementsData);
         properties.put("incompletedRequirementsData", this.incompletedRequirementsData);
+        properties.put("teamMembersData", this.teamMembersData);
         properties.put("planningNote", this.planningNote);
         properties.put("reviewNote", this.reviewNote);
         properties.put("retrospectiveNote", this.retrospectiveNote);
@@ -80,6 +81,10 @@ public abstract class GSprint
 
     public final java.util.Set<scrum.server.release.Release> getReleases() {
         return releaseDao.getReleasesBySprint((Sprint)this);
+    }
+
+    public final java.util.Set<scrum.server.sprint.TeamMemberSnapshot> getTeamMemberSnapshots() {
+        return teamMemberSnapshotDao.getTeamMemberSnapshotsBySprint((Sprint)this);
     }
 
     public final java.util.Set<scrum.server.sprint.Task> getClosedTasksInPasts() {
@@ -440,6 +445,42 @@ public abstract class GSprint
 
     protected final void updateIncompletedRequirementsData(Object value) {
         setIncompletedRequirementsData((java.lang.String)value);
+    }
+
+    // -----------------------------------------------------------
+    // - teamMembersData
+    // -----------------------------------------------------------
+
+    private java.lang.String teamMembersData;
+
+    public final java.lang.String getTeamMembersData() {
+        return teamMembersData;
+    }
+
+    public final void setTeamMembersData(java.lang.String teamMembersData) {
+        teamMembersData = prepareTeamMembersData(teamMembersData);
+        if (isTeamMembersData(teamMembersData)) return;
+        this.teamMembersData = teamMembersData;
+        updateLastModified();
+        fireModified("teamMembersData="+teamMembersData);
+    }
+
+    protected java.lang.String prepareTeamMembersData(java.lang.String teamMembersData) {
+        // teamMembersData = Str.removeUnreadableChars(teamMembersData);
+        return teamMembersData;
+    }
+
+    public final boolean isTeamMembersDataSet() {
+        return this.teamMembersData != null;
+    }
+
+    public final boolean isTeamMembersData(java.lang.String teamMembersData) {
+        if (this.teamMembersData == null && teamMembersData == null) return true;
+        return this.teamMembersData != null && this.teamMembersData.equals(teamMembersData);
+    }
+
+    protected final void updateTeamMembersData(Object value) {
+        setTeamMembersData((java.lang.String)value);
     }
 
     // -----------------------------------------------------------
@@ -927,6 +968,7 @@ public abstract class GSprint
             if (property.equals("velocity")) updateVelocity(value);
             if (property.equals("completedRequirementsData")) updateCompletedRequirementsData(value);
             if (property.equals("incompletedRequirementsData")) updateIncompletedRequirementsData(value);
+            if (property.equals("teamMembersData")) updateTeamMembersData(value);
             if (property.equals("planningNote")) updatePlanningNote(value);
             if (property.equals("reviewNote")) updateReviewNote(value);
             if (property.equals("retrospectiveNote")) updateRetrospectiveNote(value);
@@ -1035,6 +1077,12 @@ public abstract class GSprint
 
     public static final void setReleaseDao(scrum.server.release.ReleaseDao releaseDao) {
         GSprint.releaseDao = releaseDao;
+    }
+
+    static scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao;
+
+    public static final void setTeamMemberSnapshotDao(scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao) {
+        GSprint.teamMemberSnapshotDao = teamMemberSnapshotDao;
     }
 
     static scrum.server.sprint.TaskDao taskDao;

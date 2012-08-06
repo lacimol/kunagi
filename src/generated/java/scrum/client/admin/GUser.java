@@ -1603,6 +1603,10 @@ public abstract class GUser
         return getDao().getIssuesByCreator((User)this);
     }
 
+    public final java.util.List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshots() {
+        return getDao().getTeamMemberSnapshotsByTeamMember((User)this);
+    }
+
     public final java.util.List<scrum.client.sprint.Task> getTasks() {
         return getDao().getTasksByOwner((User)this);
     }

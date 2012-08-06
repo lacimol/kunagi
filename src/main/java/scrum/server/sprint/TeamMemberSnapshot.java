@@ -13,25 +13,23 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package scrum.client.statistics;
+package scrum.server.sprint;
 
-import scrum.client.sprint.Sprint;
+import scrum.server.admin.User;
 
-public class EfficiencyWidget extends ChartWidget {
+public class TeamMemberSnapshot extends GTeamMemberSnapshot {
 
-	Sprint sprint = null;
-
-	public EfficiencyWidget() {
-		sprint = getCurrentSprint();
-	}
-
-	public EfficiencyWidget(Sprint sprint) {
-		this.sprint = sprint;
+	@Override
+	public boolean isVisibleFor(User user) {
+		return getSprint().getProject().isVisibleFor(user);
 	}
 
 	@Override
-	String getChartUrl(int width) {
-		return sprint.getEfficiencyChartUrl(width, TEAM_CHART_HEIGHT);
+	public void ensureIntegrity() {
+		super.ensureIntegrity();
+		if (getSprint() == null) {
+			getDao().deleteEntity(this);
+		}
 	}
 
 }

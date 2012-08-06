@@ -19,16 +19,12 @@ import ilarkesto.core.time.Date;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import scrum.client.ScrumGwt;
 import scrum.client.admin.User;
 import scrum.client.common.AScrumWidget;
-import scrum.client.issues.Issue;
 import scrum.client.project.Project;
-import scrum.client.project.Requirement;
 import scrum.client.sprint.Task;
 import scrum.client.task.BurnHours;
 
@@ -75,20 +71,19 @@ public class BurnHoursWidget extends AScrumWidget {
 		List<User> lazyUsers = new ArrayList<User>();
 		List<User> team = project.getTeamStartWithCurrent(user);
 		for (User user : team) {
-			List<Task> tasks = project.getUserTasks(user);
-			List<Issue> issues = project.getUserBugs(user);
+			List<Task> tasks = project.getCurrentSprint().getTasks(user);
 
 			// user has no task
-			if (tasks.isEmpty() && issues.isEmpty()) {
+			if (tasks.isEmpty()) {
 				lazyUsers.add(user);
 				continue;
 			}
 
 			if (this.user == null || this.user.equals(user)) {
 				// collect
-				List<BurnHours> taskDaySnapshots = getAllTaskSnapshotsByUser(user, tasks, issues);
-				int burnedHours = getBurnedHours(taskDaySnapshots);
-				List<Task> currentTasks = project.getClaimedTasks(user);
+				List<BurnHours> taskDaySnapshots = getAllTaskSnapshotsByUser(tasks);
+				int burnedHours = Math.max(0, getBurnedHours(taskDaySnapshots));
+				List<Task> currentTasks = project.getCurrentSprint().getClaimedTasks(user);
 
 				// write
 				boolean hasClaimedTaskToday = !currentTasks.isEmpty() && Date.today().equals(date);
@@ -104,7 +99,7 @@ public class BurnHoursWidget extends AScrumWidget {
 					}
 					sb.append("font-weight:bold;'>");
 					sb.append(burnedHours);
-					sb.append("</span> hours on <ul>");
+					sb.append("</span> hours (").append(taskDaySnapshots.size()).append(" snapshots) on <ul>");
 
 					for (BurnHours taskDaySnapshot : taskDaySnapshots) {
 						int burnedWork = taskDaySnapshot.getBurnedWork();
@@ -116,7 +111,7 @@ public class BurnHoursWidget extends AScrumWidget {
 					// current work
 					for (Task currentTask : currentTasks) {
 
-						boolean isInBurnList = isInSnapshots(taskDaySnapshots, currentTask);
+						boolean isInBurnList = currentTask.containsAndBurned(taskDaySnapshots);
 						if (!isInBurnList && Date.today().equals(date)) {
 							sb.append("<li>").append(currentTask.toHtml()).append("</li>");
 						}
@@ -130,16 +125,6 @@ public class BurnHoursWidget extends AScrumWidget {
 				}
 			}
 		}
-
-		// for (User user : lazyUsers) {
-		// if (this.user == null || this.user.equals(user)) {
-		// String color = project.getUserConfig(user).getColor();
-		// sb.append("<div class='BurnHoursWidget-user'>");
-		// sb.append("<span style='color: ").append(color).append(";font-weight:bold;'>");
-		// sb.append(user.getName().toUpperCase());
-		// sb.append("</span> has burned <span style='color: red;'>nothing</span></div>");
-		// }
-		// }
 
 		sb.append("</div>");
 		html.setHTML(sb.toString());
@@ -159,33 +144,13 @@ public class BurnHoursWidget extends AScrumWidget {
 		return sb.toString();
 	}
 
-	private boolean isInSnapshots(List<BurnHours> taskDaySnapshots, Task currentTask) {
-		boolean isInBurnList = false;
-		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
-			int burnedWork = taskDaySnapshot.getBurnedWork();
-			if (burnedWork > 0) {
-				if (taskDaySnapshot.getTask().equals(currentTask)) {
-					isInBurnList = true;
-				}
-			}
-		}
-		return isInBurnList;
-	}
+	private List<BurnHours> getAllTaskSnapshotsByUser(List<Task> tasks) {
 
-	private List<BurnHours> getAllTaskSnapshotsByUser(User user, List<Task> tasks, List<Issue> issues) {
-		List<BurnHours> taskDaySnapshots = new ArrayList<BurnHours>();
+		List<BurnHours> result = new ArrayList<BurnHours>();
 
-		for (Issue issue : issues) {
-			for (Requirement req : issue.getRequirements()) {
-				taskDaySnapshots.addAll(getTaskSnapshotsByUserAt(user, req));
-			}
+		for (Task task : tasks) {
+			result.addAll(task.getTaskDaySnapshotsInSprint(date, getCurrentSprint()));
 		}
-		List<Requirement> requirements = new ArrayList<Requirement>(getRequirements(tasks));
-		for (Requirement req : requirements) {
-			taskDaySnapshots.addAll(getTaskSnapshotsByUserAt(user, req));
-		}
-
-		List<BurnHours> result = getBurnedSnapshots(taskDaySnapshots);
 
 		Collections.sort(result, BurnHours.DATE_COMPARATOR);
 		return result;
@@ -197,33 +162,6 @@ public class BurnHoursWidget extends AScrumWidget {
 			burnedHours += taskDaySnapshot.getBurnedWork();
 		}
 		return burnedHours;
-	}
-
-	private List<BurnHours> getBurnedSnapshots(List<BurnHours> taskDaySnapshots) {
-
-		List<BurnHours> result = new ArrayList<BurnHours>();
-		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
-			result.add(taskDaySnapshot);
-		}
-		return result;
-	}
-
-	private List<BurnHours> getTaskSnapshotsByUserAt(User user, Requirement req) {
-
-		List<BurnHours> results = new ArrayList<BurnHours>();
-		List<Task> usersTasks = req.getUserTasks(user);
-		for (Task task : usersTasks) {
-			results.addAll(task.getTaskDaySnapshotsInSprint(date, getCurrentSprint()));
-		}
-		return results;
-	}
-
-	private Set<Requirement> getRequirements(List<Task> tasks) {
-		Set<Requirement> reqs = new HashSet<Requirement>();
-		for (Task task : tasks) {
-			reqs.add(task.getRequirement());
-		}
-		return reqs;
 	}
 
 }

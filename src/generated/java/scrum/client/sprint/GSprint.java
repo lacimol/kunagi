@@ -545,6 +545,59 @@ public abstract class GSprint
 
     }
 
+    // --- teamMembersData ---
+
+    private java.lang.String teamMembersData ;
+
+    public final java.lang.String getTeamMembersData() {
+        return this.teamMembersData ;
+    }
+
+    public final Sprint setTeamMembersData(java.lang.String teamMembersData) {
+        if (isTeamMembersData(teamMembersData)) return (Sprint)this;
+        this.teamMembersData = teamMembersData ;
+        propertyChanged("teamMembersData", this.teamMembersData);
+        return (Sprint)this;
+    }
+
+    public final boolean isTeamMembersData(java.lang.String teamMembersData) {
+        return equals(this.teamMembersData, teamMembersData);
+    }
+
+    private transient TeamMembersDataModel teamMembersDataModel;
+
+    public TeamMembersDataModel getTeamMembersDataModel() {
+        if (teamMembersDataModel == null) teamMembersDataModel = createTeamMembersDataModel();
+        return teamMembersDataModel;
+    }
+
+    protected TeamMembersDataModel createTeamMembersDataModel() { return new TeamMembersDataModel(); }
+
+    protected class TeamMembersDataModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "Sprint_teamMembersData";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getTeamMembersData();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setTeamMembersData(value);
+        }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- planningNote ---
 
     private java.lang.String planningNote ;
@@ -876,6 +929,7 @@ public abstract class GSprint
         velocity  = (java.lang.Float) props.get("velocity");
         completedRequirementsData  = (java.lang.String) props.get("completedRequirementsData");
         incompletedRequirementsData  = (java.lang.String) props.get("incompletedRequirementsData");
+        teamMembersData  = (java.lang.String) props.get("teamMembersData");
         planningNote  = (java.lang.String) props.get("planningNote");
         reviewNote  = (java.lang.String) props.get("reviewNote");
         retrospectiveNote  = (java.lang.String) props.get("retrospectiveNote");
@@ -898,6 +952,7 @@ public abstract class GSprint
         properties.put("velocity", this.velocity);
         properties.put("completedRequirementsData", this.completedRequirementsData);
         properties.put("incompletedRequirementsData", this.incompletedRequirementsData);
+        properties.put("teamMembersData", this.teamMembersData);
         properties.put("planningNote", this.planningNote);
         properties.put("reviewNote", this.reviewNote);
         properties.put("retrospectiveNote", this.retrospectiveNote);
@@ -926,6 +981,10 @@ public abstract class GSprint
 
     public final java.util.List<scrum.client.release.Release> getReleases() {
         return getDao().getReleasesBySprint((Sprint)this);
+    }
+
+    public final java.util.List<scrum.client.sprint.TeamMemberSnapshot> getTeamMemberSnapshots() {
+        return getDao().getTeamMemberSnapshotsBySprint((Sprint)this);
     }
 
     public final java.util.List<scrum.client.sprint.Task> getClosedTasksInPasts() {

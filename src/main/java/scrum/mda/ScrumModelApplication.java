@@ -525,6 +525,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			sprintModel.addProperty("velocity", Float.class);
 			sprintModel.addStringProperty("completedRequirementsData");
 			sprintModel.addStringProperty("incompletedRequirementsData");
+			sprintModel.addStringProperty("teamMembersData");
 			sprintModel
 					.addStringProperty("planningNote")
 					.setRichtext(true)
@@ -569,6 +570,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			sprintReportModel.addReference("sprint", getSprintModel()).setMaster(true).setUnique(true);
 			sprintReportModel.addSetReference("completedRequirements", getRequirementModel());
 			sprintReportModel.addSetReference("rejectedRequirements", getRequirementModel());
+			sprintReportModel.addSetReference("teamMemberStatistics", getTeamMemberSnapshotModel());
 			sprintReportModel.addListProperty("requirementsOrderIds", String.class);
 			sprintReportModel.addSetReference("closedTasks", getTaskModel());
 			sprintReportModel.addSetReference("openTasks", getTaskModel());
@@ -589,6 +591,21 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			sprintDaySnapshotModel.addProperty("burnedWorkFromDeleted", int.class);
 		}
 		return sprintDaySnapshotModel;
+	}
+
+	private EntityModel teamMemberSnapshotModel;
+
+	public EntityModel getTeamMemberSnapshotModel() {
+		if (teamMemberSnapshotModel == null) {
+			teamMemberSnapshotModel = createEntityModel("TeamMemberSnapshot", "sprint");
+			teamMemberSnapshotModel.setGwtSupport(true);
+			teamMemberSnapshotModel.addReference("sprint", getSprintModel()).setMaster(true);
+			teamMemberSnapshotModel.addReference("teamMember", getUserModel());
+			teamMemberSnapshotModel.addProperty("initialWork", int.class);
+			teamMemberSnapshotModel.addProperty("burnedWork", int.class);
+			teamMemberSnapshotModel.addProperty("efficiency", Float.class);
+		}
+		return teamMemberSnapshotModel;
 	}
 
 	private EntityModel taskModel;

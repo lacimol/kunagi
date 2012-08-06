@@ -47,6 +47,8 @@ public abstract class GSprintReportDao
         completedRequirementsCache = null;
         sprintReportsByRejectedRequirementCache.clear();
         rejectedRequirementsCache = null;
+        sprintReportsByTeamMemberStatisticCache.clear();
+        teamMemberStatisticsCache = null;
         sprintReportsByRequirementsOrderIdCache.clear();
         requirementsOrderIdsCache = null;
         sprintReportsByClosedTaskCache.clear();
@@ -182,6 +184,46 @@ public abstract class GSprintReportDao
 
         public boolean test(SprintReport e) {
             return e.containsRejectedRequirement(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - teamMemberStatistics
+    // -----------------------------------------------------------
+
+    private final Cache<scrum.server.sprint.TeamMemberSnapshot,Set<SprintReport>> sprintReportsByTeamMemberStatisticCache = new Cache<scrum.server.sprint.TeamMemberSnapshot,Set<SprintReport>>(
+            new Cache.Factory<scrum.server.sprint.TeamMemberSnapshot,Set<SprintReport>>() {
+                public Set<SprintReport> create(scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic) {
+                    return getEntities(new ContainsTeamMemberStatistic(teamMemberStatistic));
+                }
+            });
+
+    public final Set<SprintReport> getSprintReportsByTeamMemberStatistic(scrum.server.sprint.TeamMemberSnapshot teamMemberStatistic) {
+        return new HashSet<SprintReport>(sprintReportsByTeamMemberStatisticCache.get(teamMemberStatistic));
+    }
+    private Set<scrum.server.sprint.TeamMemberSnapshot> teamMemberStatisticsCache;
+
+    public final Set<scrum.server.sprint.TeamMemberSnapshot> getTeamMemberStatistics() {
+        if (teamMemberStatisticsCache == null) {
+            teamMemberStatisticsCache = new HashSet<scrum.server.sprint.TeamMemberSnapshot>();
+            for (SprintReport e : getEntities()) {
+                teamMemberStatisticsCache.addAll(e.getTeamMemberStatistics());
+            }
+        }
+        return teamMemberStatisticsCache;
+    }
+
+    private static class ContainsTeamMemberStatistic implements Predicate<SprintReport> {
+
+        private scrum.server.sprint.TeamMemberSnapshot value;
+
+        public ContainsTeamMemberStatistic(scrum.server.sprint.TeamMemberSnapshot value) {
+            this.value = value;
+        }
+
+        public boolean test(SprintReport e) {
+            return e.containsTeamMemberStatistic(value);
         }
 
     }
@@ -371,6 +413,12 @@ public abstract class GSprintReportDao
 
     public void setRequirementDao(scrum.server.project.RequirementDao requirementDao) {
         this.requirementDao = requirementDao;
+    }
+
+    scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao;
+
+    public void setTeamMemberSnapshotDao(scrum.server.sprint.TeamMemberSnapshotDao teamMemberSnapshotDao) {
+        this.teamMemberSnapshotDao = teamMemberSnapshotDao;
     }
 
     scrum.server.sprint.TaskDao taskDao;

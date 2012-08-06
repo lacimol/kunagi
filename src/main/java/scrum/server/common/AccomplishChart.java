@@ -32,7 +32,7 @@ import scrum.server.sprint.Task;
 public class AccomplishChart extends Chart {
 
 	private static final Log LOG = Log.get(AccomplishChart.class);
-	private static final String TEAM_AVG = TEAM + " avg";
+	private static final String TEAM_AVG = Sprint.TEAM + " avg";
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -56,8 +56,8 @@ public class AccomplishChart extends Chart {
 			barDataset.addValue(burnedHours, "Burned", user.getName());
 			barDataset.addValue(remainingHours, "Remaining", user.getName());
 		}
-		burnedHours = getUserBurnedHours(sprint, TEAM);
-		remainingHours = getUserRemainingHours(sprint, TEAM);
+		burnedHours = getUserBurnedHours(sprint, Sprint.TEAM);
+		remainingHours = getUserRemainingHours(sprint, Sprint.TEAM);
 		int teamAvg = (int) (burnedHours / teamMembersCount);
 		barDataset.setValue(teamAvg, "Burned", TEAM_AVG);
 		barDataset.setValue((int) (remainingHours / teamMembersCount), "Remaining", TEAM_AVG);
@@ -76,7 +76,7 @@ public class AccomplishChart extends Chart {
 		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
 
 		for (Task task : sprintTasks) {
-			if (userName.equals(TEAM) || (task.getOwner() != null && userName.equals(task.getOwner().getName()))) {
+			if (userName.equals(Sprint.TEAM) || (task.getOwner() != null && userName.equals(task.getOwner().getName()))) {
 				allBurnedHours += task.getBurnedWork();
 			}
 		}
@@ -90,7 +90,7 @@ public class AccomplishChart extends Chart {
 		List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
 
 		for (Task task : sprintTasks) {
-			if (task.getOwner() != null && (userName.equals(TEAM) || userName.equals(task.getOwner().getName()))) {
+			if (task.getOwner() != null && (userName.equals(Sprint.TEAM) || userName.equals(task.getOwner().getName()))) {
 				allRemainingHours += task.getRemainingWork();
 			}
 		}
