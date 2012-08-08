@@ -166,7 +166,7 @@ public class UserBurndownChart extends Chart {
 		double all = 0;
 		double workDays = 0;
 
-		int workingHoursPerDay = getWorkingHoursPerDay();
+		int workingHoursPerDay = Sprint.WORKING_HOURS_PER_DAY;
 		Double idealWorkingHours = (double) (userName != null ? workingHoursPerDay : workingHoursPerDay
 				* teamMembersCount);
 

@@ -63,7 +63,7 @@ public class AccomplishChart extends Chart {
 		barDataset.setValue((int) (remainingHours / teamMembersCount), "Remaining", TEAM_AVG);
 
 		JFreeChart chart = createStackedBarChart(barDataset);
-		int maxWorkHours = sprint.getLengthInWorkDays() * getWorkingHoursPerDay();
+		int maxWorkHours = sprint.getLengthInWorkDays() * Sprint.WORKING_HOURS_PER_DAY;
 		setChartMarker(chart, teamAvg, maxWorkHours);
 		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (int) (burnedHours + remainingHours)));
 		createPic(out, width, height, chart);

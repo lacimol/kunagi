@@ -66,7 +66,6 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleEdge;
 
-import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
 import scrum.server.css.ScreenCssBuilder;
 import scrum.server.sprint.Sprint;
@@ -111,12 +110,6 @@ public abstract class Chart {
 		userColors.put("darkgray", Color.DARK_GRAY);
 		userColors.put("orange", Color.ORANGE);
 		userColors.put("green", Color.GREEN);
-	}
-
-	public int getWorkingHoursPerDay() {
-		// default is 7 hours/day/user
-		Integer hours = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
-		return hours == null ? 7 : hours;
 	}
 
 	public static JFreeChart createXYLineChart(Date firstDay, Date lastDay, int dateMarkTickUnit, float widthPerDay,

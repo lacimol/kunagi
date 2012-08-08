@@ -948,8 +948,50 @@ public class Project extends GProject {
 		req.setDescription("This is still an epic. Nothing to see, really.");
 		reqOrder.add(req);
 
-		addRandomTestRequirements(reqOrder);
+		// Statistics
+		req = requirementDao.postRequirement(this, "Statistics", 3f);
+		req.addTheme("Dev");
+		req.setDescription("Creating statistics page.");
+		reqOrder.add(req);
+		req.setSprint(getCurrentSprint());
+		taskDao.postTask(req, "Project statistics", Utl.randomInt(5, 15));
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Sprint statistics", 10);
+		}
+		taskDao.postTask(req, "User statistics", Utl.randomInt(5, 15));
+		taskDao.postTask(req, "My statistics", 10);
+		taskDao.postTask(req, "Team statistics", 10);
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Task statistics", 10);
+		}
+
+		// Refactor
+		req = requirementDao.postRequirement(this, "Refactor", 3f);
+		req.addTheme("Dev");
+		req.addTheme("Refactor");
+		req.setDescription("Refactoring statistics page.");
+		reqOrder.add(req);
+		req.setSprint(getCurrentSprint());
+		taskDao.postTask(req, "New class creation", 10);
+		taskDao.postTask(req, "Task statistics max size", Utl.randomInt(5, 15));
+		if (Utl.randomBoolean()) {
+			taskDao.postTask(req, "Shared class creation", 5);
+			taskDao.postTask(req, "Task statistics average size", Utl.randomInt(5, 15));
+		}
+
+		addRandomTestRequirements(reqOrder, 10);
 		updateRequirementsOrder(reqOrder);
+	}
+
+	public void addRandomTestRequirements(List<Requirement> reqOrder, int number) {
+		for (int x = 0; x < number; x++) {
+			addRandomTestRequirements(reqOrder);
+		}
+	}
+
+	public User getRandomTeamMember() {
+		if (getTeamMembers().size() == 0) return null;
+		return (User) getTeamMembers().toArray()[Utl.randomInt(0, getTeamMembers().size() - 1)];
 	}
 
 	public void addRandomTestRequirements(List<Requirement> reqOrder) {
@@ -965,38 +1007,12 @@ public class Project extends GProject {
 		taskDao.postTask(req, "Creation", Utl.randomInt(5, 15));
 		if (Utl.randomBoolean()) {
 			taskDao.postTask(req, "Modify", Utl.randomInt(5, 15));
+			taskDao.postTask(req, "Refactor", Utl.randomInt(5, 15));
 		}
 		if (Utl.randomBoolean()) {
 			taskDao.postTask(req, "Deletion", Utl.randomInt(5, 15));
 		}
-
-		// Statistics
-		req = requirementDao.postRequirement(this, "Statistics", 3f);
-		req.addTheme("Dev");
-		req.setDescription("Creating statistics page.");
-		reqOrder.add(req);
-		req.setSprint(getCurrentSprint());
-		taskDao.postTask(req, "Project statistics", Utl.randomInt(5, 15));
-		if (Utl.randomBoolean()) {
-			taskDao.postTask(req, "Sprint statistics", 10);
-		}
-		taskDao.postTask(req, "User statistics", Utl.randomInt(5, 15));
-		taskDao.postTask(req, "My statistics", 10);
-		if (Utl.randomBoolean()) {
-			taskDao.postTask(req, "Task statistics", 10);
-		}
-
-		// Refactor
-		if (Utl.randomBoolean()) {
-			req = requirementDao.postRequirement(this, "Refactor", 3f);
-			req.addTheme("Dev");
-			req.addTheme("Refactor");
-			req.setDescription("Refactoring statistics page.");
-			reqOrder.add(req);
-			req.setSprint(getCurrentSprint());
-			taskDao.postTask(req, "Shared class creation", 5);
-			taskDao.postTask(req, "Task statistics average size", Utl.randomInt(5, 15));
-		}
+		taskDao.postTask(req, "Test", Utl.randomInt(5, 15));
 
 	}
 
@@ -1012,7 +1028,7 @@ public class Project extends GProject {
 	}
 
 	public void addTestSprints() {
-		//sprintDao.createTestHistorySprint(this, Date.beforeDays(45), Date.beforeDays(15));
+		// sprintDao.createTestHistorySprint(this, Date.beforeDays(45), Date.beforeDays(15));
 		sprintDao.createTestFormerSprints(this);
 		sprintDao.createTestSprint(this);
 	}

@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import scrum.server.admin.User;
 import scrum.server.admin.UserDao;
+import scrum.server.sprint.Sprint;
 
 public class ProjectDao extends GProjectDao {
 
@@ -108,7 +109,8 @@ public class ProjectDao extends GProjectDao {
 		project.addTestSimpleEvents();
 		project.addTestReleases();
 
-		project.getCurrentSprint().burndownTasksRandomly(Date.beforeDays(15), Date.today().addDays(-1));
+		Sprint currentSprint = project.getCurrentSprint();
+		currentSprint.burndownTasksRandomly(currentSprint.getBegin(), Date.today());
 
 		po.setCurrentProject(project);
 

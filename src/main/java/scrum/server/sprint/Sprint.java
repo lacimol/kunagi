@@ -33,6 +33,7 @@ import java.util.Set;
 
 import scrum.client.common.WeekdaySelector;
 import scrum.client.journal.Change;
+import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
 import scrum.server.common.BurndownSnapshot;
 import scrum.server.common.Numbered;
@@ -48,6 +49,15 @@ public class Sprint extends GSprint implements Numbered {
 	private static final Log log = Log.get(Sprint.class);
 
 	public static final String TEAM = "team";
+
+	public static int WORKING_HOURS_PER_DAY = 7;
+	static {
+		// default is 7 hours/day/user
+		Integer hours = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
+		if (hours != null) {
+			WORKING_HOURS_PER_DAY = hours;
+		}
+	}
 
 	// --- dependencies ---
 
@@ -369,41 +379,52 @@ public class Sprint extends GSprint implements Numbered {
 	}
 
 	public void burndownTasksRandomly(Date begin, Date end) {
+
 		int days = getBegin().getPeriodTo(getEnd()).toDays();
-		days -= (days / 7) * 2;
-		int defaultWorkPerDay = getRemainingWork() / days;
+		int totalRemaining = getRemainingWork();
+		int defaultWorkPerDay = totalRemaining / days;
 		Set<User> teamMembers = getProject().getTeamMembers();
+		ArrayList<User> team = new ArrayList<User>(teamMembers);
 
 		getDaySnapshot(begin).updateWithCurrentSprint();
-		begin = begin.nextDay();
-		while (begin.isBefore(end)) {
-			if (!begin.getWeekday().isWeekend()) {
-				int toBurn = Utl.randomInt(0, defaultWorkPerDay + (defaultWorkPerDay * 2));
-				int totalRemaining = getRemainingWork();
-				for (Task task : getTasks()) {
-					if (toBurn == 0) break;
-					int remaining = task.getRemainingWork();
-					task.setInitialWork(remaining + Utl.randomInt(0, defaultWorkPerDay));
-					int burn = Math.min(toBurn, remaining);
-					remaining -= burn;
-					toBurn -= burn;
-					task.setBurnedWork(task.getBurnedWork() + burn);
-					if (Utl.randomInt(1, 10) == 1) {
-						remaining += Utl.randomInt(-defaultWorkPerDay * 2, defaultWorkPerDay * 3);
+
+		Date currentDay = begin.nextDay();
+		while (currentDay.isBeforeOrSame(end) && currentDay.isBeforeOrSame(getEnd())) {
+			if (!currentDay.getWeekday().isWeekend()) {
+				int toBurnPerDay = Utl.randomInt(0, defaultWorkPerDay * 2);
+				totalRemaining = getRemainingWork();
+				if (totalRemaining > 0) {
+					int userIndex = 0;
+					Collections.shuffle(team);
+					for (Task task : getTasks()) {
+						if (userIndex >= team.size()) {
+							break;
+						}
+
+						if (toBurnPerDay == 0) break;
+						int remaining = task.getRemainingWork();
+						if (remaining > 0) {
+							// claim
+							if (task.getOwner() == null) {
+								// random efficiency
+								int factor = remaining / 3;
+								task.setInitialWork(remaining + Utl.randomInt(-factor, factor));
+								task.setOwner(team.get(userIndex));
+							}
+							// burn
+							int burn = Math.min(WORKING_HOURS_PER_DAY, remaining);
+							task.addBurn(burn);
+							task.setRemainingWork(remaining - burn);
+							userIndex++;
+							toBurnPerDay -= burn;
+						}
+						task.getDaySnapshot(currentDay).updateWithCurrentTask();
+
 					}
-					if (totalRemaining == 0) {
-						remaining += Utl.randomInt(defaultWorkPerDay * 3, defaultWorkPerDay * 5);
-						totalRemaining = remaining;
-					}
-					task.setRemainingWork(remaining);
-					if (task.getOwner() == null && teamMembers.size() > 0) {
-						task.setOwner((User) teamMembers.toArray()[Utl.randomInt(0, teamMembers.size() - 1)]);
-					}
-					task.getDaySnapshot(begin).updateWithCurrentTask();
 				}
 			}
-			getDaySnapshot(begin).updateWithCurrentSprint();
-			begin = begin.nextDay();
+			getDaySnapshot(currentDay).updateWithCurrentSprint();
+			currentDay = currentDay.nextDay();
 		}
 	}
 

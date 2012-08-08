@@ -19,9 +19,9 @@ import ilarkesto.base.Utl;
 import ilarkesto.base.time.Date;
 import ilarkesto.core.scope.In;
 import ilarkesto.fp.Predicate;
-import java.util.Set;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import scrum.server.project.Project;
 import scrum.server.project.Requirement;
@@ -55,8 +55,8 @@ public class SprintDao extends GSprintDao {
 	// --- test data ---
 
 	public Sprint createTestSprint(Project project) {
-		Date begin = Date.beforeDays(15);
-		Date end = Date.inDays(15);
+		Date begin = Date.beforeDays(10);
+		Date end = Date.inDays(10);
 
 		Sprint sprint = newEntityInstance();
 		sprint.setProject(project);
@@ -105,7 +105,9 @@ public class SprintDao extends GSprintDao {
 		sprint.setBegin(begin);
 		sprint.setEnd(end);
 		sprint.setGoal("Sprint from " + sprint.getBegin() + " to " + sprint.getEnd());
-		if (end.isPast()) sprint.setVelocity(Float.valueOf(Utl.randomInt(10, 100)));
+		if (end.isPast()) {
+			sprint.setVelocity(Float.valueOf(Utl.randomInt(10, 100)));
+		}
 		saveEntity(sprint);
 
 		return sprint;
@@ -113,13 +115,29 @@ public class SprintDao extends GSprintDao {
 
 	public void createTestFormerSprints(Project project) {
 		Set<Sprint> sprints = project.getSprints();
-		sprints.add(createTestSprint(project, Date.today().addDays(-20), Date.today().addDays(-15), 3));
-		sprints.add(createTestSprint(project, Date.today().addDays(-30), Date.today().addDays(-20), 2));
-		sprints.add(createTestSprint(project, Date.today().addDays(-43), Date.today().addDays(-30), 1));
+		Date today = Date.today();
+		sprints.add(createTestSprint(project, today.addDays(-20), today.addDays(-11), 6));
+		sprints.add(createTestSprint(project, today.addDays(-30), today.addDays(-20), 5));
+		sprints.add(createTestSprint(project, today.addDays(-43), today.addDays(-30), 4));
+		sprints.add(createTestSprint(project, today.addDays(-50), today.addDays(-43), 3));
+		sprints.add(createTestSprint(project, today.addDays(-60), today.addDays(-50), 2));
+		sprints.add(createTestSprint(project, today.addDays(-68), today.addDays(-60), 1));
+
 		for (Sprint sprint : sprints) {
 			project.setCurrentSprint(sprint);
 			project.addTestRequirements();
+			// burn
 			sprint.burndownTasksRandomly(sprint.getBegin(), sprint.getEnd());
+			// close req
+			for (Task task : sprint.getTasks()) {
+				if (task.getRemainingWork() <= 0) {
+					task.getRequirement().setClosed(true);
+				}
+			}
+
+			if (sprint.getEnd().isPast()) {
+				sprint.close();
+			}
 			saveEntity(sprint);
 		}
 	}

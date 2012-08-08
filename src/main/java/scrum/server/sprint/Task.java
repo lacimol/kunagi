@@ -136,4 +136,8 @@ public class Task extends GTask implements Numbered, ReferenceSupport, LabelSupp
 		return (getOwner() != null && userName.equals(getOwner().getName()));
 	}
 
+	public void addBurn(int burned) {
+		setBurnedWork(getBurnedWork() + burned);
+	}
+
 }
