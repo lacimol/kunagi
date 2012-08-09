@@ -56,6 +56,7 @@ import scrum.server.admin.UserDao;
 import scrum.server.common.AccomplishChart;
 import scrum.server.common.BurndownChart;
 import scrum.server.common.EfficiencyChart;
+import scrum.server.common.ProjectEfficiencyChart;
 import scrum.server.common.SprintRangeChart;
 import scrum.server.common.SprintWorkChart;
 import scrum.server.common.StoryThemeChart;
@@ -85,6 +86,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private SprintRangeChart sprintRangeChart;
 	private AccomplishChart accomplishChart;
 	private StoryThemeChart storyThemeChart;
+	private ProjectEfficiencyChart projectEfficiencyChart;
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
 	private SystemMessage systemMessage;
@@ -107,21 +109,18 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public BurndownChart getBurndownChart() {
 		if (burndownChart == null) {
 			burndownChart = new BurndownChart();
-			burndownChart.setSprintDao(getSprintDao());
 		}
 		return burndownChart;
 	}
 
 	public UserBurndownChart getUserBurndownChart() {
 		UserBurndownChart userBurndownChart = new UserBurndownChart();
-		userBurndownChart.setSprintDao(getSprintDao());
 		return userBurndownChart;
 	}
 
 	public AccomplishChart getAccomplishChart() {
 		if (accomplishChart == null) {
 			accomplishChart = new AccomplishChart();
-			accomplishChart.setSprintDao(getSprintDao());
 		}
 		return accomplishChart;
 	}
@@ -129,7 +128,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public EfficiencyChart getEfficiencyChart() {
 		if (efficiencyChart == null) {
 			efficiencyChart = new EfficiencyChart();
-			efficiencyChart.setSprintDao(getSprintDao());
 		}
 		return efficiencyChart;
 	}
@@ -137,7 +135,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public VelocityChart getVelocityChart() {
 		if (velocityChart == null) {
 			velocityChart = new VelocityChart();
-			velocityChart.setSprintDao(getSprintDao());
 		}
 		return velocityChart;
 	}
@@ -145,7 +142,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public SprintWorkChart getSprintWorkChart() {
 		if (sprintWorkChart == null) {
 			sprintWorkChart = new SprintWorkChart();
-			sprintWorkChart.setSprintDao(getSprintDao());
 		}
 		return sprintWorkChart;
 	}
@@ -153,29 +149,32 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	public SprintRangeChart getSprintRangeChart() {
 		if (sprintRangeChart == null) {
 			sprintRangeChart = new SprintRangeChart(12);
-			sprintRangeChart.setSprintDao(getSprintDao());
 		}
 		return sprintRangeChart;
 	}
 
 	public SprintRangeChart getCurrentSprintRangeChart() {
 		SprintRangeChart sprintRangeChart = new SprintRangeChart(3);
-		sprintRangeChart.setSprintDao(getSprintDao());
 		return sprintRangeChart;
 	}
 
 	public TaskRangeChart getTaskRangeChart() {
 		TaskRangeChart taskRangeChart = new TaskRangeChart();
-		taskRangeChart.setSprintDao(getSprintDao());
 		return taskRangeChart;
 	}
 
 	public StoryThemeChart getStoryThemeChart() {
 		if (storyThemeChart == null) {
 			storyThemeChart = new StoryThemeChart();
-			storyThemeChart.setSprintDao(getSprintDao());
 		}
 		return storyThemeChart;
+	}
+
+	public ProjectEfficiencyChart getProjectEfficiencyChart() {
+		if (projectEfficiencyChart == null) {
+			projectEfficiencyChart = new ProjectEfficiencyChart();
+		}
+		return projectEfficiencyChart;
 	}
 
 	public SystemConfig getSystemConfig() {

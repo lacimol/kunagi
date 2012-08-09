@@ -133,6 +133,10 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		return getChartUrl(width, height) + "&chart=efficiencyChart";
 	}
 
+	public String getProjectEfficiencyChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=projectEffiChart";
+	}
+
 	public String getAccomplishChartUrl(int width, int height) {
 		return getChartUrl(width, height) + "&chart=accomplishChart";
 	}
@@ -516,5 +520,11 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 			count++;
 		}
 		return lastWorkDay;
+	}
+
+	public boolean hasTeamMemberStat() {
+		boolean hasRight = getProject().isScrumMaster(Scope.get().getComponent(Auth.class).getUser());
+		boolean hasStat = getSprintReport() != null && !getSprintReport().getTeamMemberStatistics().isEmpty();
+		return hasRight && hasStat;
 	}
 }

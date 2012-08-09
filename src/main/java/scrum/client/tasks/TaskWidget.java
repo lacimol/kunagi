@@ -26,6 +26,7 @@ import java.util.Map;
 import scrum.client.ScrumGwt;
 import scrum.client.collaboration.CommentsWidget;
 import scrum.client.common.AScrumWidget;
+import scrum.client.common.SimpleValueWidget;
 import scrum.client.impediments.Impediment;
 import scrum.client.journal.ChangeHistoryWidget;
 import scrum.client.sprint.Task;

@@ -75,35 +75,39 @@ public class RequirementWidget extends AScrumWidget {
 		left.addFieldRow("Description", requirement.getDescriptionModel());
 		left.addFieldRow("Themes", new ThemesWidget(requirement));
 
-		left.addFieldRow("Qualities", new AMultiSelectionViewEditWidget<Quality>() {
+		if (requirement.isEditable() || !requirement.getQualitys().isEmpty()) {
+			left.addFieldRow("Qualities", new AMultiSelectionViewEditWidget<Quality>() {
 
-			@Override
-			protected void onViewerUpdate() {
-				List<Quality> qualitys = new ArrayList<Quality>(requirement.getQualitys());
-				Collections.sort(qualitys);
-				setViewerItemsAsHtml(qualitys);
-			}
+				@Override
+				protected void onViewerUpdate() {
+					List<Quality> qualitys = new ArrayList<Quality>(requirement.getQualitys());
+					Collections.sort(qualitys);
+					setViewerItemsAsHtml(qualitys);
+				}
 
-			@Override
-			protected void onEditorUpdate() {
-				List<Quality> qualitys = new ArrayList<Quality>(requirement.getProject().getQualitys());
-				Collections.sort(qualitys);
-				setEditorItems(qualitys);
-				setEditorSelectedItems(requirement.getQualitys());
-			}
+				@Override
+				protected void onEditorUpdate() {
+					List<Quality> qualitys = new ArrayList<Quality>(requirement.getProject().getQualitys());
+					Collections.sort(qualitys);
+					setEditorItems(qualitys);
+					setEditorSelectedItems(requirement.getQualitys());
+				}
 
-			@Override
-			protected void onEditorSubmit() {
-				requirement.setQualitys(getEditorSelectedItems());
-			}
+				@Override
+				protected void onEditorSubmit() {
+					requirement.setQualitys(getEditorSelectedItems());
+				}
 
-			@Override
-			public boolean isEditable() {
-				return requirement.isEditable();
-			}
-		});
+				@Override
+				public boolean isEditable() {
+					return requirement.isEditable();
+				}
+			});
+		}
 
-		left.addFieldRow("Test", requirement.getTestDescriptionModel());
+		if (requirement.isEditable() || requirement.getTestDescription() != null) {
+			left.addFieldRow("Test", requirement.getTestDescriptionModel());
+		}
 
 		left.addFieldRow("Estimated work", new RequirementEstimatedWorkWidget(requirement));
 
@@ -125,21 +129,23 @@ public class RequirementWidget extends AScrumWidget {
 			}
 		});
 
-		left.addFieldRow("Related Stories", new AOutputViewEditWidget() {
+		if (requirement.isEditable()) {
+			left.addFieldRow("Related Stories", new AOutputViewEditWidget() {
 
-			@Override
-			protected void onViewerUpdate() {
-				setViewer(ScrumGwt.createToHtmlItemsWidget(requirement.getRelatedRequirements()));
-			}
-		});
+				@Override
+				protected void onViewerUpdate() {
+					setViewer(ScrumGwt.createToHtmlItemsWidget(requirement.getRelatedRequirements()));
+				}
+			});
 
-		left.addFieldRow("Related Issues", new AOutputViewEditWidget() {
+			left.addFieldRow("Related Issues", new AOutputViewEditWidget() {
 
-			@Override
-			protected void onViewerUpdate() {
-				setViewer(ScrumGwt.createToHtmlItemsWidget(requirement.getRelatedIssues()));
-			}
-		});
+				@Override
+				protected void onViewerUpdate() {
+					setViewer(ScrumGwt.createToHtmlItemsWidget(requirement.getRelatedIssues()));
+				}
+			});
+		}
 
 		if (showChangeHistory) left.addRow(new ChangeHistoryWidget(requirement), 2);
 

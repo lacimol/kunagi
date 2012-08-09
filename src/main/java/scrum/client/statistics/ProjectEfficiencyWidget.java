@@ -13,19 +13,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package scrum.client.sprint;
+package scrum.client.statistics;
 
-import java.util.Map;
+import scrum.client.sprint.Sprint;
 
-public class TeamMemberSnapshot extends GTeamMemberSnapshot implements Comparable<TeamMemberSnapshot> {
+public class ProjectEfficiencyWidget extends TwoThirdsChartWidget {
 
-	public TeamMemberSnapshot(Map data) {
-		super(data);
+	Sprint sprint = null;
+
+	public ProjectEfficiencyWidget() {
+		sprint = getCurrentSprint();
+	}
+
+	public ProjectEfficiencyWidget(Sprint sprint) {
+		this.sprint = sprint;
 	}
 
 	@Override
-	public int compareTo(TeamMemberSnapshot o) {
-		return this.getTeamMember().getName().compareTo(o.getTeamMember().getName());
+	String getChartUrl(int width) {
+		return sprint.getProjectEfficiencyChartUrl(width, TEAM_CHART_HEIGHT);
 	}
 
 }

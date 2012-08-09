@@ -481,27 +481,48 @@ public class Sprint extends GSprint implements Numbered {
 		Float efficiency = 0.00f;
 		Integer allBurnedHours = 0;
 		Integer initialBurnableHours = 0;
-		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
-		List<Task> sprintTasks = new LinkedList<Task>(this.getTasks());
 		int initialWork = 0;
 
-		for (Task task : sprintTasks) {
-			if ((userName.equals(TEAM) || task.isOwnersTask(userName)) && task.isClosed()) {
-				allBurnedHours += task.getBurnedWork();
-				initialWork = task.getInitialWork();
-				initialBurnableHours += initialWork == 0 ? task.getBurnedWork() : initialWork;
+		SprintReport sprintReport = getSprintReport();
+		if (sprintReport != null && isClosed()) {
+			// sprint history
+			for (TeamMemberSnapshot snapshot : sprintReport.getTeamMemberStatistics()) {
+				String teamMember = snapshot.getTeamMember().getName();
+				log.info(teamMember + "'s stored efficiency: " + snapshot.getEfficiency());
+				if (TEAM.equals(userName) || userName.equals(teamMember)) {
+					allBurnedHours += snapshot.getBurnedWork();
+					initialWork = snapshot.getInitialWork();
+					initialBurnableHours += initialWork == 0 ? snapshot.getBurnedWork() : initialWork;
+				}
 			}
+
+		} else {
+
+			List<Task> sprintTasks = new LinkedList<Task>(this.getTasks());
+			for (Task task : sprintTasks) {
+				if ((TEAM.equals(userName) || task.isOwnersTask(userName)) && task.isClosed()) {
+					allBurnedHours += task.getBurnedWork();
+					initialWork = task.getInitialWork();
+					initialBurnableHours += initialWork == 0 ? task.getBurnedWork() : initialWork;
+				}
+			}
+
 		}
+
 		if (allBurnedHours > 0 && initialBurnableHours > 0) {
 			efficiency = initialBurnableHours.floatValue() / allBurnedHours.floatValue();
 		}
-		log.debug(userName + "'s UserEfficiency: " + efficiency + "(" + initialBurnableHours + "/" + allBurnedHours
-				+ ")");
+
 		result.setEfficiency(BigDecimal.valueOf(efficiency).setScale(2, RoundingMode.HALF_UP).floatValue());
 		result.setAllBurnedHours(allBurnedHours);
 		result.setInitialBurnableHours(initialBurnableHours);
 		result.setBurnedHoursPerInitial(" (" + initialBurnableHours + "/" + allBurnedHours + ")");
+		log.debug(userName + "'s UserEfficiency: " + efficiency + result.getBurnedHoursPerInitial());
 		return result;
+	}
+
+	public boolean isClosed() {
+		return getVelocity() != null;
 	}
 
 }

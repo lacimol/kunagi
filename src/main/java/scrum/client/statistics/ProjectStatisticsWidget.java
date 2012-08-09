@@ -42,20 +42,16 @@ public class ProjectStatisticsWidget extends AScrumWidget {
 		currentSprintRange.addHeader("Current sprint range");
 		currentSprintRange.addSection(new CurrentSprintRangeWidget());
 
-		PagePanel sprintWorkText = new PagePanel();
-		sprintWorkText.addHeader("Sprint details");
-		sprintWorkText.addSection(new SprintWorkTextWidget());
+		PagePanel projectEfficiency = new PagePanel();
+		projectEfficiency.addHeader("Project team member's avg efficiency");
+		projectEfficiency.addSection(new ProjectEfficiencyWidget());
 
-		// TODO more stats
-		// Widget upper = TableBuilder.column(5, sprintRange, currentSprintRange);
-		// Widget left = TableBuilder.column(5, velocity);
-		// Widget right = TableBuilder.column(5, sprintWork);
-		// Widget lower = TableBuilder.row(5, left, right);
-		//
-		// return TableBuilder.column(5, upper, lower);
+		PagePanel sprintDetails = new PagePanel();
+		sprintDetails.addHeader("Sprint details");
+		sprintDetails.addSection(new SprintWorkTextWidget());
 
-		Widget left = TableBuilder.column(5, sprintRange, currentSprintRange, velocity, sprintWork);
-		Widget right = TableBuilder.column(5, sprintWorkText);
+		Widget left = TableBuilder.column(5, sprintRange, currentSprintRange, velocity, projectEfficiency, sprintWork);
+		Widget right = TableBuilder.column(5, sprintDetails);
 
 		return TableBuilder.row(5, left, right);
 	}

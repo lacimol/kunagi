@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package scrum.client.tasks;
+package scrum.client.common;
 
 import ilarkesto.gwt.client.AFieldValueWidget;
 
@@ -20,7 +20,7 @@ public class SimpleValueWidget extends AFieldValueWidget {
 
 	private Object text;
 
-	SimpleValueWidget(Object value) {
+	public SimpleValueWidget(Object value) {
 		text = value;
 	}
 

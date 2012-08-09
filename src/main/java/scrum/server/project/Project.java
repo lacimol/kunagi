@@ -26,6 +26,8 @@ import ilarkesto.rss.Rss20Builder;
 import ilarkesto.search.Searchable;
 
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,6 +63,8 @@ import scrum.server.sprint.SprintReport;
 import scrum.server.sprint.SprintReportDao;
 import scrum.server.sprint.Task;
 import scrum.server.sprint.TaskDao;
+import scrum.server.sprint.TeamMemberSnapshot;
+import scrum.server.sprint.UserEfficiency;
 import scrum.server.task.TaskDaySnapshot;
 
 public class Project extends GProject {
@@ -117,6 +121,17 @@ public class Project extends GProject {
 
 	public Set<SprintReport> getSprintReports() {
 		return sprintReportDao.getSprintReportsByProject(this);
+	}
+
+	public Set<TeamMemberSnapshot> getTeamMemberSnapshots() {
+
+		Set<TeamMemberSnapshot> snapshots = new HashSet<TeamMemberSnapshot>();
+		Set<SprintReport> reports = getSprintReports();
+		Iterator<SprintReport> iterator = reports.iterator();
+		while (iterator.hasNext()) {
+			snapshots.addAll(iterator.next().getTeamMemberStatistics());
+		}
+		return snapshots;
 	}
 
 	public void moveRequirementToTop(Requirement requirement) {
@@ -979,13 +994,13 @@ public class Project extends GProject {
 			taskDao.postTask(req, "Task statistics average size", Utl.randomInt(5, 15));
 		}
 
-		addRandomTestRequirements(reqOrder, 10);
+		addSomeRandomTestRequirements(reqOrder, 10);
 		updateRequirementsOrder(reqOrder);
 	}
 
-	public void addRandomTestRequirements(List<Requirement> reqOrder, int number) {
-		for (int x = 0; x < number; x++) {
-			addRandomTestRequirements(reqOrder);
+	public void addSomeRandomTestRequirements(List<Requirement> reqOrder, int number) {
+		for (int x = 1; x <= number; x++) {
+			addRandomTestRequirements(reqOrder, x);
 		}
 	}
 
@@ -994,11 +1009,11 @@ public class Project extends GProject {
 		return (User) getTeamMembers().toArray()[Utl.randomInt(0, getTeamMembers().size() - 1)];
 	}
 
-	public void addRandomTestRequirements(List<Requirement> reqOrder) {
+	public void addRandomTestRequirements(List<Requirement> reqOrder, int number) {
 
 		Requirement req = null;
 		// Random feature
-		req = requirementDao.postRequirement(this, "Random requirement", 2f);
+		req = requirementDao.postRequirement(this, "Random requirement " + number, 2f);
 		req.addTheme("Dev");
 		req.setDescription("Changing project statistics output values.");
 		reqOrder.add(req);
@@ -1070,6 +1085,36 @@ public class Project extends GProject {
 		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
 		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
 		return sprints.size() > 2 ? sprints.get(2) : null;
+	}
+
+	public UserEfficiency getTeamEfficiency() {
+		return getUserEfficiency(Sprint.TEAM);
+	}
+
+	public UserEfficiency getUserEfficiency(String userName) {
+
+		List<Sprint> sprints = getFormerSprints(100);
+		UserEfficiency result = new UserEfficiency();
+		Float efficiency = 0.00f;
+		Integer allBurnedHours = 0;
+		Integer initialBurnableHours = 0;
+
+		for (Sprint sprint : sprints) {
+			UserEfficiency currentEfficiency = sprint.getUserEfficiency(userName);
+			allBurnedHours += currentEfficiency.getAllBurnedHours();
+			initialBurnableHours += currentEfficiency.getInitialBurnableHours();
+		}
+
+		if (allBurnedHours > 0 && initialBurnableHours > 0) {
+			efficiency = initialBurnableHours.floatValue() / allBurnedHours.floatValue();
+		}
+
+		result.setEfficiency(BigDecimal.valueOf(efficiency).setScale(2, RoundingMode.HALF_UP).floatValue());
+		result.setAllBurnedHours(allBurnedHours);
+		result.setInitialBurnableHours(initialBurnableHours);
+		result.setBurnedHoursPerInitial(" (" + initialBurnableHours + "/" + allBurnedHours + ")");
+
+		return result;
 	}
 
 }

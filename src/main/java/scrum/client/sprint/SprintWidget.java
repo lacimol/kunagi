@@ -17,10 +17,17 @@ package scrum.client.sprint;
 import ilarkesto.gwt.client.AFieldValueWidget;
 import ilarkesto.gwt.client.TableBuilder;
 import ilarkesto.gwt.client.editor.RichtextEditorWidget;
-import ilarkesto.gwt.client.editor.TextOutputWidget;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import scrum.client.ScrumGwt;
 import scrum.client.common.AScrumWidget;
+import scrum.client.common.SimpleValueWidget;
+import scrum.client.sprint.SprintHistoryHelper.StoryInfo;
 
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Widget;
 
 public class SprintWidget extends AScrumWidget {
@@ -41,20 +48,24 @@ public class SprintWidget extends AScrumWidget {
 
 		int cols = 6;
 		if (!completed) tb.addFieldRow("Label", sprint.getLabelModel(), cols - 1);
-		tb.addFieldRow("Goal", new RichtextEditorWidget(sprint.getGoalModel()), cols - 1);
-		tb.addFieldRow("Releases", new AFieldValueWidget() {
+		if (!completed || sprint.getGoal() != null) {
+			tb.addFieldRow("Goal", new RichtextEditorWidget(sprint.getGoalModel()), cols - 1);
+		}
+		if (!completed || (sprint.getReleases() != null && !sprint.getReleases().isEmpty())) {
+			tb.addFieldRow("Releases", new AFieldValueWidget() {
 
-			@Override
-			protected void onUpdate() {
-				setContent(ScrumGwt.createToHtmlItemsWidget(sprint.getReleases()));
-			}
-		});
-
-		if (completed) {
-			tb.addFieldRow("Velocity", new TextOutputWidget(sprint.getVelocityModel()), cols - 1);
+				@Override
+				protected void onUpdate() {
+					setContent(ScrumGwt.createToHtmlItemsWidget(sprint.getReleases()));
+				}
+			});
 		}
 
-		tb.addField("Begin", sprint.getBeginModel());
+		if (completed) {
+			tb.addFieldRow("Velocity", new SimpleValueWidget(sprint.getVelocity()), cols - 1);
+		}
+
+		tb.addField("Begin", sprint.getNumberModel());
 		tb.addField("Length", sprint.getLengthInDaysModel());
 		tb.addFieldRow("End", sprint.getEndModel());
 
@@ -94,17 +105,49 @@ public class SprintWidget extends AScrumWidget {
 			tb.nextRow();
 		} else {
 			// completed
+			List<StoryInfo> stories = SprintHistoryHelper.parseRequirementsAndTasks(sprint
+					.getCompletedRequirementsData());
 			if (sprint.getSprintReport() == null) {
-				tb.addFieldRow("Completed Stories", new RichtextEditorWidget(getSprint()
-						.getCompletedRequirementLabelsModel()), cols - 1);
+				if (!stories.isEmpty()) {
+					tb.addFieldRow("Completed Stories", new RichtextEditorWidget(getSprint()
+							.getCompletedRequirementLabelsModel()), cols - 1);
+				}
 			}
 		}
 
-		tb.addFieldRow("Planning Note", new RichtextEditorWidget(sprint.getPlanningNoteModel()), cols - 1);
-		tb.addFieldRow("Review Note", new RichtextEditorWidget(sprint.getReviewNoteModel()), cols - 1);
-		tb.addFieldRow("Retrospective Note", new RichtextEditorWidget(sprint.getRetrospectiveNoteModel()), cols - 1);
+		if (!completed || sprint.getPlanningNote() != null) {
+			tb.addFieldRow("Planning Note", new RichtextEditorWidget(sprint.getPlanningNoteModel()), cols - 1);
+		}
+		if (!completed || sprint.getReviewNote() != null) {
+			tb.addFieldRow("Review Note", new RichtextEditorWidget(sprint.getReviewNoteModel()), cols - 1);
+		}
+		if (!completed || sprint.getRetrospectiveNote() != null) {
+			tb.addFieldRow("Retrospective Note", new RichtextEditorWidget(sprint.getRetrospectiveNoteModel()), cols - 1);
+		}
 
-		return TableBuilder.row(10, tb.createTable(), ScrumGwt.createEmoticonsAndComments(sprint));
+		Widget up = TableBuilder.row(10, tb.createTable(), ScrumGwt.createEmoticonsAndComments(sprint));
+		if (sprint.hasTeamMemberStat()) {
+			// new EfficiencyWidget(sprint)
+			return TableBuilder.column(10, up, createTeamMemberStatTable());
+		}
+		return up;
+
+	}
+
+	private FlexTable createTeamMemberStatTable() {
+
+		TableBuilder teamMemberStats = ScrumGwt.createFieldTable();
+		List<TeamMemberSnapshot> teamMemberStatistics = new ArrayList<TeamMemberSnapshot>(sprint.getSprintReport()
+				.getTeamMemberStatistics());
+		Collections.sort(teamMemberStatistics);
+		for (final TeamMemberSnapshot snapshot : teamMemberStatistics) {
+			String name = snapshot.getTeamMember().getName();
+			int efficiency = (int) (snapshot.getEfficiency() * 100);
+			teamMemberStats.addField(name, new SimpleValueWidget(efficiency + "%"));
+
+		}
+		return teamMemberStats.createTable();
+
 	}
 
 	public Sprint getSprint() {

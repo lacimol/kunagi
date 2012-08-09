@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class SprintHistoryWidget extends AScrumWidget {
 
-	private static final int MAX_SPRINTS_IN_HISTORY_VIEW = 3;
+	private static final int MAX_SPRINTS_IN_HISTORY_VIEW = 100;
 	private Map<Sprint, SprintHistorySprintWidget> sprintWidgets = new HashMap<Sprint, SprintHistorySprintWidget>();
 	private ChangeIndicator changeIndicator = new ChangeIndicator();
 	private PagePanel page = new PagePanel();

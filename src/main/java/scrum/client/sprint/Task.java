@@ -131,7 +131,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 	}
 
 	public String getOwnerName() {
-		return getOwner() == null ? "Not claimed yet" : getOwner().getName();
+		return getOwner() == null ? "" : getOwner().getName();
 	}
 
 	public String getWorkText() {

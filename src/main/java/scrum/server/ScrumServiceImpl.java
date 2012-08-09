@@ -702,6 +702,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		conversation.sendToClient(project.getReleases());
 		conversation.sendToClient(project.getBlogEntrys());
 		conversation.sendToClient(project.getTaskDaySnapshots());
+		conversation.sendToClient(project.getTeamMemberSnapshots());
 
 		sendToClients(conversation, config);
 	}
@@ -831,6 +832,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			ret.addAll(report.getSprintSwitchRequirementChanges());
 			ret.addAll(report.getClosedTasks());
 			ret.addAll(report.getOpenTasks());
+			ret.addAll(report.getTeamMemberStatistics());
 		}
 
 		return ret;

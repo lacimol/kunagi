@@ -105,9 +105,6 @@ public class SprintDao extends GSprintDao {
 		sprint.setBegin(begin);
 		sprint.setEnd(end);
 		sprint.setGoal("Sprint from " + sprint.getBegin() + " to " + sprint.getEnd());
-		if (end.isPast()) {
-			sprint.setVelocity(Float.valueOf(Utl.randomInt(10, 100)));
-		}
 		saveEntity(sprint);
 
 		return sprint;

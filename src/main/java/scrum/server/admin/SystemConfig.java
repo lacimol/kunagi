@@ -59,6 +59,7 @@ public class SystemConfig extends GSystemConfig {
 		if (!isMaxFileSizeSet()) setMaxFileSize(20);
 		if (!isSubscriptionKeySeedSet()) setSubscriptionKeySeed(Str.generatePassword(32));
 		if (!isSmtpServerSet()) updateSmtp();
+		if (getWorkingHoursPerDay() == null) setWorkingHoursPerDay(7);
 	}
 
 	private void updateSmtp() {

@@ -63,6 +63,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 
 	protected Chart getChart(String chartName) {
 
+		// XXX Factory pattern
 		Chart chart = null;
 		ScrumWebApplication scrumWebApp = ScrumWebApplication.get();
 		boolean isWorkChart = "workChart".equals(chartName);
@@ -74,6 +75,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		boolean isCurrentSprintRangeChart = "currentSprintRangeChart".equals(chartName);
 		boolean isTaskRangeChart = "taskRangeChart".equals(chartName);
 		boolean isStoryThemeChart = "storyThemeChart".equals(chartName);
+		boolean isProjectEffiChart = "projectEffiChart".equals(chartName);
 
 		if (isWorkChart) {
 			// team or user burned hours
@@ -102,10 +104,14 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		} else if (isStoryThemeChart) {
 			// story theme pie chart
 			chart = scrumWebApp.getStoryThemeChart();
+		} else if (isProjectEffiChart) {
+			// project effi chart
+			chart = scrumWebApp.getProjectEfficiencyChart();
 		} else {
 			// sprint burndown
 			chart = scrumWebApp.getBurndownChart();
 		}
+		chart.setSprintDao(scrumWebApp.getSprintDao());
 		return chart;
 
 	}

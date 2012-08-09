@@ -18,6 +18,7 @@ import ilarkesto.gwt.client.AIntegerViewEditWidget;
 import ilarkesto.gwt.client.AWidget;
 import ilarkesto.gwt.client.ToolbarWidget;
 import scrum.client.common.AScrumAction;
+import scrum.client.common.SimpleValueWidget;
 import scrum.client.sprint.CloseTaskAction;
 import scrum.client.sprint.ReopenTaskAction;
 import scrum.client.sprint.Task;
