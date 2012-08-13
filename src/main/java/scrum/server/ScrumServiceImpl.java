@@ -1038,4 +1038,54 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		subscriptionService.copySubscribers(issue, story);
 		subscriptionService.notifySubscribers(story, "Story created from " + issue, conversation.getProject(), null);
 	}
+
+	@Override
+	public void onCheckProjectActivity(GwtConversation conversation) {
+
+		assertProjectSelected(conversation);
+		Project project = conversation.getProject();
+		Sprint currentSprint = project.getCurrentSprint();
+		ilarkesto.core.time.Date lastWorkDay = currentSprint.getLastWorkDay();
+
+		Set<User> scrumMasters = project.getScrumMasters();
+		String from = "Kunagi Support <" + project.getSupportEmail() + ">";
+		if (!scrumMasters.isEmpty()) {
+			User sm = scrumMasters.iterator().next();
+			from = sm.getName() + " <" + sm.getEmail() + ">";
+		}
+		if (!Str.isEmail(from)) {
+			Set<User> admins = project.getAdmins();
+			if (!admins.isEmpty()) {
+				User admin = admins.iterator().next();
+				from = admin.getName() + " <" + admin.getEmail() + ">";
+			}
+		}
+
+		int minWorkigHoursPerDay = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay() - 1;
+		log.debug("CheckProjectActivity on", project.getLabel(), "at", lastWorkDay, "temMembers:", project
+				.getTeamMembers().size(), "from:", from);
+
+		for (User user : project.getTeamMembers()) {
+
+			String email = user.getEmail();
+			if (!Str.isEmail(email)) continue;
+
+			DateAndTime lastLoginDateAndTime = user.getLastLoginDateAndTime();
+			log.debug("checking ", email, "lastLogin: ", lastLoginDateAndTime, "tasks: " + user.getTasks().size());
+
+			int burnedWorkSum = currentSprint.getUserBurnAt(user, lastWorkDay);
+			boolean hasUserLoggedIn = lastLoginDateAndTime != null
+					&& lastWorkDay.isSameOrBefore(lastLoginDateAndTime.getDate());
+			if (burnedWorkSum < minWorkigHoursPerDay && (burnedWorkSum > 0 || hasUserLoggedIn)) {
+				log.debug("Send:", burnedWorkSum);
+				emailSender.sendEmail(from, email, "Kunagi daily burn stat at " + lastWorkDay, "Dear " + user.getName()
+						+ ",\n\nYou've burned only " + burnedWorkSum + " at " + lastWorkDay + ". Please burn at least "
+						+ minWorkigHoursPerDay + " hrs!\n\nKunagi support");
+			} else {
+				log.debug(" Not send:", burnedWorkSum);
+			}
+
+		}
+	}
+
 }

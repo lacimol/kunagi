@@ -280,6 +280,7 @@ public class ScrumModelApplication extends AGeneratorApplication {
 			projectModel.addAction("DeleteProject");
 			projectModel.addAction("OpenProject");
 			projectModel.addAction("UpdateProjectHomepage");
+			projectModel.addAction("CheckProjectActivity");
 		}
 		return projectModel;
 	}

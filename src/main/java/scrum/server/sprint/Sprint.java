@@ -35,7 +35,6 @@ import scrum.client.common.WeekdaySelector;
 import scrum.client.journal.Change;
 import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
-import scrum.server.common.BurndownSnapshot;
 import scrum.server.common.Numbered;
 import scrum.server.issues.Issue;
 import scrum.server.journal.ChangeDao;
@@ -246,12 +245,6 @@ public class Sprint extends GSprint implements Numbered {
 		for (Task task : tasks) {
 			shots.addAll(task.getTaskDaySnapshots(this));
 		}
-		return shots;
-	}
-
-	public List<BurndownSnapshot> getTaskBurndownSnapshots() {
-		List<BurndownSnapshot> shots = new ArrayList<BurndownSnapshot>();
-		shots.addAll(getTaskDaySnapshots());
 		return shots;
 	}
 
@@ -515,6 +508,48 @@ public class Sprint extends GSprint implements Numbered {
 
 	public boolean isClosed() {
 		return getVelocity() != null;
+	}
+
+	public int getUserBurnAt(User user, ilarkesto.core.time.Date date) {
+		int burnedWork = 0;
+		int burnedWorkSum = 0;
+
+		for (Task task : this.getTasks()) {
+			if (user.equals(task.getOwner())) {
+				int previousSnapshotBurn = 0;
+				List<TaskDaySnapshot> taskDaySnapshots = task.getTaskDaySnapshots(this);
+				Collections.sort(taskDaySnapshots, TaskDaySnapshot.DATE_COMPARATOR);
+				for (TaskDaySnapshot snapshot : taskDaySnapshots) {
+
+					burnedWork = snapshot.getBurnedWork();
+					if (previousSnapshotBurn != 0 && burnedWork > 0) {
+						burnedWork -= previousSnapshotBurn;
+					}
+
+					ilarkesto.core.time.Date burnDate = snapshot.getDate();
+					if (burnDate.equals(date) && burnDate.isSameOrAfter(this.getBegin())) {
+						burnedWorkSum += burnedWork;
+					}
+					previousSnapshotBurn = snapshot.getBurnedWork();
+				}
+			}
+
+		}
+		return burnedWorkSum;
+	}
+
+	public Date getLastWorkDay() {
+		Date begin = getBegin();
+		Date lastWorkDay = Date.today().prevDay();
+		WeekdaySelector freeDays = getProject().getFreeDaysAsWeekdaySelector();
+		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
+		int count = 0;
+		while (freeDays.isFree(dayOfWeek) && count < 28 && !begin.isAfter(lastWorkDay)) {
+			lastWorkDay = lastWorkDay.prevDay();
+			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
+			count++;
+		}
+		return lastWorkDay;
 	}
 
 }

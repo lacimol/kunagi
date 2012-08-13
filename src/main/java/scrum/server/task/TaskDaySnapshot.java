@@ -15,6 +15,8 @@
 
 package scrum.server.task;
 
+import java.util.Comparator;
+
 import scrum.server.admin.User;
 import scrum.server.common.BurndownSnapshot;
 
@@ -48,5 +50,21 @@ public class TaskDaySnapshot extends GTaskDaySnapshot implements BurndownSnapsho
 	public int getBurnedWorkTotal() {
 		return getBurnedWork();
 	}
+
+	public static final Comparator<TaskDaySnapshot> DATE_COMPARATOR = new Comparator<TaskDaySnapshot>() {
+
+		@Override
+		public int compare(TaskDaySnapshot a, TaskDaySnapshot b) {
+			return a.getDate().compareTo(b.getDate());
+		}
+	};
+
+	public static final Comparator<TaskDaySnapshot> REVERSE_DATE_COMPARATOR = new Comparator<TaskDaySnapshot>() {
+
+		@Override
+		public int compare(TaskDaySnapshot a, TaskDaySnapshot b) {
+			return DATE_COMPARATOR.compare(b, a);
+		}
+	};
 
 }

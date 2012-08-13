@@ -53,7 +53,8 @@ public class ProjectAdminWidget extends AScrumWidget {
 		tbDescr.addFieldRow("Long description", project.getLongDescriptionModel());
 		page.addSection(tbDescr.createTable());
 
-		page.addHeader("Project homepage", new ButtonWidget(new UpdateProjectHomepageAction(project)));
+		page.addHeader("Project homepage", new ButtonWidget(new UpdateProjectHomepageAction(project)),
+			new ButtonWidget(new CheckProjectActivityAction(project)));
 		TableBuilder tbHomepage = ScrumGwt.createFieldTable();
 		tbHomepage.addFieldRow("Homepage directory", project.getHomepageDirModel());
 		tbHomepage.addFieldRow("Homepage URL", project.getHomepageUrlModel());

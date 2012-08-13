@@ -287,7 +287,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 
 	public List<TaskDaySnapshot> getCurrentTaskDaySnapshots(Sprint sprint) {
 		List<TaskDaySnapshot> currentTaskDaySnapshots = new ArrayList<TaskDaySnapshot>();
-		for (TaskDaySnapshot t : getTaskDaySnapshots()) {
+		for (TaskDaySnapshot t : this.getTaskDaySnapshots()) {
 			if (sprint.getBegin().isSameOrBefore(t.getDate())) {
 				currentTaskDaySnapshots.add(t);
 			}

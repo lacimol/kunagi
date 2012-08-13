@@ -16,11 +16,13 @@
 package scrum.client.statistics;
 
 import ilarkesto.core.time.Date;
+import ilarkesto.gwt.client.ButtonWidget;
 
 import java.util.List;
 
 import scrum.client.admin.User;
 import scrum.client.common.AScrumWidget;
+import scrum.client.project.CheckProjectActivityAction;
 import scrum.client.project.Project;
 import scrum.client.workspace.PagePanel;
 
@@ -33,7 +35,11 @@ public abstract class TeamBurnHoursWidget extends AScrumWidget {
 		if (project.isFreeDay(date)) {
 			header.append(" (free day)");
 		}
-		burnHoursPanel.addHeader(header.toString());
+		if (project.getCurrentSprint().getLastWorkDay().equals(date)) {
+			burnHoursPanel.addHeader(header.toString(), new ButtonWidget(new CheckProjectActivityAction(project)));
+		} else {
+			burnHoursPanel.addHeader(header.toString());
+		}
 
 		User currentUser = getCurrentUser();
 		List<User> team = project.getTeamStartWithCurrent(currentUser);

@@ -414,6 +414,7 @@
 "9dbce7a7-56ea-4482-a514-685d99688e93","547376fe-089d-4817-983f-34a234650906","ReferenceProperty","closedOnSprintCloseTasks"
 "891902bf-0917-4c4c-b8a0-147af31424d1","547376fe-089d-4817-983f-34a234650906","ReferenceProperty","openOnSprintCloseTasks"
 "a9cd6400-f5fa-45c3-813d-52998ed7aa72","c829a32f-5300-49a9-983a-75bc0e214ae4","Event","ProjectDataReceived"
+"083c5c80-b022-4a4c-8298-e3a4195ee89e","c829a32f-5300-49a9-983a-75bc0e214ae4","ServiceCall","CheckProjectActivity"
 "08ded0fe-d8f2-429d-8874-60c0fc454ef6","c829a32f-5300-49a9-983a-75bc0e214ae4","ServiceCall","CloseProject"
 "ca632922-0e7e-4b05-b9f9-2a6b2fed1de8","c829a32f-5300-49a9-983a-75bc0e214ae4","ServiceCall","CreateExampleProject"
 "a62f9f7b-97c6-4859-bbf7-b80526518615","c829a32f-5300-49a9-983a-75bc0e214ae4","ServiceCall","SelectProject"

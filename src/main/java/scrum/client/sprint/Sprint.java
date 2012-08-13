@@ -42,6 +42,7 @@ import scrum.client.project.Project;
 import scrum.client.project.Requirement;
 import scrum.client.sprint.SprintHistoryHelper.StoryInfo;
 import scrum.client.sprint.SprintHistoryHelper.TaskInfo;
+import scrum.client.task.BurnHours;
 import scrum.client.tasks.WhiteboardWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -512,11 +513,11 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		Date begin = getBegin();
 		Date lastWorkDay = Date.today().prevDay();
 		WeekdaySelector freeDays = getProject().getFreeDaysWeekdaySelectorModel().getValue();
-		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek() + 1;
+		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
 		int count = 0;
 		while (freeDays.isFree(dayOfWeek) && count < 28 && !begin.isAfter(lastWorkDay)) {
 			lastWorkDay = lastWorkDay.prevDay();
-			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek() + 1;
+			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
 			count++;
 		}
 		return lastWorkDay;
@@ -526,5 +527,25 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		boolean hasRight = getProject().isScrumMaster(Scope.get().getComponent(Auth.class).getUser());
 		boolean hasStat = getSprintReport() != null && !getSprintReport().getTeamMemberStatistics().isEmpty();
 		return hasRight && hasStat;
+	}
+
+	public List<BurnHours> getAllSortedTaskSnapshots(List<Task> tasks, Date date) {
+
+		List<BurnHours> result = new ArrayList<BurnHours>();
+
+		for (Task task : tasks) {
+			result.addAll(task.getTaskDaySnapshotsInSprint(date, this));
+		}
+
+		Collections.sort(result, BurnHours.DATE_COMPARATOR);
+		return result;
+	}
+
+	public int getBurnedHours(List<BurnHours> taskDaySnapshots) {
+		int burnedHours = 0;
+		for (BurnHours taskDaySnapshot : taskDaySnapshots) {
+			burnedHours += taskDaySnapshot.getBurnedWork();
+		}
+		return Math.max(0, burnedHours);
 	}
 }

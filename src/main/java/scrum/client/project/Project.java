@@ -778,6 +778,6 @@ public class Project extends GProject implements ForumSupport {
 
 	public boolean isFreeDay(Date date) {
 		WeekdaySelector freeDays = this.getFreeDaysWeekdaySelectorModel().getValue();
-		return freeDays.isFree(date.getWeekday().getDayOfWeek() + 1);
+		return freeDays.isFree(date.getWeekday().getDayOfWeek());
 	}
 }
