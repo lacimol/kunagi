@@ -34,6 +34,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import scrum.client.common.WeekdaySelector;
+import scrum.server.ScrumWebApplication;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
 import scrum.server.task.TaskDaySnapshot;
@@ -77,8 +78,9 @@ public class UserBurndownChart extends Chart {
 
 		Map<String, Integer> userBurnedHours = getUserBurnedHours(sprint, firstDay, lastDay);
 
-		LOG.debug("Creating burndown chart for ", userName, ", size: ", userBurnedHours.size(), "userBurnedHours from",
-			firstDay, "to", lastDay, "(" + width + "x" + height + " px)");
+		LOG.debug("Creating burndown chart for", userName == null ? "team" : userName, ", size:",
+			userBurnedHours.size(), "userBurnedHours from", firstDay, "to", lastDay, "(" + width + "x" + height
+					+ " px)");
 
 		int dayCount = firstDay.getPeriodTo(lastDay).toDays();
 		int dateMarkTickUnit = 1;
@@ -106,7 +108,7 @@ public class UserBurndownChart extends Chart {
 		int burnedWork;
 		Integer burnedThatDay;
 		for (Task task : sprintTasks) {
-			if (userName == null || (task.getOwner() != null && userName.equals(task.getOwner().getName()))) {
+			if (userName == null || task.isOwnersTask(userName)) {
 				int previousSnapshotBurn = 0;
 				for (TaskDaySnapshot snapshot : task.getTaskDaySnapshots(sprint)) {
 					day = snapshot.getDate().toString(dateFormat);
@@ -166,7 +168,7 @@ public class UserBurndownChart extends Chart {
 		double all = 0;
 		double workDays = 0;
 
-		int workingHoursPerDay = Sprint.WORKING_HOURS_PER_DAY;
+		int workingHoursPerDay = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
 		Double idealWorkingHours = (double) (userName != null ? workingHoursPerDay : workingHoursPerDay
 				* teamMembersCount);
 

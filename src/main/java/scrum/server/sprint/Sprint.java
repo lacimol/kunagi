@@ -50,15 +50,6 @@ public class Sprint extends GSprint implements Numbered {
 
 	public static final String TEAM = "team";
 
-	public static int WORKING_HOURS_PER_DAY = 7;
-	static {
-		// default is 7 hours/day/user
-		Integer hours = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
-		if (hours != null) {
-			WORKING_HOURS_PER_DAY = hours;
-		}
-	}
-
 	// --- dependencies ---
 
 	private static transient ChangeDao changeDao;
@@ -412,7 +403,8 @@ public class Sprint extends GSprint implements Numbered {
 								task.setOwner(team.get(userIndex));
 							}
 							// burn
-							int burn = Math.min(WORKING_HOURS_PER_DAY, remaining);
+							int burn = Math.min(ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay(),
+								remaining);
 							task.addBurn(burn);
 							task.setRemainingWork(remaining - burn);
 							userIndex++;

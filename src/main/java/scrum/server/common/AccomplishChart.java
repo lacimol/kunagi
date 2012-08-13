@@ -25,6 +25,7 @@ import java.util.List;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
@@ -63,7 +64,8 @@ public class AccomplishChart extends Chart {
 		barDataset.setValue((int) (remainingHours / teamMembersCount), "Remaining", TEAM_AVG);
 
 		JFreeChart chart = createStackedBarChart(barDataset);
-		int maxWorkHours = sprint.getLengthInWorkDays() * Sprint.WORKING_HOURS_PER_DAY;
+		int maxWorkHours = sprint.getLengthInWorkDays()
+				* ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
 		setChartMarker(chart, teamAvg, maxWorkHours);
 		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (int) (burnedHours + remainingHours)));
 		createPic(out, width, height, chart);
