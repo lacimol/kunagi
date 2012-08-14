@@ -26,6 +26,7 @@ import ilarkesto.base.time.DateAndTime;
 import ilarkesto.concurrent.TaskManager;
 import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
+import ilarkesto.di.app.BackupApplicationDataDirTask;
 import ilarkesto.di.app.WebApplicationStarter;
 import ilarkesto.gwt.server.AGwtConversation;
 import ilarkesto.io.IO;
@@ -76,7 +77,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 
 	private static final int MAX_UPDATE_TRY_NR = 3;
 	private static int updateTryNr = 0;
-
 	private static final Log log = Log.get(ScrumWebApplication.class);
 
 	private BurndownChart burndownChart;
@@ -239,8 +239,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	protected void onStartWebApplication() {
 		Log.setDebugEnabled(isDevelopmentMode() || getConfig().isLoggingDebug());
 
-		deleteOldBackupFiles(getApplicationDataDir() + "/backup");
-
 		String url = getConfig().getUrl();
 		if (!Str.isBlank(url)) getSystemConfig().setUrl(url);
 
@@ -314,6 +312,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 
 	@Override
 	protected void scheduleTasks(TaskManager tm) {
+		tm.scheduleWithFixedDelay(autowire(new BackupApplicationDataDirTask()), Tm.HOUR * 24 + (Tm.MINUTE));
 		tm.scheduleWithFixedDelay(autowire(new DestroyTimeoutedSessionsTask()), Tm.MINUTE);
 		tm.scheduleWithFixedDelay(autowire(new HomepageUpdaterTask()), Tm.HOUR);
 		tm.scheduleWithFixedDelay(autowire(getSubscriptionService().new Task()), Tm.MINUTE);

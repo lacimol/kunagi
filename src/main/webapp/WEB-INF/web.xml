@@ -76,6 +76,17 @@
         <url-pattern>/shutdown</url-pattern>
     </servlet-mapping>
 
+    <!-- backup command -->
+    <servlet>
+        <servlet-name>backup</servlet-name>
+        <servlet-class>scrum.server.admin.BackupServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>      
+    <servlet-mapping>
+        <servlet-name>backup</servlet-name>
+        <url-pattern>/backup</url-pattern>
+    </servlet-mapping>
+
 	<!-- main communication service -->
 	<servlet>
 		<servlet-name>scrum</servlet-name>

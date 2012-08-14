@@ -93,6 +93,10 @@ public class AdminServlet extends AHttpServlet {
 	private void actions(HtmlRenderer html) {
 		sectionHeader(html, "Functions");
 		html.text("[ ");
+		html.A("backup", "Create backup");
+		html.text(" ]");
+
+		html.text("[ ");
 		html.A("shutdown", "Shutdown application");
 		html.text(" ]");
 	}
