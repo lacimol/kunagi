@@ -305,6 +305,12 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			Issue issue = (Issue) entity;
 			issue.setDate(DateAndTime.now());
 			issue.setCreator(currentUser);
+			// if teamMember was created
+			if (currentUser != null && !Str.isBlank(currentUser.getEmail())) {
+				issue.setIssuerName(currentUser.getName());
+				issue.setIssuerEmail(currentUser.getEmail());
+				subscriptionService.subscribe(currentUser.getEmail(), issue);
+			}
 		}
 
 		if (entity instanceof Task) {
