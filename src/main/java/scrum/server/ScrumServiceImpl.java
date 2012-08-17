@@ -164,10 +164,13 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		Sprint sprint = project.getCurrentSprint();
 		User currentUser = conversation.getSession().getUser();
 
+		log.debug("... onPullStoryToSprint:", story.getReferenceAndLabel(), "Sprint:", sprint);
 		sprint.pullRequirement(story, currentUser);
 
 		postProjectEvent(conversation, currentUser.getName() + " pulled " + story.getReferenceAndLabel()
 				+ " to current sprint", story);
+
+		subscriptionService.notifySubscribers(story, "Story pulled to current Sprint", project, null);
 
 		sendToClients(conversation, sprint);
 		sendToClients(conversation, story);
@@ -181,10 +184,14 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		Sprint sprint = story.getSprint();
 		User currentUser = conversation.getSession().getUser();
 
+		log.debug("... onKickStoryFromSprint:", story.getReferenceAndLabel(), "Sprint:", sprint);
 		sprint.kickRequirement(story, currentUser);
 
 		postProjectEvent(conversation, currentUser.getName() + " kicked " + story.getReferenceAndLabel()
 				+ " from current sprint", story);
+
+		subscriptionService.notifySubscribers(story, "Story kicked from current Sprint", conversation.getProject(),
+			null);
 
 		sendToClients(conversation, story.getTasksInSprint());
 		sendToClients(conversation, story);
@@ -612,8 +619,13 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 				requirement);
 		}
 
+		log.debug("... onRequirementChanged:", requirement.getReferenceAndLabel(), "reqSprint:", sprint,
+			"previousRequirementSprint:", previousRequirementSprint);
 		if (sprint != previousRequirementSprint) {
-			if (properties.containsKey("sprintId")) {
+			boolean hasSprintId = properties.containsKey("sprintId");
+			log.debug("hasSprintId:", hasSprintId);
+			if (hasSprintId) {
+				log.debug("inCurrentSprint:", inCurrentSprint);
 				if (inCurrentSprint) {
 					postProjectEvent(conversation,
 						currentUser.getName() + " pulled " + requirement.getReferenceAndLabel() + " to current sprint",

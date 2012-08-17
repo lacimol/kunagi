@@ -213,6 +213,7 @@ public class SubscriptionService {
 
 	private class Notification {
 
+		private static final int NOTIFICATION_DELAY_MIN = 1;
 		private AEntity subject;
 		private String message;
 		private Project project;
@@ -235,7 +236,7 @@ public class SubscriptionService {
 		}
 
 		private void updateActionTime() {
-			actionTime = DateAndTime.now().addMinutes(10);
+			actionTime = DateAndTime.now().addMinutes(NOTIFICATION_DELAY_MIN);
 		}
 	}
 }

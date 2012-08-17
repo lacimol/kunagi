@@ -6,6 +6,23 @@ KUNAGI
     http://kunagi.org
     mailto:support@kunagi.org
 
+KUNAGI STAT
+
+	This is an extended version of Kunagi which contains some useful statistics 
+	about team members, tasks, sprints and projects. 
+	
+	These are:
+	- My statistics: current user burndown chart and claimed tasks.
+	- Team statistics: team members burndown charts (for daily meeting)
+	- Project statistics: sprints range history, velocity history, 
+	team member's avg efficiency and sprint work hours history 
+	- Sprint statistics: team efficiency and accomplishment chart, 
+	Story themes pie chart
+	- Task statistics: task range chart
+	- User's statistics: team members all burndown for sprint
+	
+	http://
+	mailto:lacimol@gmail.com
 	
 DESCRIPTION
 
