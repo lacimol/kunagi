@@ -94,6 +94,10 @@ public class SubscriptionService {
 		log.info(email, "unsubscribed from", subscriptions.size(), "entities");
 	}
 
+	public void notifySubscribers(AEntity subject, String message, Project project) {
+		notifySubscribers(subject, message, project, null);
+	}
+
 	public void notifySubscribers(AEntity subject, String message, Project project, String exceptionEmail) {
 		Subscription subscription = subscriptionDao.getSubscriptionBySubject(subject);
 		if (subscription == null || subscription.isSubscribersEmailsEmpty()) {
@@ -223,7 +227,7 @@ public class SubscriptionService {
 		public Notification(AEntity subject, String message, Project project, Set<String> emails) {
 			super();
 			this.subject = subject;
-			this.message = message;
+			this.message = "- " + message + " at " + DateAndTime.now();
 			this.project = project;
 			this.emails = emails;
 			updateActionTime();
@@ -231,7 +235,8 @@ public class SubscriptionService {
 
 		public void merge(String newMessage, Set<String> newEmails) {
 			emails.addAll(newEmails);
-			message += "; " + newMessage;
+			// message += "; " + newMessage;
+			message += "\n- " + newMessage + " at " + DateAndTime.now();
 			updateActionTime();
 		}
 

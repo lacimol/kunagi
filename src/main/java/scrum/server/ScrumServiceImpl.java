@@ -170,7 +170,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		postProjectEvent(conversation, currentUser.getName() + " pulled " + story.getReferenceAndLabel()
 				+ " to current sprint", story);
 
-		subscriptionService.notifySubscribers(story, "Story pulled to current Sprint", project, null);
+		subscriptionService.notifySubscribers(story, "Story pulled to current Sprint", project);
 
 		sendToClients(conversation, sprint);
 		sendToClients(conversation, story);
@@ -190,8 +190,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		postProjectEvent(conversation, currentUser.getName() + " kicked " + story.getReferenceAndLabel()
 				+ " from current sprint", story);
 
-		subscriptionService.notifySubscribers(story, "Story kicked from current Sprint", conversation.getProject(),
-			null);
+		subscriptionService.notifySubscribers(story, "Story kicked from current Sprint", conversation.getProject());
 
 		sendToClients(conversation, story.getTasksInSprint());
 		sendToClients(conversation, story);
@@ -423,8 +422,9 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		User currentUser = conversation.getSession().getUser();
 		if (!Auth.isEditable(entity, currentUser)) throw new PermissionDeniedException();
 
+		Project project = conversation.getProject();
 		Sprint previousRequirementSprint = entity instanceof Requirement ? ((Requirement) entity).getSprint() : null;
-
+		log.debug("... onChangeProperties:", entity);
 		if (entity instanceof Requirement) {
 			postChangeIfChanged(conversation, entity, properties, currentUser, "label");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "description");
@@ -432,8 +432,16 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			postChangeIfChanged(conversation, entity, properties, currentUser, "sprintId");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "closed");
 			postChangeIfChanged(conversation, entity, properties, currentUser, "issueId");
+			if (properties.containsKey("closed")) {
+				Requirement requirement = (Requirement) entity;
+				if ((Boolean) properties.get("closed")) {
+					subscriptionService.notifySubscribers(requirement, "Requirement closed", project);
+				} else {
+					subscriptionService.notifySubscribers(requirement, "Requirement reopened", project);
+				}
+			}
 		}
-		Project project = conversation.getProject();
+
 		if (entity instanceof Task) {
 			// update sprint day snapshot before change
 			if (project.isCurrentSprintSet()) {
@@ -502,7 +510,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		conversation.getProject().updateHomepage(comment.getParent(), false);
 		if (comment.isPublished() && properties.containsKey("published")) {
 			subscriptionService.notifySubscribers(comment.getParent(),
-				"New comment posted by " + comment.getAuthorLabel(), conversation.getProject(), null);
+				"New comment posted by " + comment.getAuthorLabel(), conversation.getProject());
 		}
 	}
 
@@ -533,11 +541,11 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			if (issue.isClosed()) {
 				issue.setCloseDate(Date.today());
 				postProjectEvent(conversation, currentUser.getName() + " closed " + issue.getReferenceAndLabel(), issue);
-				subscriptionService.notifySubscribers(issue, "Issue closed", conversation.getProject(), null);
+				subscriptionService.notifySubscribers(issue, "Issue closed", conversation.getProject());
 			} else {
 				postProjectEvent(conversation, currentUser.getName() + " reopened " + issue.getReferenceAndLabel(),
 					issue);
-				subscriptionService.notifySubscribers(issue, "Issue reopened", conversation.getProject(), null);
+				subscriptionService.notifySubscribers(issue, "Issue reopened", conversation.getProject());
 			}
 		}
 
@@ -575,7 +583,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 			if (issue.isIdea() || issue.isBug()) {
 				postProjectEvent(conversation, currentUser.getName() + " accepted " + issue.getReferenceAndLabel(),
 					issue);
-				subscriptionService.notifySubscribers(issue, "Issue accepted", conversation.getProject(), null);
+				subscriptionService.notifySubscribers(issue, "Issue accepted", conversation.getProject());
 			}
 		}
 
@@ -615,6 +623,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		}
 
 		if (properties.containsKey("accepted") && requirement.isRejectDateSet()) {
+			log.info("... onRequirementChanged_accepted:", requirement.getReferenceAndLabel());
 			postProjectEvent(conversation, currentUser.getName() + " accepted " + requirement.getReferenceAndLabel(),
 				requirement);
 		}
@@ -630,14 +639,14 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 					postProjectEvent(conversation,
 						currentUser.getName() + " pulled " + requirement.getReferenceAndLabel() + " to current sprint",
 						requirement);
-					subscriptionService.notifySubscribers(requirement, "Story pulled to current Sprint",
-						conversation.getProject(), null);
+					subscriptionService
+							.notifySubscribers(requirement, "Story pulled to current Sprint", currentProject);
 				} else {
 					postProjectEvent(conversation,
 						currentUser.getName() + " kicked " + requirement.getReferenceAndLabel()
 								+ " from current sprint", requirement);
 					subscriptionService.notifySubscribers(requirement, "Story kicked from current Sprint",
-						conversation.getProject(), null);
+						currentProject);
 				}
 			}
 		}
@@ -1054,7 +1063,7 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 		changeDao.postChange(issue, currentUser, "storyId", null, story.getId());
 		changeDao.postChange(story, currentUser, "issueId", null, issue.getId());
 		subscriptionService.copySubscribers(issue, story);
-		subscriptionService.notifySubscribers(story, "Story created from " + issue, conversation.getProject(), null);
+		subscriptionService.notifySubscribers(story, "Story created from " + issue, conversation.getProject());
 	}
 
 	@Override
