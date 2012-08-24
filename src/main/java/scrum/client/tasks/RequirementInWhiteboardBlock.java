@@ -46,8 +46,8 @@ public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 		header.addText(requirement.getLabelModel());
 		header.addText(requirement.getThemesAsStringModel(), true, false);
 		header.addText(requirement.getTaskStatusLabelModel(), true);
-		header.appendCell(new EmoticonsWidget(requirement), null, true);
-		header.appendCell(new RequirementWorkIndicatorBarWidget(requirement), "150px", true);
+		header.appendCell(new EmoticonsWidget(requirement), "20px", true);
+		header.appendCell(new RequirementWorkIndicatorBarWidget(requirement), "110px", true);
 		header.addMenuAction(new RejectRequirementAction(requirement));
 		header.addMenuAction(new FixRequirementAction(requirement));
 		header.addMenuAction(new CloseRequirementAction(requirement));

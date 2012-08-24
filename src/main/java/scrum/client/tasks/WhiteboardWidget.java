@@ -97,16 +97,13 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		grid.setCellPadding(0);
 		grid.setCellSpacing(0);
 
-		pullNextButton = new ButtonWidget(new PullNextRequirementAction(getCurrentSprint()));
-
-		PagePanel page = new PagePanel();
+		pullNextButton = new ButtonWidget(new PullNextRequirementAction(sprint));
 
 		whiteboardWrapper = new SimplePanel();
 		whiteboardWrapper.setVisible(getCurrentProject().isTeamMember(getCurrentUser()));
-		// hideShowButton = new ButtonWidget(new HideMyWhiteboardAction());
-		// whiteboardWrapper.setWidget(hideShowButton);
 		whiteboardHeader = new HTML();
 
+		PagePanel page = new PagePanel();
 		page.addHeader(whiteboardHeader, pullNextButton, whiteboardWrapper);
 		page.addSection(grid);
 		userGuide = new UserGuideWidget(getLocalizer().views().whiteboard(), sprint.getRequirements().size() < 3,
@@ -169,7 +166,7 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 		userGuide.update();
 		pullNextButton.update();
 		hideShowButton.update();
-		super.onUpdate();
+		// super.onUpdate();
 	}
 
 	private void setLabels() {
@@ -179,10 +176,10 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 	}
 
 	private void setWidgets(int row, Requirement requirement) {
-		// grid.setWidget(row, 0, new Label(requirement.getLabel()));
-		setWidget(row, 0, openTasks.get(requirement), null, "WhiteboardWidget-open");
-		setWidget(row, 1, ownedTasks.get(requirement), null, "WhiteboardWidget-owned");
-		setWidget(row, 2, closedTasks.get(requirement), null, "WhiteboardWidget-done");
+		// null
+		setWidget(row, 0, openTasks.get(requirement), "33%", "WhiteboardWidget-open");
+		setWidget(row, 1, ownedTasks.get(requirement), "33%", "WhiteboardWidget-owned");
+		setWidget(row, 2, closedTasks.get(requirement), "33%", "WhiteboardWidget-done");
 	}
 
 	private List<Requirement> getRequirements(Sprint sprint) {
