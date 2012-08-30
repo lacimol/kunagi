@@ -39,7 +39,7 @@ public class GwtConversation extends AGwtConversation {
 
 	private EmoticonDao emoticonDao;
 
-	public void setEmoticonDao(EmoticonDao emoticonDao) {
+	public synchronized void setEmoticonDao(EmoticonDao emoticonDao) {
 		this.emoticonDao = emoticonDao;
 	}
 

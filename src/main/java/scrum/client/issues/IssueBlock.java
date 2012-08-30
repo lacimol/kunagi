@@ -1,19 +1,20 @@
 /*
  * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
  * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
- * License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
- * for more details.
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
  * 
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package scrum.client.issues;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
@@ -24,12 +25,11 @@ import scrum.client.img.Img;
 import scrum.client.journal.ActivateChangeHistoryAction;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class IssueBlock extends ABlockWidget<Issue> implements TrashSupport {
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	// private Label typeLabel;
 
@@ -45,7 +45,7 @@ public class IssueBlock extends ABlockWidget<Issue> implements TrashSupport {
 		header.addText(issue.getThemesAsStringModel(), true, false);
 		header.addText(issue.getStatusLabelModel(), true);
 
-		header.appendCell(new EmoticonsWidget(issue), null, true);
+		header.appendOuterCell(new EmoticonsWidget(issue), null, true);
 
 		header.addMenuAction(new AcceptIssueAsBugAction(issue));
 		header.addMenuAction(new AcceptIssueAsIdeaAction(issue));

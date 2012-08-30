@@ -1,13 +1,13 @@
 /*
  * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
  * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
- * License as published by the Free Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
- * for more details.
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+ * License for more details.
  * 
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
@@ -22,18 +22,21 @@ import ilarkesto.gwt.client.DropdownMenuButtonWidget;
 import ilarkesto.gwt.client.editor.AFieldModel;
 import ilarkesto.gwt.client.editor.TextOutputWidget;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class BlockHeaderWidget extends AWidget {
 
-	private HorizontalPanel table;
+	private HorizontalPanel outerFramePanel;
 	private FocusPanel dragHandleWrapper;
-	private AnchorPanel centerWrapper;
+	private AnchorPanel centerAnchorPanel;
+	private Collection<AnchorPanel> anchorPanels = new ArrayList<AnchorPanel>();
 	private HorizontalPanel centerTable;
 
 	private DropdownMenuButtonWidget menu;
@@ -47,25 +50,25 @@ public class BlockHeaderWidget extends AWidget {
 
 		centerTable = new HorizontalPanel();
 
-		centerWrapper = new AnchorPanel();
-		centerWrapper.setStyleName("BlockHeaderWidget-anchor");
-		centerWrapper.setWidth("100%");
-		centerWrapper.add(centerTable);
+		centerAnchorPanel = new AnchorPanel();
+		centerAnchorPanel.setStyleName("BlockHeaderWidget-anchor");
+		centerAnchorPanel.setWidth("100%");
+		centerAnchorPanel.add(centerTable);
 
-		table = new HorizontalPanel();
-		table.setStyleName("BlockHeaderWidget");
-		table.setWidth("100%");
-		table.add(dragHandleWrapper);
-		table.setCellWidth(dragHandleWrapper, "50px");
-		table.add(centerWrapper);
+		outerFramePanel = new HorizontalPanel();
+		outerFramePanel.setStyleName("BlockHeaderWidget");
+		outerFramePanel.setWidth("100%");
+		outerFramePanel.add(dragHandleWrapper);
+		outerFramePanel.setCellWidth(dragHandleWrapper, "50px");
+		outerFramePanel.add(centerAnchorPanel);
 
-		return table;
+		return outerFramePanel;
 	}
 
 	@Override
 	protected void onUpdate() {
 		super.onUpdate();
-		centerWrapper.setFocus(false);
+		centerAnchorPanel.setFocus(false);
 	}
 
 	public void addText(AFieldModel<?> model) {
@@ -81,48 +84,53 @@ public class BlockHeaderWidget extends AWidget {
 	}
 
 	public void addText(AFieldModel<?> model, String width, boolean secondary, boolean small) {
-		SimplePanel cell = createCell(new TextOutputWidget(model).setForceEmptyChar(true), secondary, small, null);
+		AnchorPanel cell = createCell(new TextOutputWidget(model).setForceEmptyChar(true), secondary, small, null);
 		if (width != null) cell.setWidth(width);
 		centerTable.add(cell);
 	}
 
 	// ---
 
-	public SimplePanel addIconWrapper() {
-		SimplePanel cell = createCell(null, false, false, "BlockHeaderWidget-prefixIcon");
+	public AnchorPanel addIconWrapper() {
+		AnchorPanel cell = createCell(null, false, false, "BlockHeaderWidget-prefixIcon");
 		cell.setHeight("16px");
 		cell.setWidth("16px");
 		centerTable.add(cell);
 		return cell;
 	}
 
-	public void appendCell(Widget widget, String width, boolean alignRight) {
-		table.add(widget);
-		if (alignRight) table.setCellHorizontalAlignment(widget, HorizontalPanel.ALIGN_RIGHT);
-		if (width != null) table.setCellWidth(widget, width);
+	public void appendOuterCell(Widget widget, String width, boolean alignRight) {
+		outerFramePanel.add(widget);
+		if (alignRight) outerFramePanel.setCellHorizontalAlignment(widget, HorizontalPanel.ALIGN_RIGHT);
+		if (width != null) outerFramePanel.setCellWidth(widget, width);
 	}
 
-	private SimplePanel createCell(Widget widget, boolean secondary, boolean small, String additionalStyleName) {
-		SimplePanel wrapper = new SimplePanel();
+	private AnchorPanel createCell(Widget widget, boolean secondary, boolean small, String additionalStyleName) {
+		AnchorPanel wrapper = new AnchorPanel();
 		wrapper.setStyleName("BlockHeaderWidget-cell");
+		wrapper.addStyleName("BlockHeaderWidget-anchor");
+		wrapper.setWidth("100%");
 		wrapper.setHeight("100%");
+
+		anchorPanels.add(wrapper);
+
 		if (secondary) wrapper.addStyleName("BlockHeaderWidget-cell-secondary");
 		if (small) wrapper.addStyleName("BlockHeaderWidget-cell-small");
 		if (additionalStyleName != null) wrapper.addStyleName(additionalStyleName);
-		wrapper.setWidget(widget);
+		wrapper.add(widget);
 		return wrapper;
 	}
 
 	public void addMenuAction(AScrumAction action) {
 		if (menu == null) {
 			menu = new DropdownMenuButtonWidget();
-			appendCell(menu, "30px", true);
+			appendOuterCell(menu, "30px", true);
 		}
 		menu.addAction(action);
 	}
 
 	public void addToolbarAction(AAction action) {
-		appendCell(new ButtonWidget(action), "5px", true);
+		appendOuterCell(new ButtonWidget(action), "5px", true);
 	}
 
 	public void setDragHandle(String text) {
@@ -138,11 +146,18 @@ public class BlockHeaderWidget extends AWidget {
 	}
 
 	public void addClickHandler(ClickHandler handler) {
-		centerWrapper.addClickHandler(handler);
+		centerAnchorPanel.addClickHandler(handler);
+
+		for (AnchorPanel ap : anchorPanels) {
+			ap.addClickHandler(handler);
+		}
 	}
 
 	public void setHref(String href) {
-		centerWrapper.setHref(href);
+		centerAnchorPanel.setHref(href);
+		for (AnchorPanel ap : anchorPanels) {
+			ap.setHref(href);
+		}
 	}
 
 	public FocusPanel getDragHandle() {

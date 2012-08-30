@@ -19,6 +19,9 @@ import ilarkesto.base.CryptOneWay;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
 import ilarkesto.core.logging.Log;
+import ilarkesto.integration.gravatar.Gravatar;
+import ilarkesto.integration.gravatar.Profile;
+import ilarkesto.integration.gravatar.Profile.Name;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +55,22 @@ public class User extends GUser {
 
 	// --- ---
 
+	public void tryUpdateByGravatar() {
+		try {
+			updateByGravatar();
+		} catch (Throwable ex) {
+			log.error("Updating user data by Gravatar failed", ex);
+		}
+	}
+
+	public void updateByGravatar() {
+		Profile profile = Gravatar.loadProfile(getEmail());
+		Name name = profile.getName();
+		if (name != null) {
+			if (!isFullNameSet()) setFullName(name.getFormatted());
+		}
+	}
+
 	@Override
 	protected String prepareEmail(String email) {
 		return super.prepareEmail(email == null ? null : email.toLowerCase());
@@ -72,8 +91,6 @@ public class User extends GUser {
 
 		String urlBase = webApplication.createUrl(null);
 		StringBuilder sb = new StringBuilder();
-		String nameSuffix = webApplication.getSystemConfig().isInstanceNameSet() ? " @ "
-				+ webApplication.getSystemConfig().getInstanceName() : "";
 		sb.append(
 			"You have created an account for " + webApplication.getSystemConfig().getInstanceNameWithApplicationLabel())
 				.append(urlBase).append("\n");

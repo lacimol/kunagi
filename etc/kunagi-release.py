@@ -42,7 +42,7 @@ print 'Releasing Kunagi ' + releaseLabel
 
 
 # configuration
-os.chdir('/home/scrum/')
+os.chdir('/home/kunagi/')
 workDir = os.path.abspath('kunagi-release-workdir')
 artifactsDestinationHomeDir = '/var/www/kunagi.org/releases'
 githubUser = 'git://github.com/Kunagi'

@@ -31,7 +31,7 @@ public class RiskBlock extends ABlockWidget<Risk> implements TrashSupport {
 		Risk risk = getObject();
 		header.addText(risk.getPriorityLabelModel(), "100px", true, false);
 		header.addText(risk.getLabelModel());
-		header.appendCell(new EmoticonsWidget(risk), null, true);
+		header.appendOuterCell(new EmoticonsWidget(risk), null, true);
 		header.addMenuAction(new ActivateChangeHistoryAction(risk));
 		header.addMenuAction(new DeleteRiskAction(risk));
 	}

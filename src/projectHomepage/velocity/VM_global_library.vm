@@ -12,22 +12,21 @@
 
     <meta name="og:title" content="$title">
     <meta name="og:type" content="website">
-    <meta name="og:url" content="http://kunagi.org">
-    <meta name="og:image" content="http://kunagi.org/img/kunagi.png">
+    <meta name="og:url" content="${project.homepageUrl}">
+    <meta name="og:image" content="${project.homepageUrl}/img/kunagi.png">
     <meta name="og:site_name" content="Kunagi">
     <meta name="fb:admins" content="kunagi">
     <meta name="og:description" content="$description">
 
     <meta itemprop="name" content="$title">
     <meta itemprop="description" content="$description">
-    <meta itemprop="image" content="http://kunagi.org/img/kunagi.png">
+    <meta itemprop="image" content="${project.homepageUrl}/img/kunagi.png">
     
     <meta name="robots" content="index">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="kunagihomepage.css" type="text/css">
     <link rel="alternate" type="application/rss+xml" title="Kunagi Blog" href="http://feeds.feedburner.com/kunagi">
     <script type="text/javascript" src="js/jquery.js"></script>
-    <script type="text/javascript" src="js/jquery.sharrre.js"></script>
     <script type="text/javascript" src="js/kunagihomepage.js"></script>
 
 </head>
@@ -40,7 +39,7 @@
     <td width="172px">
     <div id="menu">
             
-            <a href="http://kunagi.org/"><img src="img/kunagi.png" height="85" alt="kunagi"></a>
+            <a href="${project.homepageUrl}"><img src="img/kunagi.png" height="85" alt="kunagi"></a>
             
             #navigLink("index", "Home", $page)
             #navigLink("blog", "Blog", $page)
@@ -147,7 +146,7 @@ pageTracker._trackPageview();
     <div class="separator"></div>
     <div class="section">
         <div class="sidebar">
-          <div class="starter"> <a onclick="kunagihp.subscribe('https://servisto.de/scrum/subscribe?subject=$entity.id&email=')" title="Subscribe to changes and comments on this entity">Subscribe</a> </div>
+          <div class="starter"> <a onclick="kunagihp.subscribe('${kunagiUrl}subscribe?subject=$entity.id&email=')" title="Subscribe to changes and comments on this entity">Subscribe</a> </div>
         </div>
         <h2>Comments</h2>
         #foreach( $comment in $entity.comments )
@@ -179,7 +178,7 @@ pageTracker._trackPageview();
     <form id="commentForm" method="post" accept-charset="UTF-8">
         <input name="projectId" type="hidden" value="$project.id">
         #if ($entityId) <input name="entityId" type="hidden" value="$entityId"> #end
-        <input name="returnUrl" type="hidden" value="http://kunagi.org/message.html#{message}">
+        <input name="returnUrl" type="hidden" value="${project.homepageUrl}/message.html#{message}">
         <input name="publish" type="hidden" value="true">
         <input id="spamPreventionCodeField" name="spamPreventionCode" type="hidden" value="spam">
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -232,7 +231,7 @@ pageTracker._trackPageview();
     <script type="text/javascript">
         var buttonHtml = '<input id="commentFormSubmitButton" type="submit" name="submit" class="submit" value="$submitLabel">';
         $(document.getElementById('commentFormSubmitButtonContainer')).append(buttonHtml);
-		$(document.getElementById('commentForm')).attr('action', 'https://servisto.de/scrum/$servlet');
+		$(document.getElementById('commentForm')).attr('action', '${kunagiUrl}${servlet}');
 		var spamPreventionCode = 'no-spam';
 		$(document.getElementById('spamPreventionCodeField')).attr('value', spamPreventionCode);
     </script>
@@ -245,7 +244,7 @@ pageTracker._trackPageview();
     <table><tr>
         <td width="100">
             <h3>Flattr</h3>
-            <script type="text/javascript">var flattr_url = 'http://kunagi.org';</script>
+            <script type="text/javascript">var flattr_url = '${project.homepageUrl}';</script>
             <script src="http://api.flattr.com/button/load.js" type="text/javascript"></script>
         </td>
         <td width="190">
@@ -304,10 +303,38 @@ pageTracker._trackPageview();
 
 
 #macro( socialbuttons $url )
-    <div id="shareme" data-url="$url" data-text="Kunagi"></div>
-    <script type="text/javascript">kunagihp.sharrre();</script>
+    <table border="0" style="margin: 10px 0 10px 0;"><tr>
+    
+    <td>
+        <div class="g-plusone" data-size="medium"></div>
+        <script type="text/javascript">
+          (function() {
+            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+            po.src = 'https://apis.google.com/js/plusone.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+          })();
+        </script>
+    </td>    
+    
+    <td>
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+        <div class="fb-like" data-href="$url" data-send="false" data-width="350" data-show-faces="false"></div>
+    </td>
+    
+    </tr></table>
 #end
 
+
+#macro( socialbuttonsmain )
+    #socialbuttons(${project.homepageUrl})
+#end
 
 #macro( socialpages )
     <div class="socialpages">

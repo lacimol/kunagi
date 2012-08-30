@@ -16,6 +16,7 @@ package scrum.client.project;
 
 import ilarkesto.core.time.Date;
 import ilarkesto.core.time.TimePeriod;
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
@@ -28,14 +29,13 @@ import scrum.client.journal.ActivateChangeHistoryAction;
 import scrum.client.sprint.Sprint;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RequirementBlock extends ABlockWidget<Requirement> implements TrashSupport {
 
 	public RequirementBlock() {}
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 	private SprintSwitchIndicatorWidget sprintBorderIndicator;
 
 	@Override
@@ -46,8 +46,8 @@ public class RequirementBlock extends ABlockWidget<Requirement> implements Trash
 		header.addText(requirement.getThemesAsStringModel(), true, false);
 		header.addText(requirement.getEstimatedWorkWithUnitModel(), true);
 
-		header.appendCell(new EmoticonsWidget(requirement), null, true);
-		header.appendCell(new EstimationBarWidget(requirement), "150px", true);
+		header.appendOuterCell(new EmoticonsWidget(requirement), null, true);
+		header.appendOuterCell(new EstimationBarWidget(requirement), "150px", true);
 
 		header.addMenuAction(new AddRequirementToCurrentSprintAction(requirement));
 		header.addMenuAction(new RemoveRequirementFromSprintAction(requirement));

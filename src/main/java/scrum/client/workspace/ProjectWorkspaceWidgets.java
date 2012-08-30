@@ -314,8 +314,6 @@ public class ProjectWorkspaceWidgets extends GProjectWorkspaceWidgets implements
 	}
 
 	public void showEntity(AGwtEntity entity) {
-		AWidget widget = getWidgetForEntity(entity);
-
 		log.debug("Showing entity:", entity);
 		if (entity instanceof Task) {
 			showTask((Task) entity);

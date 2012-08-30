@@ -677,7 +677,7 @@ public abstract class GSprint
     }
 
     public final void setRequirementsOrderIdsAsCommaSeparatedString(String requirementsOrderIds) {
-        this.requirementsOrderIds = new java.util.ArrayList(Str.parseCommaSeparatedString(requirementsOrderIds));
+        setRequirementsOrderIds(Str.parseCommaSeparatedString(requirementsOrderIds));
     }
 
     protected final void updateRequirementsOrderIds(Object value) {

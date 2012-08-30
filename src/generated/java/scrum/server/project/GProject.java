@@ -1132,7 +1132,7 @@ public abstract class GProject
     }
 
     public final void setRequirementsOrderIdsAsCommaSeparatedString(String requirementsOrderIds) {
-        this.requirementsOrderIds = new java.util.ArrayList(Str.parseCommaSeparatedString(requirementsOrderIds));
+        setRequirementsOrderIds(Str.parseCommaSeparatedString(requirementsOrderIds));
     }
 
     protected final void updateRequirementsOrderIds(Object value) {
@@ -1225,7 +1225,7 @@ public abstract class GProject
     }
 
     public final void setUrgentIssuesOrderIdsAsCommaSeparatedString(String urgentIssuesOrderIds) {
-        this.urgentIssuesOrderIds = new java.util.ArrayList(Str.parseCommaSeparatedString(urgentIssuesOrderIds));
+        setUrgentIssuesOrderIds(Str.parseCommaSeparatedString(urgentIssuesOrderIds));
     }
 
     protected final void updateUrgentIssuesOrderIds(Object value) {

@@ -139,7 +139,11 @@ public class SubscriptionService {
 			Iterator<Notification> iterator = notifications.iterator();
 			while (iterator.hasNext()) {
 				Notification notification = iterator.next();
-				if (!ignoreActionTime && notification.actionTime.isFuture()) continue;
+				if (!ignoreActionTime && notification.actionTime.isFuture()) {
+					log.debug("Notification pending until",
+						notification.actionTime.getPeriodToNow().toShortestString(), "->", notification);
+					continue;
+				}
 				sendEmails(notification);
 				changeDao.postChange(notification.subject, null, Change.NOTIFICATION_EMAILS_SENT, null,
 					Str.concat(notification.emails, ", "));
@@ -242,6 +246,11 @@ public class SubscriptionService {
 
 		private void updateActionTime() {
 			actionTime = DateAndTime.now().addMinutes(NOTIFICATION_DELAY_MIN);
+		}
+
+		@Override
+		public String toString() {
+			return message + " -> " + Str.concat(emails, ", ");
 		}
 	}
 }

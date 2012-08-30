@@ -97,7 +97,11 @@ public class AdminServlet extends AHttpServlet {
 		html.text(" ]");
 
 		html.text("[ ");
-		html.A("shutdown", "Shutdown application");
+		html.A("shutdown", "Shutdown application now");
+		html.text(" ]");
+
+		html.text("[ ");
+		html.A("shutdown?delay=5", "Shutdown application in 5 minutes");
 		html.text(" ]");
 	}
 

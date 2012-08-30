@@ -14,6 +14,7 @@
  */
 package scrum.client.sprint;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
 import scrum.client.common.BlockHeaderWidget;
@@ -24,13 +25,12 @@ import scrum.client.journal.ActivateChangeHistoryAction;
 import scrum.client.tasks.TaskWidget;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TaskInHistoryBlock extends ABlockWidget<Task> implements TrashSupport {
 
 	private Sprint sprint;
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	public TaskInHistoryBlock(Sprint sprint) {
 		super();

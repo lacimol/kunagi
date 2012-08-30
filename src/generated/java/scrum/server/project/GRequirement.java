@@ -757,7 +757,7 @@ public abstract class GRequirement
     }
 
     public final void setTasksOrderIdsAsCommaSeparatedString(String tasksOrderIds) {
-        this.tasksOrderIds = new java.util.ArrayList(Str.parseCommaSeparatedString(tasksOrderIds));
+        setTasksOrderIds(Str.parseCommaSeparatedString(tasksOrderIds));
     }
 
     protected final void updateTasksOrderIds(Object value) {
@@ -850,7 +850,7 @@ public abstract class GRequirement
     }
 
     public final void setThemesAsCommaSeparatedString(String themes) {
-        this.themes = new java.util.ArrayList(Str.parseCommaSeparatedString(themes));
+        setThemes(Str.parseCommaSeparatedString(themes));
     }
 
     protected final void updateThemes(Object value) {

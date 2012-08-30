@@ -186,7 +186,7 @@ public abstract class GSubscription
     }
 
     public final void setSubscribersEmailsAsCommaSeparatedString(String subscribersEmails) {
-        this.subscribersEmails = new java.util.HashSet(Str.parseCommaSeparatedString(subscribersEmails));
+        setSubscribersEmails(Str.parseCommaSeparatedString(subscribersEmails));
     }
 
     protected final void updateSubscribersEmails(Object value) {

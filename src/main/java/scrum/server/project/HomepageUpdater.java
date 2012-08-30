@@ -39,6 +39,8 @@ import scrum.client.wiki.Header;
 import scrum.client.wiki.HtmlContext;
 import scrum.client.wiki.WikiModel;
 import scrum.client.wiki.WikiParser;
+import scrum.server.ScrumWebApplication;
+import scrum.server.admin.SystemConfig;
 import scrum.server.admin.User;
 import scrum.server.collaboration.Comment;
 import scrum.server.collaboration.CommentDao;
@@ -118,6 +120,12 @@ public class HomepageUpdater {
 
 	private void processDefaultTemplates() {
 		ContextBuilder context = new ContextBuilder();
+
+		SystemConfig config = ScrumWebApplication.get().getSystemConfig();
+		context.put("kunagiUrl", config.getUrl());
+		context.put("kunagiAdminEmail", config.getAdminEmail());
+		context.put("kunagiInstanceName", config.getInstanceName());
+
 		fillProject(context.putSubContext("project"));
 		fillWiki(context.putSubContext("wiki"));
 		fillBlog(context.putSubContext("blog"));
@@ -419,6 +427,7 @@ public class HomepageUpdater {
 		context.put("shortDescription", toHtml(project.getShortDescription()));
 		context.put("description", wikiToHtml(project.getDescription()));
 		context.put("longDescription", wikiToHtml(project.getLongDescription()));
+		context.put("homepageUrl", project.getHomepageUrl());
 		Release currentRelease = project.getCurrentRelease();
 		context.put("currentRelease", currentRelease == null ? "?" : toHtml(currentRelease.getLabel()));
 	}

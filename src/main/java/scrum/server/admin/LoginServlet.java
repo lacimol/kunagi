@@ -322,9 +322,9 @@ public class LoginServlet extends AHttpServlet {
 
 		boolean admin = user != null && user.isAdmin();
 		boolean authenticated;
-		String email = null;
 		if (systemConfig.isLdapEnabled(true) && !admin) {
 			// LDAP authentication
+			String email = null;
 			try {
 				email = Ldap.authenticateUserGetEmail(systemConfig.getLdapUrl(), systemConfig.getLdapUser(),
 					systemConfig.getLdapPassword(), systemConfig.getLdapBaseDn(),
@@ -352,7 +352,14 @@ public class LoginServlet extends AHttpServlet {
 					return;
 				}
 
-				user = userDao.postUser(email, username, Str.generatePassword(23));
+				try {
+					user = userDao.postUser(email, username, Str.generatePassword(23));
+				} catch (Exception ex) {
+					log.warn(ex);
+					renderLoginPage(resp, username, null, historyToken, "Creating a new user <" + username
+							+ "> with email <" + email + "> failed: " + Str.getRootCauseMessage(ex), false, false);
+					return;
+				}
 				if (Str.isEmail(email)) user.setEmail(email);
 				webApplication.triggerRegisterNotification(user, request.getRemoteHost());
 			}
@@ -396,7 +403,7 @@ public class LoginServlet extends AHttpServlet {
 		if (webApplication.getConfig().isShowRelease()) title += " " + applicationInfo.getRelease();
 		if (systemConfig.isInstanceNameSet()) title += " @ " + systemConfig.getInstanceName();
 		html.startHEAD(title, "EN");
-		html.META("X-UA-Compatible", "chrome=1");
+		html.META("X-UA-Compatible", "IE=edge");
 		html.LINKfavicon();
 		html.LINKcss("scrum.ScrumGwtApplication/screen.css");
 		html.endHEAD();

@@ -282,10 +282,6 @@ public class Project extends GProject implements ForumSupport {
 		return isProductOwner(user) || isTeamMember(user);
 	}
 
-	public boolean isParticipant(User user) {
-		return getParticipants().contains(user);
-	}
-
 	public boolean isTeamMember(User user) {
 		return getTeamMembers().contains(user);
 	}

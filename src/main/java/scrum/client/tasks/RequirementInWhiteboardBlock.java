@@ -14,6 +14,7 @@
  */
 package scrum.client.tasks;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.BlockHeaderWidget;
@@ -32,12 +33,11 @@ import scrum.client.sprint.CreateTaskAction;
 import scrum.client.sprint.RequirementWorkIndicatorBarWidget;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	@Override
 	protected void onInitializationHeader(BlockHeaderWidget header) {
@@ -46,8 +46,8 @@ public class RequirementInWhiteboardBlock extends ABlockWidget<Requirement> {
 		header.addText(requirement.getLabelModel());
 		header.addText(requirement.getThemesAsStringModel(), true, false);
 		header.addText(requirement.getTaskStatusLabelModel(), true);
-		header.appendCell(new EmoticonsWidget(requirement), "20px", true);
-		header.appendCell(new RequirementWorkIndicatorBarWidget(requirement), "110px", true);
+		header.appendOuterCell(new EmoticonsWidget(requirement), "20px", true);
+		header.appendOuterCell(new RequirementWorkIndicatorBarWidget(requirement), "110px", true);
 		header.addMenuAction(new RejectRequirementAction(requirement));
 		header.addMenuAction(new FixRequirementAction(requirement));
 		header.addMenuAction(new CloseRequirementAction(requirement));

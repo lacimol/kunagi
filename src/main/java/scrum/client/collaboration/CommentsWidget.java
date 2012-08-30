@@ -68,7 +68,6 @@ public class CommentsWidget extends AScrumWidget {
 		commentListPanel = new FlowPanel();
 
 		FlowPanel panel = new FlowPanel();
-		panel = new FlowPanel();
 		panel.setStyleName("CommentsWidget");
 		panel.add(editorWrapper);
 		panel.add(commentListPanel);

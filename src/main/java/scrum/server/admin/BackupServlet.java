@@ -42,11 +42,15 @@ public class BackupServlet extends AHttpServlet {
 			return;
 		}
 
+		// TODO show message
 		webApplication.getTaskManager().start(webApplication.autowire(new BackupApplicationDataDirTask()));
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Backup initiated");
+		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Backup running", 3, "admin.html");
 		html.startBODY();
 		html.H1("Backup initiated");
+		html.startP();
+		html.text("All clients are blocked until backup is completed.");
+		html.endP();
 		html.endBODY();
 		html.endHTML();
 		html.flush();

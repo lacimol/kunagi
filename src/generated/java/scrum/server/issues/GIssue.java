@@ -1075,7 +1075,7 @@ public abstract class GIssue
     }
 
     public final void setThemesAsCommaSeparatedString(String themes) {
-        this.themes = new java.util.ArrayList(Str.parseCommaSeparatedString(themes));
+        setThemes(Str.parseCommaSeparatedString(themes));
     }
 
     protected final void updateThemes(Object value) {

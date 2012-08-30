@@ -57,7 +57,7 @@ public class StartServlet extends AHttpServlet {
 		if (config.isShowRelease()) title += " " + applicationInfo.getRelease();
 		if (systemConfig.isInstanceNameSet()) title += " @ " + systemConfig.getInstanceName();
 		html.startHEAD(title, "EN");
-		html.META("X-UA-Compatible", "chrome=1");
+		html.META("X-UA-Compatible", "IE=edge");
 		html.LINKfavicon();
 		html.SCRIPTjavascript("scrum.ScrumGwtApplication/scrum.ScrumGwtApplication.nocache.js", null);
 		html.SCRIPTjavascript("codemirror/js/codemirror.js", null);

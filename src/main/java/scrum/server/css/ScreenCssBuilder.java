@@ -363,7 +363,7 @@ public class ScreenCssBuilder implements CssBuilder {
 				.lineHeight(lineHeight);
 		css.table().borderCollapseCollapse();
 		css.td().verticalAlignTop().fontFamily(fontFamily).fontSize(fontSize).lineHeight(lineHeight);
-		css.a().cursorPointer().color(cLink).textDecorationUnderline();
+		css.a().cursorPointer().color(cLink).textDecorationUnderline().outlineNone();
 		css.p().margin(0, 0, 10, 0);
 		css.h1().fontSize(fontSize + 6).lineHeight(lineHeight + 6).fontWeightBold().margin(5, 0, 5, 0);
 		css.h2().fontSize(fontSize + 4).lineHeight(lineHeight + 4).fontWeightBold().margin(5, 0, 5, 0);
@@ -503,10 +503,16 @@ public class ScreenCssBuilder implements CssBuilder {
 				.border(1, cNavigatorSeparator).borderRadius(5);
 		css.style(".BlockHeaderWidget-anchor").displayBlock().floatLeft().width100().textDecorationNone();
 		css.style(".BlockHeaderWidget-dragHandle:hover").background("white", "../blockdraghandle-hover-bg.png");
-		css.style(".BlockHeaderWidget-cell").color(cBlockHeaderCellSecondary).fontWeightBold().color(cHeaderBackground)
-				.padding(4, 5, 0, 5);
-		css.style(".BlockHeaderWidget-cell-secondary").color(cBlockHeaderCellSecondary).fontWeightNormal();
-		css.style(".BlockHeaderWidget-cell-small").fontSize(fontSizeSmall).fontWeightNormal().paddingTop(6);
+
+		css.style(".BlockHeaderWidget-cell").fontWeightBold().color(cHeaderBackground).padding(4, 5, 0, 5);
+
+		css.style("a.BlockHeaderWidget-anchor:hover, a.BlockHeaderWidget-anchor:visited").color(cHeaderBackground);
+		css.style(
+			".BlockHeaderWidget-cell-secondary, a.BlockHeaderWidget-cell-secondary:visited, a.BlockHeaderWidget-cell-secondary:hover")
+				.color(cBlockHeaderCellSecondary).fontWeightNormal();
+		css.style(
+			".BlockHeaderWidget-cell-small, a.BlockHeaderWidget-cell-small:visited, a.BlockHeaderWidget-cell-small:hover")
+				.color(cBlockHeaderCellSecondary).fontSize(fontSizeSmall).fontWeightNormal().paddingTop(6);
 
 		css.style(".BlockHeaderWidget .ButtonWidget").padding(2, 5, 0, 5).margin(0);
 		css.style(".BlockHeaderWidget .ButtonWidget .gwt-Button").fontSize(fontSizeSmall).margin(0).padding(1);

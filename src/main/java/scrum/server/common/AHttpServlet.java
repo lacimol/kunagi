@@ -62,8 +62,8 @@ public abstract class AHttpServlet extends HttpServlet {
 
 	@Override
 	protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		if (webApplication.isShutdown()) {
-			resp.sendError(503, "Application shut down");
+		if (webApplication != null && webApplication.isShuttingDown()) {
+			resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Application shutting down");
 			return;
 		}
 		Servlet.preventCaching(resp);
@@ -76,6 +76,10 @@ public abstract class AHttpServlet extends HttpServlet {
 
 	@Override
 	protected final void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if (webApplication != null && webApplication.isShuttingDown()) {
+			resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Application shutting down");
+			return;
+		}
 		Servlet.preventCaching(resp);
 		try {
 			onRequest(req, resp, (WebSession) ScrumWebApplication.get().getWebSession(req));
@@ -108,6 +112,11 @@ public abstract class AHttpServlet extends HttpServlet {
 	// --- helper ---
 
 	protected HtmlRenderer createDefaultHtmlWithHeader(HttpServletResponse resp, String subtitle) throws IOException {
+		return createDefaultHtmlWithHeader(resp, subtitle, 0, null);
+	}
+
+	protected HtmlRenderer createDefaultHtmlWithHeader(HttpServletResponse resp, String subtitle, int refreshSeconds,
+			String refreshUrl) throws IOException {
 		String charset = IO.UTF_8;
 		resp.setContentType("text/html");
 		HtmlRenderer html = new HtmlRenderer(resp.getOutputStream(), charset);
@@ -117,7 +126,8 @@ public abstract class AHttpServlet extends HttpServlet {
 		title += " " + subtitle;
 		if (systemConfig.isInstanceNameSet()) title += " @ " + systemConfig.getInstanceName();
 		html.startHEAD(title, "EN");
-		html.META("X-UA-Compatible", "chrome=1");
+		html.META("X-UA-Compatible", "IE=edge");
+		if (!Str.isBlank(refreshUrl)) html.METArefresh(refreshSeconds, refreshUrl);
 		html.LINKfavicon();
 		html.endHEAD();
 		return html;

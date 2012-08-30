@@ -88,7 +88,6 @@ public class Requirement extends GRequirement implements ReferenceSupport, Label
 	}
 
 	public Impediment getImpediment() {
-		Set<Impediment> impediments = new HashSet<Impediment>();
 		for (Task task : getTasksInSprint()) {
 			if (task.isBlocked()) return task.getImpediment();
 		}

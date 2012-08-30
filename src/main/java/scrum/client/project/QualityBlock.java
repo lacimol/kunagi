@@ -28,7 +28,7 @@ public class QualityBlock extends ABlockWidget<Quality> implements TrashSupport 
 	@Override
 	protected void onInitializationHeader(BlockHeaderWidget header) {
 		Quality quality = getObject();
-		header.appendCell(new EmoticonsWidget(quality), null, true);
+		header.appendOuterCell(new EmoticonsWidget(quality), null, true);
 		header.addText(quality.getLabelModel());
 		header.addMenuAction(new DeleteQualityAction(quality));
 	}

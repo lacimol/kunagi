@@ -14,6 +14,7 @@
  */
 package scrum.client.impediments;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
@@ -24,12 +25,11 @@ import scrum.client.img.Img;
 import scrum.client.journal.ActivateChangeHistoryAction;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ImpedimentBlock extends ABlockWidget<Impediment> implements TrashSupport {
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	@Override
 	protected void onInitializationHeader(BlockHeaderWidget header) {
@@ -37,7 +37,7 @@ public class ImpedimentBlock extends ABlockWidget<Impediment> implements TrashSu
 		header.addText(impediment.getDateModel(), "70px", true, true);
 		statusIcon = header.addIconWrapper();
 		header.addText(impediment.getLabelModel());
-		header.appendCell(new EmoticonsWidget(impediment), null, true);
+		header.appendOuterCell(new EmoticonsWidget(impediment), null, true);
 		header.addMenuAction(new ActivateChangeHistoryAction(impediment));
 		header.addMenuAction(new CloseImpedimentAction(impediment));
 		header.addMenuAction(new ReopenImpedimentAction(impediment));

@@ -18,7 +18,8 @@ import ilarkesto.auth.OpenId;
 import ilarkesto.base.Str;
 import ilarkesto.base.time.DateAndTime;
 import ilarkesto.core.logging.Log;
-
+import ilarkesto.integration.gravatar.Gravatar;
+import ilarkesto.integration.gravatar.Profile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,7 @@ public class UserDao extends GUserDao {
 		user.setEmail(email);
 		user.setName(name);
 		user.setPassword(password);
+		user.tryUpdateByGravatar();
 		saveEntity(user);
 		log.info("User created:", user);
 		return user;
@@ -68,16 +70,25 @@ public class UserDao extends GUserDao {
 		}
 
 		if (name == null && email != null) {
+			Profile profile = Gravatar.loadProfile(email);
+			if (profile != null) name = profile.getPreferredUsername();
+		}
+
+		if (name == null && email != null) {
 			name = Str.cutTo(email, "@");
-			if (getUserByName(name) != null) name = email;
-			if (getUserByName(name) != null) name = null;
 		}
 
 		if (name == null) {
 			name = OpenId.cutUsername(openId);
 			name = Str.removePrefix(name, "AItOaw");
 			if (name.length() > 10) name = name.substring(0, 9);
-			if (getUserByName(name) != null) name = openId;
+		}
+
+		String namePrefix = name;
+		int suffix = 1;
+		while (getUserByName(name) != null) {
+			suffix++;
+			name = namePrefix + suffix;
 		}
 
 		User user = newEntityInstance();
@@ -88,7 +99,8 @@ public class UserDao extends GUserDao {
 			user.setEmail(email);
 			user.setEmailVerified(true);
 		}
-		user.setPassword(Str.generatePassword(10));
+		user.setPassword(Str.generatePassword());
+		user.tryUpdateByGravatar();
 		saveEntity(user);
 		log.info("User created:", user);
 		return user;

@@ -14,6 +14,7 @@
  */
 package scrum.client.sprint;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
 import scrum.client.common.AScrumAction;
@@ -25,12 +26,11 @@ import scrum.client.journal.ActivateChangeHistoryAction;
 import scrum.client.tasks.TaskWidget;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TaskInRequirementBlock extends ABlockWidget<Task> implements TrashSupport {
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	@Override
 	protected void onInitializationHeader(BlockHeaderWidget header) {
@@ -38,7 +38,7 @@ public class TaskInRequirementBlock extends ABlockWidget<Task> implements TrashS
 		statusIcon = header.addIconWrapper();
 		header.addText(task.getLabelModel());
 		header.addText(task.getOwnerModel(), true);
-		header.appendCell(new EmoticonsWidget(task), null, true);
+		header.appendOuterCell(new EmoticonsWidget(task), null, true);
 		header.addMenuAction(new ClaimTaskAction(task));
 		header.addMenuAction(new CloseTaskAction(task));
 		header.addMenuAction(new ReopenTaskAction(task));

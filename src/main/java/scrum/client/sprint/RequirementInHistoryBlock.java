@@ -14,8 +14,6 @@
  */
 package scrum.client.sprint;
 
-import ilarkesto.gwt.client.Gwt;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +36,6 @@ public class RequirementInHistoryBlock extends ABlockWidget<Requirement> {
 	private Sprint sprint;
 	private BlockListWidget<Task> taskList;
 	private RequirementWidget requirementWidget;
-	private FlowPanel right;
 	private ChangeHistoryWidget changeHistoryWidget;
 
 	public RequirementInHistoryBlock(Sprint sprint) {
@@ -98,7 +95,6 @@ public class RequirementInHistoryBlock extends ABlockWidget<Requirement> {
 	protected void onUpdateBody() {
 		requirementWidget.update();
 		taskList.update();
-		Gwt.update(right);
 		changeHistoryWidget.update();
 	}
 

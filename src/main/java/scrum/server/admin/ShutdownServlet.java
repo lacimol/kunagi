@@ -14,6 +14,8 @@
  */
 package scrum.server.admin;
 
+import ilarkesto.core.base.Str;
+import ilarkesto.core.time.Tm;
 import ilarkesto.ui.web.HtmlRenderer;
 
 import java.io.IOException;
@@ -25,6 +27,8 @@ import scrum.server.WebSession;
 import scrum.server.common.AHttpServlet;
 
 public class ShutdownServlet extends AHttpServlet {
+
+	private boolean shutdownInitiated;
 
 	@Override
 	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
@@ -41,14 +45,19 @@ public class ShutdownServlet extends AHttpServlet {
 			return;
 		}
 
-		webApplication.shutdown();
+		if (!shutdownInitiated) {
+			shutdownInitiated = true;
+			String sDelay = req.getParameter("delay");
+			long delayInMillis = 0;
+			if (!Str.isBlank(sDelay)) delayInMillis = Long.parseLong(sDelay) * Tm.MINUTE;
+			webApplication.shutdown(delayInMillis);
+		}
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Shutdown initiated");
+		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Shutdown initiated", 3, "admin.html");
 		html.startBODY();
 		html.H1("Shutdown initiated");
 		html.endBODY();
 		html.endHTML();
 		html.flush();
 	}
-
 }

@@ -14,6 +14,7 @@
  */
 package scrum.client.sprint;
 
+import ilarkesto.gwt.client.AnchorPanel;
 import ilarkesto.gwt.client.ButtonWidget;
 import ilarkesto.gwt.client.Gwt;
 import ilarkesto.gwt.client.TableBuilder;
@@ -42,7 +43,6 @@ import scrum.client.project.RequirementWidget;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RequirementInSprintBlock extends ABlockWidget<Requirement> {
@@ -53,7 +53,7 @@ public class RequirementInSprintBlock extends ABlockWidget<Requirement> {
 	private FlexTable bodyWidget;
 	private ChangeHistoryWidget changeHistoryWidget;
 
-	private SimplePanel statusIcon;
+	private AnchorPanel statusIcon;
 
 	private boolean decidableOnInitialization;
 
@@ -67,7 +67,7 @@ public class RequirementInSprintBlock extends ABlockWidget<Requirement> {
 		header.addText(requirement.getLabelModel());
 		header.addText(requirement.getThemesAsStringModel(), true, false);
 		header.addText(requirement.getTaskStatusLabelModel(), true);
-		header.appendCell(new EmoticonsWidget(requirement), null, true);
+		header.appendOuterCell(new EmoticonsWidget(requirement), null, true);
 		header.addMenuAction(new RejectRequirementAction(requirement));
 		header.addMenuAction(new FixRequirementAction(requirement));
 		header.addMenuAction(new CloseRequirementAction(requirement));

@@ -318,16 +318,19 @@ public class Sprint extends GSprint implements Numbered {
 		super.ensureIntegrity();
 		updateNumber();
 
-		if (getProject().isCurrentSprint(this)) {
+		Project project = getProject();
+
+		if (project.isCurrentSprint(this)) {
 			if (!isBeginSet()) setBegin(Date.today());
 			if (!isEndSet()) setEnd(getBegin().addDays(14));
 
 			// auto stretch sprint
 			if (getEnd().isYesterday()) setEnd(Date.today());
 
+			updateNextSprintDates();
 		}
 
-		if (getProject().isNextSprint(this)) {
+		if (project.isNextSprint(this)) {
 			// auto move next sprint
 			if (isBeginSet() && getBegin().isPast()) {
 				int len = 0;
@@ -346,6 +349,25 @@ public class Sprint extends GSprint implements Numbered {
 		// getDao().deleteEntity(this);
 		// }
 
+	}
+
+	public void updateNextSprintDates() {
+		Project project = getProject();
+		if (!project.isCurrentSprint(this)) return;
+
+		Sprint nextSprint = project.getNextSprint();
+		if (nextSprint == null) return;
+
+		Date nextBegin = nextSprint.getBegin();
+		if (nextBegin == null) return;
+
+		if (getEnd().isAfter(nextBegin)) {
+			Integer length = nextSprint.getLengthInDays();
+			nextSprint.setBegin(getEnd());
+			if (length != null) {
+				nextSprint.setEnd(nextSprint.getBegin().addDays(length));
+			}
+		}
 	}
 
 	@Override

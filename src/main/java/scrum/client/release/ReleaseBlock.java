@@ -15,6 +15,7 @@
 package scrum.client.release;
 
 import ilarkesto.core.time.Date;
+import ilarkesto.gwt.client.AnchorPanel;
 import ilarkesto.gwt.client.editor.AFieldModel;
 import scrum.client.collaboration.EmoticonsWidget;
 import scrum.client.common.ABlockWidget;
@@ -26,12 +27,11 @@ import scrum.client.img.Img;
 import scrum.client.journal.ActivateChangeHistoryAction;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ReleaseBlock extends ABlockWidget<Release> implements TrashSupport {
 
-	private SimplePanel typeIcon;
+	private AnchorPanel typeIcon;
 
 	@Override
 	protected void onInitializationHeader(BlockHeaderWidget header) {
@@ -40,7 +40,7 @@ public class ReleaseBlock extends ABlockWidget<Release> implements TrashSupport 
 		header.addText(release.getLabelModel());
 		header.addText(createDateSuffixModel(), true);
 		header.addText(release.getParentReleaseLabelModel(), true);
-		header.appendCell(new EmoticonsWidget(release), null, true);
+		header.appendOuterCell(new EmoticonsWidget(release), null, true);
 		header.addMenuAction(new CreateBugfixReleaseAction(release));
 		header.addMenuAction(new ReleaseReleaseAction(release));
 		header.addMenuAction(new UnreleaseReleaseAction(release));

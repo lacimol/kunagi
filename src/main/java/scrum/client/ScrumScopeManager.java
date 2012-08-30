@@ -53,7 +53,7 @@ public class ScrumScopeManager {
 	private static CascadingScope userScope;
 	private static CascadingScope projectScope;
 
-	static void initialize() {
+	static synchronized void initialize() {
 		assert scopeManager == null;
 
 		Dao dao = Dao.get();

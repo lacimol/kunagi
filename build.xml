@@ -31,14 +31,14 @@
             <fileset dir="src/generated/java" />
             <fileset dir="${ilarkesto.dir}/src/main/java" />
         </copy>
-        <javac srcdir="${classes.output.dir}" destdir="${classes.output.dir}" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac target="1.6" srcdir="${classes.output.dir}" destdir="${classes.output.dir}" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
 			<classpath>
 				<fileset dir="${ilarkesto.dir}/lib" />
 			</classpath>
         </javac>
 
         <mkdir dir="${build.dir}/test-classes" />
-        <javac srcdir="src/test/java" destdir="${build.dir}/test-classes" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="src/test/java" destdir="${build.dir}/test-classes" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
             <classpath>
                 <path location="${classes.output.dir}" />
                 <fileset dir="${ilarkesto.dir}/lib" />
@@ -166,11 +166,11 @@
 	</target>
 	
 	<target name="deployToLatest">
-		<copy file="${build.dir}/kunagi.war" tofile="/home/scrum-latest/tomcat/webapps/scrum-latest.war" preservelastmodified="true" />
+		<copy file="${build.dir}/kunagi.war" tofile="/home/kunagi-latest/tomcat/webapps/kunagi-latest.war" preservelastmodified="true" />
 	</target>
 
 	<target name="installScripts">
-		<copy file="etc/kunagi-release.py" tofile="/home/scrum/bin/kunagi-release" preservelastmodified="true" />
+		<copy file="etc/kunagi-release.py" tofile="/home/kunagi/bin/kunagi-release" preservelastmodified="true" failonerror="true" />
 	</target>
 	
     <target name="continousIntegrationBuild" depends="clean,test,package,publishPackages,releaseHomepage,installScripts,deployToLatest" />

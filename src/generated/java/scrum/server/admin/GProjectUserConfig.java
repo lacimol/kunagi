@@ -417,7 +417,7 @@ public abstract class GProjectUserConfig
     }
 
     public final void setSelectedEntitysIdsAsCommaSeparatedString(String selectedEntitysIds) {
-        this.selectedEntitysIds = new java.util.ArrayList(Str.parseCommaSeparatedString(selectedEntitysIds));
+        setSelectedEntitysIds(Str.parseCommaSeparatedString(selectedEntitysIds));
     }
 
     protected final void updateSelectedEntitysIds(Object value) {
@@ -574,7 +574,7 @@ public abstract class GProjectUserConfig
     }
 
     public final void setPblFilterThemesAsCommaSeparatedString(String pblFilterThemes) {
-        this.pblFilterThemes = new java.util.ArrayList(Str.parseCommaSeparatedString(pblFilterThemes));
+        setPblFilterThemes(Str.parseCommaSeparatedString(pblFilterThemes));
     }
 
     protected final void updatePblFilterThemes(Object value) {

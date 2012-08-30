@@ -24,6 +24,8 @@
     <h2>Networking</h2>
     You can follow us or write a review on your favorite site: #sociallinks()
     
+    #socialbuttonsmain()
+    
 </div>
 
 

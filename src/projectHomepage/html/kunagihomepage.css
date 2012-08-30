@@ -19,7 +19,7 @@ input, textarea {border: 1px solid #192666; font: 14px/19px monospace; padding: 
     #searchbox {margin: 40px 10px 10px 10px;}
         #searchinput {padding: 2px; font-size: 12px; line-height: 12px; background: #EEF; color: #666; border: 1px solid #666; float: right;}
 
-#content {background: white; padding: 25px; min-height: 500px; border: 1px solid #666; -border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;}
+#content {background: white; padding: 25px; min-height: 500px; border: 1px solid #666; border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;}
     #content a {color: #B37400;}
     #content a.reference {font-family: monospace;}
     #content code {color: #7070A0; font-family: monospace;}
