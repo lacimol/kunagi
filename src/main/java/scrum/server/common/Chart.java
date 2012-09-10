@@ -130,6 +130,10 @@ public abstract class Chart {
 				new float[] { 3f }, 0));
 		renderer.setSeriesPaint(2, COLOR_OPTIMUM_LINE);
 		renderer.setSeriesStroke(2, new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
+		// workhours max
+		renderer.setSeriesPaint(3, COLOR_OPTIMUM_LINE);
+		renderer.setSeriesStroke(3, new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 1.0f,
+				new float[] { 3f }, 0));
 
 		DateAxis domainAxis1 = new DateAxis();
 		domainAxis1.setLabelFont(new Font(domainAxis1.getLabelFont().getName(), Font.PLAIN, 7));
