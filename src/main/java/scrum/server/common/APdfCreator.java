@@ -104,8 +104,20 @@ public abstract class APdfCreator {
 		rowHeader.cell().setFontStyle(new FontStyle(defaultFont).setBold(true)).text(req.getHistoryLabel(pastSprint));
 		rowHeader.cell().setFontStyle(smallerFont).text(req.getWorkDescriptionAsString());
 
+		int allBurnedWork = 0;
+		Collection<Task> allTasks = closedTasks;
+		allTasks.addAll(openTasks);
+		for (Task task : allTasks) {
+			allBurnedWork += task.getBurnedWork();
+		}
+
+		String themes = req.getThemesAsCommaSeparatedString() == null ? "No themes" : req
+				.getThemesAsCommaSeparatedString();
+		richtextRow(table, "Themes and burned hours", themes + ", " + allBurnedWork + " hrs");
 		richtextRow(table, "Story description", req.getDescription());
-		richtextRow(table, "Acceptance tests", req.getTestDescription());
+		if (req.getTestDescription() != null) {
+			richtextRow(table, "Acceptance tests", req.getTestDescription());
+		}
 
 		tasksRow(table, "Closed tasks", closedTasks);
 		tasksRow(table, "Open tasks", openTasks);

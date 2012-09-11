@@ -574,4 +574,30 @@ public class Sprint extends GSprint implements Numbered {
 		return lastWorkDay;
 	}
 
+	public int getWorkDaysInSprint() {
+
+		int totalWorkDays = 0;
+		WeekdaySelector freeDays = getProject().getFreeDaysAsWeekdaySelector();
+
+		Date date = getBegin();
+		while (date.isBeforeOrSame(getEnd())) {
+			if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) totalWorkDays++;
+			date = date.nextDay();
+		}
+		return totalWorkDays;
+	}
+
+	public int getMaxWorkingHoursForTeam() {
+
+		int dailyBreakHours = 1;
+		int dayoffCorrection = 1;
+		int meetingDaysCorrection = 2;
+
+		int workingHoursPerDay = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
+		int usefulWorkingHoursPerDay = workingHoursPerDay - dailyBreakHours;
+		int teamMembers = getProject().getTeamMembersCount() - dayoffCorrection;
+
+		return usefulWorkingHoursPerDay * (getWorkDaysInSprint() - meetingDaysCorrection) * teamMembers;
+	}
+
 }

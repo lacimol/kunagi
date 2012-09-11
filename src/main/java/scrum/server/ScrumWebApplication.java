@@ -61,7 +61,8 @@ import scrum.server.common.EfficiencyChart;
 import scrum.server.common.ProjectEfficiencyChart;
 import scrum.server.common.SprintRangeChart;
 import scrum.server.common.SprintWorkChart;
-import scrum.server.common.StoryThemeChart;
+import scrum.server.common.StoryBurnThemeChart;
+import scrum.server.common.StoryCountThemeChart;
 import scrum.server.common.TaskRangeChart;
 import scrum.server.common.UserBurndownChart;
 import scrum.server.common.VelocityChart;
@@ -86,7 +87,8 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private SprintWorkChart sprintWorkChart;
 	private SprintRangeChart sprintRangeChart;
 	private AccomplishChart accomplishChart;
-	private StoryThemeChart storyThemeChart;
+	private StoryCountThemeChart storyThemeChart;
+	private StoryBurnThemeChart storyBurnThemeChart;
 	private ProjectEfficiencyChart projectEfficiencyChart;
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
@@ -164,11 +166,18 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		return taskRangeChart;
 	}
 
-	public StoryThemeChart getStoryThemeChart() {
+	public StoryCountThemeChart getStoryThemeChart() {
 		if (storyThemeChart == null) {
-			storyThemeChart = new StoryThemeChart();
+			storyThemeChart = new StoryCountThemeChart();
 		}
 		return storyThemeChart;
+	}
+
+	public StoryBurnThemeChart getStoryBurnThemeChart() {
+		if (storyBurnThemeChart == null) {
+			storyBurnThemeChart = new StoryBurnThemeChart();
+		}
+		return storyBurnThemeChart;
 	}
 
 	public ProjectEfficiencyChart getProjectEfficiencyChart() {

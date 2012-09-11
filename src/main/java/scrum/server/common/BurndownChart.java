@@ -12,7 +12,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import scrum.client.common.WeekdaySelector;
-import scrum.server.ScrumWebApplication;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.SprintDaySnapshot;
 
@@ -48,7 +47,7 @@ public class BurndownChart extends Chart {
 
 		WeekdaySelector freeDays = sprint.getProject().getFreeDaysAsWeekdaySelector();
 
-		writeSprintBurndownChart(out, snapshots, sprint.getBegin(), sprint.getEnd(), freeDays, width, height);
+		writeSprintBurndownChart(out, snapshots, sprint, freeDays, width, height);
 	}
 
 	// private void writeProjectBurndownChart(OutputStream out, List<ProjectSprintSnapshot> snapshots, Date
@@ -77,8 +76,11 @@ public class BurndownChart extends Chart {
 	// }
 	// }
 
-	void writeSprintBurndownChart(OutputStream out, List<? extends BurndownSnapshot> snapshots, Date firstDay,
-			Date lastDay, WeekdaySelector freeDays, int width, int height) {
+	void writeSprintBurndownChart(OutputStream out, List<? extends BurndownSnapshot> snapshots, Sprint sprint,
+			WeekdaySelector freeDays, int width, int height) {
+
+		Date firstDay = sprint.getBegin();
+		Date lastDay = sprint.getEnd();
 		LOG.debug("Creating burndown chart:", snapshots.size(), "snapshots from", firstDay, "to", lastDay, "(" + width
 				+ "x" + height + " px)");
 
@@ -91,21 +93,18 @@ public class BurndownChart extends Chart {
 		}
 
 		List<BurndownSnapshot> burndownSnapshots = new ArrayList<BurndownSnapshot>(snapshots);
-		DefaultXYDataset data = createSprintBurndownChartDataset(burndownSnapshots, firstDay, lastDay, freeDays);
-		// set workhours interval
-		int daysBetween = firstDay.getPeriodTo(lastDay).toDays();
-		int maxWorkHours = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay() * daysBetween;
-		int maxData = (int) getMaximum(data);
-		JFreeChart chart = createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data,
-			Math.max(maxData, maxWorkHours), height);
+		DefaultXYDataset data = createSprintBurndownChartDataset(burndownSnapshots, sprint, freeDays);
+
+		int maxData = Math.max((int) getMaximum(data), sprint.getMaxWorkingHoursForTeam());
+		JFreeChart chart = createXYLineChart(sprint, dateMarkTickUnit, widthPerDay, data, maxData, height);
 		createPic(out, width, height, chart);
 	}
 
 	private DefaultXYDataset createSprintBurndownChartDataset(final List<BurndownSnapshot> snapshots,
-			final Date firstDay, final Date lastDay, final WeekdaySelector freeDays) {
+			final Sprint sprint, final WeekdaySelector freeDays) {
 
 		ChartDataFactory factory = new ChartDataFactory();
-		factory.createDataset(snapshots, firstDay, lastDay, freeDays);
+		factory.createDataset(snapshots, sprint, freeDays);
 		return factory.getDataset();
 	}
 
@@ -119,9 +118,6 @@ public class BurndownChart extends Chart {
 
 		List<Double> idealDates = new ArrayList<Double>();
 		List<Double> idealValues = new ArrayList<Double>();
-
-		List<Double> workHoursDates = new ArrayList<Double>();
-		List<Double> workHoursValues = new ArrayList<Double>();
 
 		List<BurndownSnapshot> snapshots;
 		WeekdaySelector freeDays;
@@ -149,16 +145,16 @@ public class BurndownChart extends Chart {
 
 		DefaultXYDataset dataset;
 
-		public void createDataset(final List<BurndownSnapshot> snapshots, final Date firstDay, final Date lastDay,
+		public void createDataset(final List<BurndownSnapshot> snapshots, final Sprint sprint,
 				final WeekdaySelector freeDays) {
+
+			Date firstDay = sprint.getBegin();
+			Date lastDay = sprint.getEnd();
+
 			this.snapshots = snapshots;
 			this.freeDays = freeDays;
 
-			date = firstDay;
-			while (date.isBeforeOrSame(lastDay)) {
-				if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) totalWorkDays++;
-				date = date.nextDay();
-			}
+			totalWorkDays = sprint.getWorkDaysInSprint();
 
 			setDate(firstDay);
 			while (true) {
@@ -179,10 +175,6 @@ public class BurndownChart extends Chart {
 				} else {
 					processPrefix();
 				}
-				int daysBetween = date.getPeriodTo(lastDay).toDays();
-				int maximum = ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay() * daysBetween;
-				workHoursDates.add((double) millisBegin);
-				workHoursValues.add((double) maximum);
 
 				if (date.equals(lastDay)) break;
 
@@ -194,7 +186,6 @@ public class BurndownChart extends Chart {
 			dataset.addSeries("Main", toArray(mainDates, mainValues));
 			dataset.addSeries("Extrapolation", toArray(extrapolationDates, extrapolationValues));
 			dataset.addSeries("Ideal", toArray(idealDates, idealValues));
-			dataset.addSeries("WorkHours", toArray(workHoursDates, workHoursValues));
 		}
 
 		private void setDate(Date newDate) {
@@ -255,6 +246,7 @@ public class BurndownChart extends Chart {
 			}
 			idealDates.add((double) millisEnd);
 			idealValues.add(idealRemaining);
+
 			if (totalRemaining <= 0) extrapolationFinished = true;
 		}
 

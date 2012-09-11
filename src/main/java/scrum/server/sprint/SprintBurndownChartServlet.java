@@ -75,6 +75,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		boolean isCurrentSprintRangeChart = "currentSprintRangeChart".equals(chartName);
 		boolean isTaskRangeChart = "taskRangeChart".equals(chartName);
 		boolean isStoryThemeChart = "storyThemeChart".equals(chartName);
+		boolean isStoryBurnThemeChart = "storyBurnThemeChart".equals(chartName);
 		boolean isProjectEffiChart = "projectEffiChart".equals(chartName);
 
 		if (isWorkChart) {
@@ -104,6 +105,9 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		} else if (isStoryThemeChart) {
 			// story theme pie chart
 			chart = scrumWebApp.getStoryThemeChart();
+		} else if (isStoryBurnThemeChart) {
+			// story burn theme pie chart
+			chart = scrumWebApp.getStoryBurnThemeChart();
 		} else if (isProjectEffiChart) {
 			// project effi chart
 			chart = scrumWebApp.getProjectEfficiencyChart();

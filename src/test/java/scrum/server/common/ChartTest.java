@@ -152,7 +152,7 @@ public class ChartTest extends ATest {
 	public void storyThemeChart() throws IOException {
 
 		BufferedOutputStream out = getOutputStream("/storyTheme.png");
-		new StoryThemeChart().writeChart(out, project.getCurrentSprint(), 800, 400);
+		new StoryCountThemeChart().writeChart(out, project.getCurrentSprint(), 800, 400);
 		out.close();
 
 	}

@@ -36,8 +36,12 @@ public class SprintStatisticsWidget extends TeamBurnHoursWidget {
 		accomplish.addSection(new AccomplishWidget());
 
 		PagePanel storyTheme = new PagePanel();
-		storyTheme.addHeader("Story themes");
+		storyTheme.addHeader("Story themes count");
 		storyTheme.addSection(new StoryThemeWidget());
+
+		PagePanel storyBurnTheme = new PagePanel();
+		storyBurnTheme.addHeader("Story themes burnhours");
+		storyBurnTheme.addSection(new StoryBurnThemeWidget());
 
 		// burned hours
 		Project project = getCurrentProject();
@@ -45,7 +49,7 @@ public class SprintStatisticsWidget extends TeamBurnHoursWidget {
 		PagePanel yesterdayTeamBurnHours = createBurnHoursPanel(project, yesterday);
 		PagePanel todayTeamBurnHours = createBurnHoursPanel(project, Date.today());
 
-		Widget left = TableBuilder.column(5, efficiency, accomplish, storyTheme);
+		Widget left = TableBuilder.column(5, efficiency, accomplish, storyTheme, storyBurnTheme);
 		Widget right = TableBuilder.column(5, todayTeamBurnHours, yesterdayTeamBurnHours);
 
 		return TableBuilder.row(5, left, right);

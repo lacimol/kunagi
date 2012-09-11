@@ -112,8 +112,11 @@ public abstract class Chart {
 		userColors.put("green", Color.GREEN);
 	}
 
-	public static JFreeChart createXYLineChart(Date firstDay, Date lastDay, int dateMarkTickUnit, float widthPerDay,
+	public static JFreeChart createXYLineChart(Sprint sprint, int dateMarkTickUnit, float widthPerDay,
 			DefaultXYDataset data, double max, int height) {
+
+		Date firstDay = sprint.getBegin();
+		Date lastDay = sprint.getEnd();
 
 		double valueLabelTickUnit = calculateTick(max, height);
 		double upperBoundary = Math.min(max * 1.1f, max + 3);
@@ -132,7 +135,7 @@ public abstract class Chart {
 		renderer.setSeriesStroke(2, new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
 		// workhours max
 		renderer.setSeriesPaint(3, COLOR_OPTIMUM_LINE);
-		renderer.setSeriesStroke(3, new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 1.0f,
+		renderer.setSeriesStroke(3, new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 1.0f,
 				new float[] { 3f }, 0));
 
 		DateAxis domainAxis1 = new DateAxis();

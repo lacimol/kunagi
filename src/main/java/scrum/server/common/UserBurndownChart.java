@@ -90,8 +90,8 @@ public class UserBurndownChart extends Chart {
 			widthPerDay = (float) width / (float) dayCount * dateMarkTickUnit;
 		}
 
-		JFreeChart chart = createSprintBurndownChart(userBurnedHours, firstDay, lastDay, freeDays, dateMarkTickUnit,
-			widthPerDay, height);
+		JFreeChart chart = createSprintBurndownChart(userBurnedHours, sprint, freeDays, dateMarkTickUnit, widthPerDay,
+			height);
 		createPic(out, width, height, chart);
 	}
 
@@ -136,15 +136,18 @@ public class UserBurndownChart extends Chart {
 		return sorted;
 	}
 
-	private JFreeChart createSprintBurndownChart(Map<String, Integer> userBurnedHours, Date firstDay, Date lastDay,
+	private JFreeChart createSprintBurndownChart(Map<String, Integer> userBurnedHours, Sprint sprint,
 			WeekdaySelector freeDays, int dateMarkTickUnit, float widthPerDay, int height) {
+
+		Date firstDay = sprint.getBegin();
+		Date lastDay = sprint.getEnd();
 
 		DefaultXYDataset data = null;
 		double max = 0;
 		data = createWorkDataset(userBurnedHours, firstDay, lastDay, freeDays);
 		max = Math.max(max, UserBurndownChart.getMaximum(data));
 
-		return createXYLineChart(firstDay, lastDay, dateMarkTickUnit, widthPerDay, data, max, height);
+		return createXYLineChart(sprint, dateMarkTickUnit, widthPerDay, data, max, height);
 	}
 
 	public DefaultXYDataset createWorkDataset(final Map<String, Integer> userBurnedHours, final Date firstDay,

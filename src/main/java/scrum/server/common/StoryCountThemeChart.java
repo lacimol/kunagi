@@ -28,13 +28,13 @@ import org.jfree.data.general.DefaultPieDataset;
 import scrum.server.project.Requirement;
 import scrum.server.sprint.Sprint;
 
-public class StoryThemeChart extends Chart {
+public class StoryCountThemeChart extends Chart {
 
-	private static final Log LOG = Log.get(StoryThemeChart.class);
+	private static final Log LOG = Log.get(StoryCountThemeChart.class);
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new StoryThemeChart().writeChart(out, sprint, width, height);
+		new StoryCountThemeChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
@@ -47,11 +47,11 @@ public class StoryThemeChart extends Chart {
 		int noThemes = 0;
 		for (Requirement req : sprint.getRequirements()) {
 			for (String theme : req.getThemes()) {
-				Integer oldTheme = themes.get(theme);
-				if (oldTheme == null) {
-					oldTheme = 0;
+				Integer value = themes.get(theme);
+				if (value == null) {
+					value = 0;
 				}
-				themes.put(theme, ++oldTheme);
+				themes.put(theme, ++value);
 			}
 			if (req.getThemes().size() == 0) {
 				themes.put("No themes", ++noThemes);
