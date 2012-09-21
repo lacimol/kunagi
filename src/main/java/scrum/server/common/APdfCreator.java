@@ -97,7 +97,7 @@ public abstract class APdfCreator {
 			Collection<Task> closedTasks, Sprint pastSprint) {
 		pdf.nl();
 
-		ATable table = pdf.table(3, 20, 3);
+		ATable table = pdf.table(3, 18, 5);
 
 		ARow rowHeader = table.row().setDefaultBackgroundColor(Color.LIGHT_GRAY);
 		rowHeader.cell().setFontStyle(referenceFont).text(req.getReference());

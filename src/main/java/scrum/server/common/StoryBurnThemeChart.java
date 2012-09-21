@@ -84,7 +84,7 @@ public class StoryBurnThemeChart extends Chart {
 	private int getAllBurnedWorkForReq(Sprint sprint, Requirement req) {
 
 		SprintReport sprintReport = sprint.getSprintReport();
-		Collection<Task> allTasks = req.getTasks();
+		Collection<Task> allTasks = req.getTasksAsList();
 		if (sprintReport != null) {
 			allTasks = sprintReport.getClosedTasks(req);
 			allTasks.addAll(sprintReport.getOpenTasks(req));

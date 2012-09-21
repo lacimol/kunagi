@@ -91,13 +91,15 @@ public class Requirement extends GRequirement implements Numbered, ReferenceSupp
 	}
 
 	public String getWorkDescriptionAsString() {
+
 		if (!isInCurrentSprint()) return Str.appendIfNotBlank(getEstimatedWorkAsString(), "SP");
-		int remaining = getRemainingWork();
+
 		int burned = getBurnedWork();
+		int remaining = getRemainingWork();
 		int total = remaining + burned;
-		if (total == 0) return null;
+		if (!isInCurrentSprint() || total == 0) return Str.appendIfNotBlank(getEstimatedWorkAsString(), "SP");
 		float percent = burned * 100f / total;
-		return burned + "/" + total + " hrs. (" + Math.round(percent) + "%), " + getEstimatedWorkAsString() + " SP";
+		return getEstimatedWorkAsString() + " SP, " + burned + "/" + total + " hrs. (" + Math.round(percent) + "%)";
 	}
 
 	public int getTotalWork() {
@@ -115,6 +117,14 @@ public class Requirement extends GRequirement implements Numbered, ReferenceSupp
 	public int getBurnedWork() {
 		int work = 0;
 		for (Task task : getTasksInSprint()) {
+			work += task.getBurnedWork();
+		}
+		return work;
+	}
+
+	public int getClosedTasksBurnedWork() {
+		int work = 0;
+		for (Task task : getClosedTasksAsList()) {
 			work += task.getBurnedWork();
 		}
 		return work;
