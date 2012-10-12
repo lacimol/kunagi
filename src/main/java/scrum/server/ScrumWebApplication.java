@@ -20,13 +20,12 @@ package scrum.server;
 import ilarkesto.auth.OpenId;
 import ilarkesto.base.Sys;
 import ilarkesto.base.Tm;
-import ilarkesto.base.Url;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
-import ilarkesto.base.time.TimePeriod;
 import ilarkesto.concurrent.TaskManager;
 import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.TimePeriod;
 import ilarkesto.di.app.BackupApplicationDataDirTask;
 import ilarkesto.di.app.WebApplicationStarter;
 import ilarkesto.gwt.server.AGwtConversation;
@@ -64,6 +63,7 @@ import scrum.server.common.SprintWorkChart;
 import scrum.server.common.StoryBurnThemeChart;
 import scrum.server.common.StoryCountThemeChart;
 import scrum.server.common.TaskRangeChart;
+import scrum.server.common.TeamMemberBurnPieChart;
 import scrum.server.common.UserBurndownChart;
 import scrum.server.common.VelocityChart;
 import scrum.server.journal.ProjectEvent;
@@ -90,6 +90,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private StoryCountThemeChart storyThemeChart;
 	private StoryBurnThemeChart storyBurnThemeChart;
 	private ProjectEfficiencyChart projectEfficiencyChart;
+	private TeamMemberBurnPieChart teamMemberBurnPieChart;
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
 	private SystemMessage systemMessage;
@@ -178,6 +179,13 @@ public class ScrumWebApplication extends GScrumWebApplication {
 			storyBurnThemeChart = new StoryBurnThemeChart();
 		}
 		return storyBurnThemeChart;
+	}
+
+	public TeamMemberBurnPieChart getTeamMemberBurnPieChart() {
+		if (teamMemberBurnPieChart == null) {
+			teamMemberBurnPieChart = new TeamMemberBurnPieChart();
+		}
+		return teamMemberBurnPieChart;
 	}
 
 	public ProjectEfficiencyChart getProjectEfficiencyChart() {
@@ -375,11 +383,6 @@ public class ScrumWebApplication extends GScrumWebApplication {
 		} finally {
 			updateSystemMessage(new SystemMessage());
 		}
-	}
-
-	@Override
-	public Url getHomeUrl() {
-		return new Url("index.html");
 	}
 
 	private String getBaseUrl() {

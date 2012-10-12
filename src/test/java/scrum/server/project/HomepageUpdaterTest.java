@@ -16,7 +16,7 @@ package scrum.server.project;
 
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.io.IO;
 import ilarkesto.testng.ATest;
 
@@ -41,6 +41,7 @@ public class HomepageUpdaterTest extends ATest {
 
 	@BeforeClass
 	public void createProject() {
+		TestUtil.getApp().getSystemConfig().setUrl("http://localhost/kunagi");
 		project = TestUtil.createProject(TestUtil.getDuke());
 	}
 

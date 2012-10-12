@@ -16,8 +16,8 @@ package scrum.server.collaboration;
 
 import ilarkesto.base.AFactoryCache;
 import ilarkesto.base.Cache;
-import ilarkesto.base.time.DateAndTime;
 import ilarkesto.core.base.Str;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.fp.Predicate;
 import ilarkesto.persistence.AEntity;
 

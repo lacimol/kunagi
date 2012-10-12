@@ -16,6 +16,7 @@ package scrum.client.admin;
 
 import ilarkesto.core.time.DateAndTime;
 import ilarkesto.core.time.TimePeriod;
+import ilarkesto.core.time.Tm;
 
 import java.io.Serializable;
 
@@ -42,7 +43,7 @@ public class SystemMessage implements Serializable, IsSerializable {
 	}
 
 	public SystemMessage(String text, long expiresInMilliseconds) {
-		this(text, new DateAndTime(System.currentTimeMillis() + expiresInMilliseconds), true);
+		this(text, new DateAndTime(Tm.getCurrentTimeMillis() + expiresInMilliseconds), true);
 	}
 
 	public boolean isActive() {

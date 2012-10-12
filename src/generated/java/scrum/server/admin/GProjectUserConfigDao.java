@@ -14,12 +14,11 @@
 package scrum.server.admin;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GProjectUserConfigDao
             extends ilarkesto.persistence.ADao<ProjectUserConfig> {
@@ -434,21 +433,21 @@ public abstract class GProjectUserConfigDao
     // - lastActivityDateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<ProjectUserConfig>> projectUserConfigsByLastActivityDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<ProjectUserConfig>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<ProjectUserConfig>>() {
-                public Set<ProjectUserConfig> create(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<ProjectUserConfig>> projectUserConfigsByLastActivityDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<ProjectUserConfig>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<ProjectUserConfig>>() {
+                public Set<ProjectUserConfig> create(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
                     return getEntities(new IsLastActivityDateAndTime(lastActivityDateAndTime));
                 }
             });
 
-    public final Set<ProjectUserConfig> getProjectUserConfigsByLastActivityDateAndTime(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
+    public final Set<ProjectUserConfig> getProjectUserConfigsByLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         return new HashSet<ProjectUserConfig>(projectUserConfigsByLastActivityDateAndTimeCache.get(lastActivityDateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> lastActivityDateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> lastActivityDateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getLastActivityDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getLastActivityDateAndTimes() {
         if (lastActivityDateAndTimesCache == null) {
-            lastActivityDateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            lastActivityDateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (ProjectUserConfig e : getEntities()) {
                 if (e.isLastActivityDateAndTimeSet()) lastActivityDateAndTimesCache.add(e.getLastActivityDateAndTime());
             }
@@ -458,9 +457,9 @@ public abstract class GProjectUserConfigDao
 
     private static class IsLastActivityDateAndTime implements Predicate<ProjectUserConfig> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsLastActivityDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsLastActivityDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 
@@ -554,21 +553,21 @@ public abstract class GProjectUserConfigDao
     // - pblFilterDateFrom
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<ProjectUserConfig>> projectUserConfigsByPblFilterDateFromCache = new Cache<ilarkesto.base.time.Date,Set<ProjectUserConfig>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<ProjectUserConfig>>() {
-                public Set<ProjectUserConfig> create(ilarkesto.base.time.Date pblFilterDateFrom) {
+    private final Cache<ilarkesto.core.time.Date,Set<ProjectUserConfig>> projectUserConfigsByPblFilterDateFromCache = new Cache<ilarkesto.core.time.Date,Set<ProjectUserConfig>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<ProjectUserConfig>>() {
+                public Set<ProjectUserConfig> create(ilarkesto.core.time.Date pblFilterDateFrom) {
                     return getEntities(new IsPblFilterDateFrom(pblFilterDateFrom));
                 }
             });
 
-    public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateFrom(ilarkesto.base.time.Date pblFilterDateFrom) {
+    public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterDateFromCache.get(pblFilterDateFrom));
     }
-    private Set<ilarkesto.base.time.Date> pblFilterDateFromsCache;
+    private Set<ilarkesto.core.time.Date> pblFilterDateFromsCache;
 
-    public final Set<ilarkesto.base.time.Date> getPblFilterDateFroms() {
+    public final Set<ilarkesto.core.time.Date> getPblFilterDateFroms() {
         if (pblFilterDateFromsCache == null) {
-            pblFilterDateFromsCache = new HashSet<ilarkesto.base.time.Date>();
+            pblFilterDateFromsCache = new HashSet<ilarkesto.core.time.Date>();
             for (ProjectUserConfig e : getEntities()) {
                 if (e.isPblFilterDateFromSet()) pblFilterDateFromsCache.add(e.getPblFilterDateFrom());
             }
@@ -578,9 +577,9 @@ public abstract class GProjectUserConfigDao
 
     private static class IsPblFilterDateFrom implements Predicate<ProjectUserConfig> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsPblFilterDateFrom(ilarkesto.base.time.Date value) {
+        public IsPblFilterDateFrom(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -594,21 +593,21 @@ public abstract class GProjectUserConfigDao
     // - pblFilterDateTo
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<ProjectUserConfig>> projectUserConfigsByPblFilterDateToCache = new Cache<ilarkesto.base.time.Date,Set<ProjectUserConfig>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<ProjectUserConfig>>() {
-                public Set<ProjectUserConfig> create(ilarkesto.base.time.Date pblFilterDateTo) {
+    private final Cache<ilarkesto.core.time.Date,Set<ProjectUserConfig>> projectUserConfigsByPblFilterDateToCache = new Cache<ilarkesto.core.time.Date,Set<ProjectUserConfig>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<ProjectUserConfig>>() {
+                public Set<ProjectUserConfig> create(ilarkesto.core.time.Date pblFilterDateTo) {
                     return getEntities(new IsPblFilterDateTo(pblFilterDateTo));
                 }
             });
 
-    public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateTo(ilarkesto.base.time.Date pblFilterDateTo) {
+    public final Set<ProjectUserConfig> getProjectUserConfigsByPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         return new HashSet<ProjectUserConfig>(projectUserConfigsByPblFilterDateToCache.get(pblFilterDateTo));
     }
-    private Set<ilarkesto.base.time.Date> pblFilterDateTosCache;
+    private Set<ilarkesto.core.time.Date> pblFilterDateTosCache;
 
-    public final Set<ilarkesto.base.time.Date> getPblFilterDateTos() {
+    public final Set<ilarkesto.core.time.Date> getPblFilterDateTos() {
         if (pblFilterDateTosCache == null) {
-            pblFilterDateTosCache = new HashSet<ilarkesto.base.time.Date>();
+            pblFilterDateTosCache = new HashSet<ilarkesto.core.time.Date>();
             for (ProjectUserConfig e : getEntities()) {
                 if (e.isPblFilterDateToSet()) pblFilterDateTosCache.add(e.getPblFilterDateTo());
             }
@@ -618,9 +617,9 @@ public abstract class GProjectUserConfigDao
 
     private static class IsPblFilterDateTo implements Predicate<ProjectUserConfig> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsPblFilterDateTo(ilarkesto.base.time.Date value) {
+        public IsPblFilterDateTo(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

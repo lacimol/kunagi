@@ -14,11 +14,13 @@
 package scrum.server.sprint;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GSprint
             extends AEntity
@@ -272,13 +274,13 @@ public abstract class GSprint
     // - begin
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date begin;
+    private ilarkesto.core.time.Date begin;
 
-    public final ilarkesto.base.time.Date getBegin() {
+    public final ilarkesto.core.time.Date getBegin() {
         return begin;
     }
 
-    public final void setBegin(ilarkesto.base.time.Date begin) {
+    public final void setBegin(ilarkesto.core.time.Date begin) {
         begin = prepareBegin(begin);
         if (isBegin(begin)) return;
         this.begin = begin;
@@ -286,7 +288,7 @@ public abstract class GSprint
         fireModified("begin="+begin);
     }
 
-    protected ilarkesto.base.time.Date prepareBegin(ilarkesto.base.time.Date begin) {
+    protected ilarkesto.core.time.Date prepareBegin(ilarkesto.core.time.Date begin) {
         return begin;
     }
 
@@ -294,27 +296,27 @@ public abstract class GSprint
         return this.begin != null;
     }
 
-    public final boolean isBegin(ilarkesto.base.time.Date begin) {
+    public final boolean isBegin(ilarkesto.core.time.Date begin) {
         if (this.begin == null && begin == null) return true;
         return this.begin != null && this.begin.equals(begin);
     }
 
     protected final void updateBegin(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setBegin((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setBegin((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
     // - end
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date end;
+    private ilarkesto.core.time.Date end;
 
-    public final ilarkesto.base.time.Date getEnd() {
+    public final ilarkesto.core.time.Date getEnd() {
         return end;
     }
 
-    public final void setEnd(ilarkesto.base.time.Date end) {
+    public final void setEnd(ilarkesto.core.time.Date end) {
         end = prepareEnd(end);
         if (isEnd(end)) return;
         this.end = end;
@@ -322,7 +324,7 @@ public abstract class GSprint
         fireModified("end="+end);
     }
 
-    protected ilarkesto.base.time.Date prepareEnd(ilarkesto.base.time.Date end) {
+    protected ilarkesto.core.time.Date prepareEnd(ilarkesto.core.time.Date end) {
         return end;
     }
 
@@ -330,14 +332,14 @@ public abstract class GSprint
         return this.end != null;
     }
 
-    public final boolean isEnd(ilarkesto.base.time.Date end) {
+    public final boolean isEnd(ilarkesto.core.time.Date end) {
         if (this.end == null && end == null) return true;
         return this.end != null && this.end.equals(end);
     }
 
     protected final void updateEnd(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setEnd((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setEnd((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------

@@ -18,83 +18,79 @@ import ilarkesto.auth.AuthenticationFailedException;
 import ilarkesto.auth.OpenId;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.integration.ldap.Ldap;
 import ilarkesto.io.IO;
 import ilarkesto.ui.web.HtmlRenderer;
-import ilarkesto.webapp.Servlet;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.openid4java.consumer.VerificationResult;
 
 import scrum.client.ScrumGwtApplication;
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class LoginServlet extends AHttpServlet {
+public class LoginServlet extends AKunagiServlet {
 
 	private static final long serialVersionUID = 1;
 
 	private static Log log = Log.get(LoginServlet.class);
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		String historyToken = req.getParameter("historyToken");
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		String historyToken = req.get("historyToken");
 
-		if (session.getUser() != null) {
-			resp.sendRedirect(getStartPage(historyToken));
+		if (req.getSession().getUser() != null) {
+			req.sendRedirect(getStartPage(historyToken));
 			return;
 		}
 
-		if (tokenLogin(req, resp, session)) {
-			resp.sendRedirect(getStartPage(historyToken));
+		if (tokenLogin(req)) {
+			req.sendRedirect(getStartPage(historyToken));
 			return;
 		}
 
-		if (OpenId.isOpenIdCallback(req)) {
-			loginOpenId(resp, session, req);
+		if (OpenId.isOpenIdCallback(req.getHttpRequest())) {
+			loginOpenId(req);
 			return;
 		}
 
-		if (req.getParameter("createAccount") != null) {
-			createAccount(req.getParameter("username"), req.getParameter("email"), req.getParameter("password"),
-				historyToken, req, resp, session);
+		if (req.get("createAccount") != null) {
+			createAccount(req.get("username"), req.get("email"), req.get("password"), historyToken, req);
 			return;
 		}
 
-		if (req.getParameter("passwordRequest") != null) {
-			passwordRequest(req.getParameter("email"), historyToken, resp, session);
+		if (req.get("passwordRequest") != null) {
+			passwordRequest(req.get("email"), historyToken, req);
 			return;
 		}
 
-		String openId = req.getParameter("openid");
+		String openId = req.get("openid");
 		if (openId != null) {
-			redirectOpenId(openId, req.getParameter("keepmeloggedin") != null, historyToken, resp, session, req);
+			redirectOpenId(openId, req.get("keepmeloggedin") != null, historyToken, req);
 			return;
 		}
 
-		String username = req.getParameter("username");
+		String username = req.get("username");
 		if (username != null) {
-			login(username, req.getParameter("password"), req.getParameter("keepmeloggedin") != null, historyToken,
-				req, resp, session);
+			login(username, req.get("password"), req.get("keepmeloggedin") != null, historyToken, req);
 			return;
 		}
 
-		renderLoginPage(resp, null, null, historyToken, null, req.getParameter("showPasswordRequest") != null,
-			req.getParameter("showCreateAccount") != null);
+		renderLoginPage(req, null, null, historyToken, null, req.get("showPasswordRequest") != null,
+			req.get("showCreateAccount") != null);
 	}
 
-	private void passwordRequest(String login, String historyToken, HttpServletResponse resp, WebSession session)
+	private void passwordRequest(String login, String historyToken, RequestWrapper<WebSession> req)
 			throws UnsupportedEncodingException, IOException {
 		if (login == null || Str.isBlank(login)) {
-			renderLoginPage(resp, login, null, historyToken, "E-Mail required.", true, false);
+			renderLoginPage(req, login, null, historyToken, "E-Mail required.", true, false);
 			return;
 		}
 
@@ -107,32 +103,31 @@ public class LoginServlet extends AHttpServlet {
 		}
 
 		if (user == null) {
-			renderLoginPage(resp, login, login, historyToken, "User '" + login + "' does not exist.", true, false);
+			renderLoginPage(req, login, login, historyToken, "User '" + login + "' does not exist.", true, false);
 			return;
 		}
 
 		if (user.isAdmin()) {
-			renderLoginPage(resp, login, login, historyToken, "Admins can not request new passwords.", true, false);
+			renderLoginPage(req, login, login, historyToken, "Admins can not request new passwords.", true, false);
 			return;
 		}
 
 		if (!user.isEmailVerified()) {
-			renderLoginPage(resp, login, login, historyToken, "User '" + login
+			renderLoginPage(req, login, login, historyToken, "User '" + login
 					+ "' has no verified email. Please contact the admin: " + systemConfig.getAdminEmail(), true, false);
 			return;
 		}
 
 		user.triggerNewPasswordRequest();
-		renderLoginPage(resp, login, login, historyToken, "New password has been sent to " + login, false, false);
+		renderLoginPage(req, login, login, historyToken, "New password has been sent to " + login, false, false);
 	}
 
 	private void createAccount(String username, String email, String password, String historyToken,
-			HttpServletRequest req, HttpServletResponse resp, WebSession session) throws UnsupportedEncodingException,
-			IOException {
+			RequestWrapper<WebSession> req) throws UnsupportedEncodingException, IOException {
 
 		if (webApplication.getSystemConfig().isRegistrationDisabled()) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Feature is disabled.",
-				false, false);
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Feature is disabled.", false,
+				false);
 			return;
 		}
 
@@ -141,42 +136,42 @@ public class LoginServlet extends AHttpServlet {
 		if (Str.isBlank(password)) password = null;
 
 		if (username == null) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Username required.", false,
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Username required.", false,
 				true);
 			return;
 		}
 		if (systemConfig.isUserEmailMandatory() && email == null) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. E-Mail required.", false,
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. E-Mail required.", false,
 				true);
 			return;
 		}
 		if (password == null) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Password required.", false,
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Password required.", false,
 				true);
 			return;
 		}
 
 		if (Str.containsNonLetterOrDigit(username)) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Name '" + username
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Name '" + username
 					+ "' contains an illegal character. Only letters and digits allowed.", false, true);
 			return;
 		}
 
 		if (email != null && !Str.isEmail(email)) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Illegal email address.",
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Illegal email address.",
 				false, true);
 			return;
 		}
 
 		if (userDao.getUserByName(username) != null) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Name '" + username
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Name '" + username
 					+ "' is already used.", false, true);
 			log.warn("Registration failed. User name already exists:", username);
 			return;
 		}
 
 		if (email != null && userDao.getUserByEmail(email) != null) {
-			renderLoginPage(resp, username, email, historyToken, "Creating account failed. Email '" + email
+			renderLoginPage(req, username, email, historyToken, "Creating account failed. Email '" + email
 					+ "' is already used.", false, true);
 			log.warn("Registration failed. User email already exists:", email);
 			return;
@@ -189,8 +184,8 @@ public class LoginServlet extends AHttpServlet {
 		webApplication.triggerRegisterNotification(user, req.getRemoteHost());
 		webApplication.sendToClients(user);
 
-		session.setUser(user);
-		resp.sendRedirect(getStartPage(historyToken));
+		req.getSession().setUser(user);
+		req.sendRedirect(getStartPage(historyToken));
 	}
 
 	private String getStartPage(String historyToken) {
@@ -200,24 +195,23 @@ public class LoginServlet extends AHttpServlet {
 		return url;
 	}
 
-	private void loginOpenId(HttpServletResponse resp, WebSession session, HttpServletRequest request)
-			throws UnsupportedEncodingException, IOException {
-		HttpSession httpSession = request.getSession();
-		String historyToken = (String) httpSession.getAttribute("openidHistoryToken");
-		boolean keepmeloggedin = httpSession.getAttribute("openidKeepmeloggedin") != null;
+	private void loginOpenId(RequestWrapper<WebSession> req) throws UnsupportedEncodingException, IOException {
+		HttpSession httpSession = req.getHttpSession();
+		String historyToken = req.getSessionAttributeAsString("openidHistoryToken");
+		boolean keepmeloggedin = req.getSessionAttribute("openidKeepmeloggedin") != null;
 
 		VerificationResult openIdResult;
 		try {
-			openIdResult = OpenId.getVerificationFromCallback(request);
+			openIdResult = OpenId.getVerificationFromCallback(req.getHttpRequest());
 		} catch (RuntimeException ex) {
 			log.error("OpenID authentication failed.", ex);
-			renderLoginPage(resp, null, null, historyToken,
+			renderLoginPage(req, null, null, historyToken,
 				"OpenID authentication failed: " + Str.format(Utl.getRootCause(ex)), false, false);
 			return;
 		}
 		String openId = OpenId.getOpenId(openIdResult);
 		if (openId == null) {
-			renderLoginPage(resp, null, null, historyToken, "OpenID authentication failed.", false, false);
+			renderLoginPage(req, null, null, historyToken, "OpenID authentication failed.", false, false);
 			return;
 		}
 
@@ -229,13 +223,13 @@ public class LoginServlet extends AHttpServlet {
 
 		if (user == null) {
 			if (webApplication.getSystemConfig().isRegistrationDisabled()) {
-				renderLoginPage(resp, null, null, historyToken, "There is no user with the OpenID " + openId
+				renderLoginPage(req, null, null, historyToken, "There is no user with the OpenID " + openId
 						+ " and creating new users is disabled.", false, false);
 				return;
 			}
 
 			if (!webApplication.getSystemConfig().isOpenIdDomainAllowed(openId)) {
-				renderLoginPage(resp, null, null, historyToken, "Registration failed. OpenID domains are limited to: "
+				renderLoginPage(req, null, null, historyToken, "Registration failed. OpenID domains are limited to: "
 						+ webApplication.getSystemConfig().getOpenIdDomains(), false, false);
 				log.warn("Registration failed. OpenID domains are limited to:", webApplication.getSystemConfig()
 						.getOpenIdDomains());
@@ -244,7 +238,7 @@ public class LoginServlet extends AHttpServlet {
 
 			if (email != null) {
 				if (userDao.getUserByEmail(email) != null) {
-					renderLoginPage(resp, null, null, historyToken, "Creating account failed. Email '" + email
+					renderLoginPage(req, null, null, historyToken, "Creating account failed. Email '" + email
 							+ "' is already used.", false, false);
 					log.warn("Registration failed. Email already exists:", email);
 					return;
@@ -252,7 +246,7 @@ public class LoginServlet extends AHttpServlet {
 			}
 
 			if (email == null && webApplication.getSystemConfig().isUserEmailMandatory()) {
-				renderLoginPage(resp, null, null, historyToken,
+				renderLoginPage(req, null, null, historyToken,
 					"Creating account failed. Required email address was not included in OpenID response.", false,
 					false);
 				return;
@@ -260,62 +254,59 @@ public class LoginServlet extends AHttpServlet {
 
 			user = userDao.postUserWithOpenId(openId, nickname, fullName, email);
 			webApplication.getTransactionService().commit();
-			webApplication.triggerRegisterNotification(user, request.getRemoteHost());
+			webApplication.triggerRegisterNotification(user, req.getRemoteHost());
 		}
 
 		log.info("User authenticated by OpenID:", openId, "->", user);
 
 		if (user.isDisabled()) {
-			renderLoginPage(resp, null, null, historyToken, "User is disabled.", false, false);
+			renderLoginPage(req, null, null, historyToken, "User is disabled.", false, false);
 			return;
 		}
 
 		user.setLastLoginDateAndTime(DateAndTime.now());
 		if (!user.isEmailSet()) user.setEmail(email);
-		session.setUser(user);
+		req.getSession().setUser(user);
 
 		if (keepmeloggedin)
-			Servlet.setCookie(resp, ScrumGwtApplication.LOGIN_TOKEN_COOKIE, user.getLoginToken(),
-				LOGIN_TOKEN_COOKIE_MAXAGE);
+			req.setCookie(ScrumGwtApplication.LOGIN_TOKEN_COOKIE, user.getLoginToken(), LOGIN_TOKEN_COOKIE_MAXAGE);
 
-		resp.sendRedirect(getStartPage(historyToken));
+		req.sendRedirect(getStartPage(historyToken));
 	}
 
-	private void redirectOpenId(String openId, boolean keepmeloggedin, String historyToken, HttpServletResponse resp,
-			WebSession session, HttpServletRequest request) throws UnsupportedEncodingException, IOException {
-		HttpSession httpSession = request.getSession();
+	private void redirectOpenId(String openId, boolean keepmeloggedin, String historyToken,
+			RequestWrapper<WebSession> req) throws UnsupportedEncodingException, IOException {
 		if (Str.isBlank(openId)) openId = null;
 
 		if (openId == null) {
-			renderLoginPage(resp, null, null, historyToken, "Login failed. OpenID required.", false, true);
+			renderLoginPage(req, null, null, historyToken, "Login failed. OpenID required.", false, true);
 			return;
 		}
 
 		String returnUrl = webApplication.createUrl("login.html");
 		if (!returnUrl.startsWith("http")) {
-			returnUrl = request.getRequestURL().toString();
+			returnUrl = req.getUrl();
 		}
 
 		String openIdUrl;
 		try {
-			openIdUrl = OpenId.createAuthenticationRequestUrl(openId, returnUrl, httpSession, true, false, false,
-				false, true, webApplication.getSystemConfig().isUserEmailMandatory());
+			openIdUrl = OpenId.createAuthenticationRequestUrl(openId, returnUrl, req.getHttpSession(), true, false,
+				false, false, true, webApplication.getSystemConfig().isUserEmailMandatory());
 		} catch (RuntimeException ex) {
 			log.error("OpenID authentication failed.", ex);
-			renderLoginPage(resp, null, null, historyToken,
+			renderLoginPage(req, null, null, historyToken,
 				"OpenID authentication failed: " + Str.format(Utl.getRootCause(ex)), false, false);
 			return;
 		}
 
-		httpSession.setAttribute("openidHistoryToken", historyToken);
-		httpSession.setAttribute("openidKeepmeloggedin", keepmeloggedin ? "true" : null);
+		req.setSessionAttribute("openidHistoryToken", historyToken);
+		req.setSessionAttribute("openidKeepmeloggedin", keepmeloggedin ? "true" : null);
 
-		resp.sendRedirect(openIdUrl);
+		req.sendRedirect(openIdUrl);
 	}
 
 	private void login(String username, String password, boolean keepmeloggedin, String historyToken,
-			HttpServletRequest request, HttpServletResponse resp, WebSession session)
-			throws UnsupportedEncodingException, IOException {
+			RequestWrapper<WebSession> req) throws UnsupportedEncodingException, IOException {
 		User user = null;
 		if (username.contains("@")) user = userDao.getUserByEmail(username.toLowerCase());
 		if (user == null) user = userDao.getUserByName(username);
@@ -334,20 +325,20 @@ public class LoginServlet extends AHttpServlet {
 				authenticated = false;
 			} catch (Exception ex) {
 				log.error("LDAP authentication failed.", ex);
-				renderLoginPage(resp, username, null, historyToken,
+				renderLoginPage(req, username, null, historyToken,
 					"LDAP authentication failed: " + Str.getRootCauseMessage(ex), false, false);
 				return;
 			}
 
 			if (authenticated && user == null) {
 				if (webApplication.getSystemConfig().isRegistrationDisabled()) {
-					renderLoginPage(resp, null, null, historyToken, "There is no user " + username
+					renderLoginPage(req, null, null, historyToken, "There is no user " + username
 							+ " and creating new users is disabled.", false, false);
 					return;
 				}
 
 				if (userDao.getUserByEmail(email) != null) {
-					renderLoginPage(resp, null, null, historyToken, "User with email " + email + " already exists: "
+					renderLoginPage(req, null, null, historyToken, "User with email " + email + " already exists: "
 							+ email, false, false);
 					return;
 				}
@@ -356,12 +347,12 @@ public class LoginServlet extends AHttpServlet {
 					user = userDao.postUser(email, username, Str.generatePassword(23));
 				} catch (Exception ex) {
 					log.warn(ex);
-					renderLoginPage(resp, username, null, historyToken, "Creating a new user <" + username
+					renderLoginPage(req, username, null, historyToken, "Creating a new user <" + username
 							+ "> with email <" + email + "> failed: " + Str.getRootCauseMessage(ex), false, false);
 					return;
 				}
 				if (Str.isEmail(email)) user.setEmail(email);
-				webApplication.triggerRegisterNotification(user, request.getRemoteHost());
+				webApplication.triggerRegisterNotification(user, req.getRemoteHost());
 			}
 		} else {
 			// default password authentication
@@ -369,34 +360,33 @@ public class LoginServlet extends AHttpServlet {
 		}
 
 		if (!authenticated || user == null) {
-			renderLoginPage(resp, username, null, historyToken, "Login failed.", false, false);
+			renderLoginPage(req, username, null, historyToken, "Login failed.", false, false);
 			return;
 		}
 
 		if (user.isDisabled()) {
-			renderLoginPage(resp, username, null, historyToken, "User is disabled.", false, false);
+			renderLoginPage(req, username, null, historyToken, "User is disabled.", false, false);
 			return;
 		}
 
 		user.setLastLoginDateAndTime(DateAndTime.now());
-		session.setUser(user);
+		req.getSession().setUser(user);
 
 		if (keepmeloggedin)
-			Servlet.setCookie(resp, ScrumGwtApplication.LOGIN_TOKEN_COOKIE, user.getLoginToken(),
-				LOGIN_TOKEN_COOKIE_MAXAGE);
+			req.setCookie(ScrumGwtApplication.LOGIN_TOKEN_COOKIE, user.getLoginToken(), LOGIN_TOKEN_COOKIE_MAXAGE);
 
-		resp.sendRedirect(getStartPage(historyToken));
+		req.sendRedirect(getStartPage(historyToken));
 	}
 
-	private void renderLoginPage(HttpServletResponse resp, String username, String email, String historyToken,
+	private void renderLoginPage(RequestWrapper<WebSession> req, String username, String email, String historyToken,
 			String message, boolean passwordRequest, boolean createAccount) throws UnsupportedEncodingException,
 			IOException {
 		if (webApplication.getSystemConfig().isRegistrationDisabled()) createAccount = false;
 
 		String charset = IO.UTF_8;
-		resp.setContentType("text/html");
+		req.setContentTypeHtml();
 
-		HtmlRenderer html = new HtmlRenderer(resp.getOutputStream(), charset);
+		HtmlRenderer html = new HtmlRenderer(req.getWriter(), charset);
 		html.startHTMLstandard();
 
 		String title = "Kunagi Login";

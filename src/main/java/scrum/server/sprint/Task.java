@@ -14,7 +14,7 @@
  */
 package scrum.server.sprint;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 
 import java.util.List;
 

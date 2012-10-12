@@ -14,11 +14,13 @@
 package scrum.server.admin;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GUser
             extends AUser
@@ -438,13 +440,13 @@ public abstract class GUser
     // - lastLoginDateAndTime
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.DateAndTime lastLoginDateAndTime;
+    private ilarkesto.core.time.DateAndTime lastLoginDateAndTime;
 
-    public final ilarkesto.base.time.DateAndTime getLastLoginDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getLastLoginDateAndTime() {
         return lastLoginDateAndTime;
     }
 
-    public final void setLastLoginDateAndTime(ilarkesto.base.time.DateAndTime lastLoginDateAndTime) {
+    public final void setLastLoginDateAndTime(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
         lastLoginDateAndTime = prepareLastLoginDateAndTime(lastLoginDateAndTime);
         if (isLastLoginDateAndTime(lastLoginDateAndTime)) return;
         this.lastLoginDateAndTime = lastLoginDateAndTime;
@@ -452,7 +454,7 @@ public abstract class GUser
         fireModified("lastLoginDateAndTime="+lastLoginDateAndTime);
     }
 
-    protected ilarkesto.base.time.DateAndTime prepareLastLoginDateAndTime(ilarkesto.base.time.DateAndTime lastLoginDateAndTime) {
+    protected ilarkesto.core.time.DateAndTime prepareLastLoginDateAndTime(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
         return lastLoginDateAndTime;
     }
 
@@ -460,27 +462,27 @@ public abstract class GUser
         return this.lastLoginDateAndTime != null;
     }
 
-    public final boolean isLastLoginDateAndTime(ilarkesto.base.time.DateAndTime lastLoginDateAndTime) {
+    public final boolean isLastLoginDateAndTime(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
         if (this.lastLoginDateAndTime == null && lastLoginDateAndTime == null) return true;
         return this.lastLoginDateAndTime != null && this.lastLoginDateAndTime.equals(lastLoginDateAndTime);
     }
 
     protected final void updateLastLoginDateAndTime(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.DateAndTime((String)value);
-        setLastLoginDateAndTime((ilarkesto.base.time.DateAndTime)value);
+        value = value == null ? null : new ilarkesto.core.time.DateAndTime((String)value);
+        setLastLoginDateAndTime((ilarkesto.core.time.DateAndTime)value);
     }
 
     // -----------------------------------------------------------
     // - registrationDateAndTime
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.DateAndTime registrationDateAndTime;
+    private ilarkesto.core.time.DateAndTime registrationDateAndTime;
 
-    public final ilarkesto.base.time.DateAndTime getRegistrationDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getRegistrationDateAndTime() {
         return registrationDateAndTime;
     }
 
-    public final void setRegistrationDateAndTime(ilarkesto.base.time.DateAndTime registrationDateAndTime) {
+    public final void setRegistrationDateAndTime(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
         registrationDateAndTime = prepareRegistrationDateAndTime(registrationDateAndTime);
         if (isRegistrationDateAndTime(registrationDateAndTime)) return;
         this.registrationDateAndTime = registrationDateAndTime;
@@ -488,7 +490,7 @@ public abstract class GUser
         fireModified("registrationDateAndTime="+registrationDateAndTime);
     }
 
-    protected ilarkesto.base.time.DateAndTime prepareRegistrationDateAndTime(ilarkesto.base.time.DateAndTime registrationDateAndTime) {
+    protected ilarkesto.core.time.DateAndTime prepareRegistrationDateAndTime(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
         return registrationDateAndTime;
     }
 
@@ -496,14 +498,14 @@ public abstract class GUser
         return this.registrationDateAndTime != null;
     }
 
-    public final boolean isRegistrationDateAndTime(ilarkesto.base.time.DateAndTime registrationDateAndTime) {
+    public final boolean isRegistrationDateAndTime(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
         if (this.registrationDateAndTime == null && registrationDateAndTime == null) return true;
         return this.registrationDateAndTime != null && this.registrationDateAndTime.equals(registrationDateAndTime);
     }
 
     protected final void updateRegistrationDateAndTime(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.DateAndTime((String)value);
-        setRegistrationDateAndTime((ilarkesto.base.time.DateAndTime)value);
+        value = value == null ? null : new ilarkesto.core.time.DateAndTime((String)value);
+        setRegistrationDateAndTime((ilarkesto.core.time.DateAndTime)value);
     }
 
     // -----------------------------------------------------------

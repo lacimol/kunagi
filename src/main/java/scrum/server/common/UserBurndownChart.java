@@ -15,8 +15,8 @@
 
 package scrum.server.common;
 
-import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.Date;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -100,7 +100,7 @@ public class UserBurndownChart extends Chart {
 		Map<String, Integer> userBurnedHours = new HashMap<String, Integer>();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		while (firstDay.isBeforeOrSame(lastDay)) {
-			userBurnedHours.put(firstDay.toString(dateFormat), 0);
+			userBurnedHours.put(dateFormat.format(firstDay.toJavaDate()), 0);
 			firstDay = firstDay.nextDay();
 		}
 
@@ -111,7 +111,7 @@ public class UserBurndownChart extends Chart {
 			if (userName == null || task.isOwnersTask(userName)) {
 				int previousSnapshotBurn = 0;
 				for (TaskDaySnapshot snapshot : task.getTaskDaySnapshots(sprint)) {
-					day = snapshot.getDate().toString(dateFormat);
+					day = dateFormat.format(snapshot.getDate().toJavaDate());
 					burnedWork = snapshot.getBurnedWork();
 					if (previousSnapshotBurn != 0 && burnedWork > 0) {
 						burnedWork -= previousSnapshotBurn;

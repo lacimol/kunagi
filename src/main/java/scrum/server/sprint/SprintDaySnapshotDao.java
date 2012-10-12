@@ -14,7 +14,7 @@
  */
 package scrum.server.sprint;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.fp.Predicate;
 
 import java.util.LinkedList;
@@ -25,6 +25,7 @@ public class SprintDaySnapshotDao extends GSprintDaySnapshotDao {
 	public SprintDaySnapshot getSprintDaySnapshot(final Sprint sprint, final Date date, boolean autoCreate) {
 		SprintDaySnapshot snapshot = getEntity(new Predicate<SprintDaySnapshot>() {
 
+			@Override
 			public boolean test(SprintDaySnapshot e) {
 				return e.isSprint(sprint) && e.isDate(date);
 			}

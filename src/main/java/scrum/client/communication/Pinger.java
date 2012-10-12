@@ -15,6 +15,7 @@
 package scrum.client.communication;
 
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.Tm;
 
 import java.util.LinkedList;
 
@@ -39,7 +40,7 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 
 	private Timer timer;
 	private int maxDelay = MAX_DELAY;
-	private long lastDataReceiveTime = System.currentTimeMillis();
+	private long lastDataReceiveTime = Tm.getCurrentTimeMillis();
 	private LinkedList<Long> pingTimes = new LinkedList<Long>();
 
 	@Override
@@ -49,12 +50,12 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 			@Override
 			public void run() {
 				if (!serviceCaller.containsServiceCall(PingServiceCall.class)) {
-					final long start = System.currentTimeMillis();
+					final long start = Tm.getCurrentTimeMillis();
 					new PingServiceCall().execute(new Runnable() {
 
 						@Override
 						public void run() {
-							long time = System.currentTimeMillis() - start;
+							long time = Tm.getCurrentTimeMillis() - start;
 							pingTimes.add(time);
 							if (pingTimes.size() > 10) pingTimes.removeFirst();
 						}
@@ -77,7 +78,7 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 	public void onServerDataReceived(ServerDataReceivedEvent event) {
 		DataTransferObject data = event.getData();
 		if (data.containsEntities()) {
-			lastDataReceiveTime = System.currentTimeMillis();
+			lastDataReceiveTime = Tm.getCurrentTimeMillis();
 			reschedule();
 		}
 	}
@@ -98,7 +99,7 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 
 	public void reschedule() {
 		if (timer == null) return;
-		long idle = System.currentTimeMillis() - lastDataReceiveTime;
+		long idle = Tm.getCurrentTimeMillis() - lastDataReceiveTime;
 		idle = (int) (idle * 0.15);
 		if (idle < MIN_DELAY) idle = MIN_DELAY;
 		if (idle > maxDelay) idle = maxDelay;
@@ -113,7 +114,7 @@ public class Pinger extends GPinger implements ServerDataReceivedHandler, BlockE
 	private void deactivatePowerPolling() {
 		if (maxDelay == MAX_DELAY) return;
 		maxDelay = MAX_DELAY;
-		lastDataReceiveTime = System.currentTimeMillis();
+		lastDataReceiveTime = Tm.getCurrentTimeMillis();
 		log.debug("PowerPolling deactivated");
 	}
 

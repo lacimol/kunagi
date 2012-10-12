@@ -15,7 +15,7 @@
 
 package scrum.server.task;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.fp.Predicate;
 
 import java.util.LinkedList;
@@ -29,6 +29,7 @@ public class TaskDaySnapshotDao extends GTaskDaySnapshotDao {
 	public TaskDaySnapshot getTaskDaySnapshot(final Task task, final Date date, boolean autoCreate) {
 		TaskDaySnapshot snapshot = getEntity(new Predicate<TaskDaySnapshot>() {
 
+			@Override
 			public boolean test(TaskDaySnapshot e) {
 				return e.isTask(task) && e.isDate(date);
 			}

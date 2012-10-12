@@ -14,12 +14,11 @@
 package scrum.server.collaboration;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GCommentDao
             extends ilarkesto.persistence.ADao<Comment> {
@@ -336,21 +335,21 @@ public abstract class GCommentDao
     // - dateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<Comment>> commentsByDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<Comment>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<Comment>>() {
-                public Set<Comment> create(ilarkesto.base.time.DateAndTime dateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<Comment>> commentsByDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<Comment>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<Comment>>() {
+                public Set<Comment> create(ilarkesto.core.time.DateAndTime dateAndTime) {
                     return getEntities(new IsDateAndTime(dateAndTime));
                 }
             });
 
-    public final Set<Comment> getCommentsByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    public final Set<Comment> getCommentsByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return new HashSet<Comment>(commentsByDateAndTimeCache.get(dateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> dateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getDateAndTimes() {
         if (dateAndTimesCache == null) {
-            dateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            dateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (Comment e : getEntities()) {
                 if (e.isDateAndTimeSet()) dateAndTimesCache.add(e.getDateAndTime());
             }
@@ -360,9 +359,9 @@ public abstract class GCommentDao
 
     private static class IsDateAndTime implements Predicate<Comment> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

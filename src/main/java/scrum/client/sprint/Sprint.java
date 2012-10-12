@@ -170,6 +170,10 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 		return getChartUrl(width, height) + "&chart=storyBurnThemeChart";
 	}
 
+	public String getTeamMemberBurnPieChartUrl(int width, int height) {
+		return getChartUrl(width, height) + "&chart=teamMemberBurnPieChart";
+	}
+
 	public boolean isCompleted() {
 		return getVelocity() != null;
 	}

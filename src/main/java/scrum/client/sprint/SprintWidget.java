@@ -17,7 +17,7 @@ package scrum.client.sprint;
 import ilarkesto.gwt.client.AFieldValueWidget;
 import ilarkesto.gwt.client.TableBuilder;
 import ilarkesto.gwt.client.editor.RichtextEditorWidget;
-
+import ilarkesto.gwt.client.editor.TextOutputWidget;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,10 +62,10 @@ public class SprintWidget extends AScrumWidget {
 		}
 
 		if (completed) {
-			tb.addFieldRow("Velocity", new SimpleValueWidget(sprint.getVelocity()), cols - 1);
+			tb.addFieldRow("Velocity", new TextOutputWidget(sprint.getVelocityModel()), cols - 1);
 		}
 
-		tb.addField("Begin", sprint.getNumberModel());
+		tb.addField("Begin", sprint.getBeginModel());
 		tb.addField("Length", sprint.getLengthInDaysModel());
 		tb.addFieldRow("End", sprint.getEndModel());
 

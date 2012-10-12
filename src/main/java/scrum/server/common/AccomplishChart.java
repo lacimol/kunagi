@@ -78,7 +78,7 @@ public class AccomplishChart extends Chart {
 		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
 
 		for (Task task : sprintTasks) {
-			if (userName.equals(Sprint.TEAM) || (task.getOwner() != null && userName.equals(task.getOwner().getName()))) {
+			if (userName.equals(Sprint.TEAM) || (task.isOwnersTask(userName))) {
 				allBurnedHours += task.getBurnedWork();
 			}
 		}
@@ -89,7 +89,8 @@ public class AccomplishChart extends Chart {
 	private Double getUserRemainingHours(Sprint sprint, String userName) {
 
 		Double allRemainingHours = 0.0;
-		List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
+		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
+		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
 
 		for (Task task : sprintTasks) {
 			if (task.getOwner() != null && (userName.equals(Sprint.TEAM) || userName.equals(task.getOwner().getName()))) {

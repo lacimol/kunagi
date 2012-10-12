@@ -17,8 +17,8 @@ package scrum.server.common;
 
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.Date;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -295,14 +295,22 @@ public abstract class Chart {
 		return chart;
 	}
 
+	public JFreeChart createPercentPieChart(final DefaultPieDataset dataset) {
+		return createPieChart(dataset, new StandardPieSectionLabelGenerator("{0} = {1}%"));
+	}
+
+	public JFreeChart createAmountPieChart(final DefaultPieDataset dataset) {
+		return createPieChart(dataset, new StandardPieSectionLabelGenerator("{0} = {1}"));
+	}
+
 	@SuppressWarnings("unchecked")
-	public JFreeChart createPieChart(final DefaultPieDataset dataset) {
+	public JFreeChart createPieChart(final DefaultPieDataset dataset, StandardPieSectionLabelGenerator label) {
 
 		final JFreeChart chart = ChartFactory.createPieChart("", dataset, false, true, false);
 		PiePlot plot = (PiePlot) chart.getPlot();
 		plot.setNoDataMessage("No data available");
 		plot.setLabelGap(0.02);
-		plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} = {1}"));
+		plot.setLabelGenerator(label);
 		plot.setForegroundAlpha(0.90f);
 		// expode
 		List<String> keys = dataset.getKeys();

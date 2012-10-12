@@ -17,9 +17,9 @@ package scrum.server.project;
 import ilarkesto.base.Money;
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
-import ilarkesto.base.time.DateAndTime;
-import ilarkesto.base.time.Time;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.Time;
 import ilarkesto.persistence.AEntity;
 import ilarkesto.persistence.Persist;
 import ilarkesto.rss.Rss20Builder;
@@ -767,16 +767,20 @@ public class Project extends GProject {
 		Impediment imp = null;
 
 		// no documentation
-		imp = impedimentDao.postImpediment(this, Date.randomPast(5), "There is no documentation. Seriously.", false);
+		imp = impedimentDao.postImpediment(this, randomPast(5), "There is no documentation. Seriously.", false);
 		imp.setDescription("Someone promised that, I remember. Where is it?");
 
 		// no daily scrums
-		imp = impedimentDao.postImpediment(this, Date.randomPast(5), "Daily Scrums are not daily", true);
+		imp = impedimentDao.postImpediment(this, randomPast(5), "Daily Scrums are not daily", true);
 		imp.setDescription("\"Daily Scrums\" are supposed to be daily. That's why they are called DAILY Scrums.");
 		imp.setSolution("Fixed time and place to 09.00 p. m. at Starbucks every morning (except weekdays, weekends and holydays).");
 
 		// no coffee
-		imp = impedimentDao.postImpediment(this, Date.randomPast(5), "There is no coffee machine", false);
+		imp = impedimentDao.postImpediment(this, randomPast(5), "There is no coffee machine", false);
+	}
+
+	private static Date randomPast(int beforeMaxDays) {
+		return Date.beforeDays(Utl.randomInt(0, beforeMaxDays));
 	}
 
 	public void addTestRisks() {

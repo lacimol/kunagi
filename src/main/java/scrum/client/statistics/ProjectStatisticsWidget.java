@@ -43,14 +43,21 @@ public class ProjectStatisticsWidget extends AScrumWidget {
 		currentSprintRange.addSection(new CurrentSprintRangeWidget());
 
 		PagePanel projectEfficiency = new PagePanel();
-		projectEfficiency.addHeader("Project team member's avg efficiency");
+		projectEfficiency.addHeader("Team member's avg efficiency (estimated/burned)");
 		projectEfficiency.addSection(new ProjectEfficiencyWidget());
+
+		PagePanel teamMemberBurn = new PagePanel();
+		int temMembersCount = getCurrentProject().getTeamMembers().size();
+		int avgBurnPercent = temMembersCount > 0 ? (int) (100.0 / temMembersCount) : 0;
+		teamMemberBurn.addHeader("Team member's avg efficiency in team (avg: " + avgBurnPercent + "%)");
+		teamMemberBurn.addSection(new TeamMemberBurnWidget());
 
 		PagePanel sprintDetails = new PagePanel();
 		sprintDetails.addHeader("Sprint details");
 		sprintDetails.addSection(new SprintWorkTextWidget());
 
-		Widget left = TableBuilder.column(5, sprintRange, currentSprintRange, velocity, projectEfficiency, sprintWork);
+		Widget left = TableBuilder.column(5, sprintRange, currentSprintRange, velocity, projectEfficiency,
+			teamMemberBurn, sprintWork);
 		Widget right = TableBuilder.column(5, sprintDetails);
 
 		return TableBuilder.row(5, left, right);

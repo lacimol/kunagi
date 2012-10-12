@@ -14,12 +14,11 @@
 package scrum.server.project;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GProjectDao
             extends ilarkesto.persistence.ADao<Project> {
@@ -379,21 +378,21 @@ public abstract class GProjectDao
     // - begin
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Project>> projectsByBeginCache = new Cache<ilarkesto.base.time.Date,Set<Project>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Project>>() {
-                public Set<Project> create(ilarkesto.base.time.Date begin) {
+    private final Cache<ilarkesto.core.time.Date,Set<Project>> projectsByBeginCache = new Cache<ilarkesto.core.time.Date,Set<Project>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Project>>() {
+                public Set<Project> create(ilarkesto.core.time.Date begin) {
                     return getEntities(new IsBegin(begin));
                 }
             });
 
-    public final Set<Project> getProjectsByBegin(ilarkesto.base.time.Date begin) {
+    public final Set<Project> getProjectsByBegin(ilarkesto.core.time.Date begin) {
         return new HashSet<Project>(projectsByBeginCache.get(begin));
     }
-    private Set<ilarkesto.base.time.Date> beginsCache;
+    private Set<ilarkesto.core.time.Date> beginsCache;
 
-    public final Set<ilarkesto.base.time.Date> getBegins() {
+    public final Set<ilarkesto.core.time.Date> getBegins() {
         if (beginsCache == null) {
-            beginsCache = new HashSet<ilarkesto.base.time.Date>();
+            beginsCache = new HashSet<ilarkesto.core.time.Date>();
             for (Project e : getEntities()) {
                 if (e.isBeginSet()) beginsCache.add(e.getBegin());
             }
@@ -403,9 +402,9 @@ public abstract class GProjectDao
 
     private static class IsBegin implements Predicate<Project> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsBegin(ilarkesto.base.time.Date value) {
+        public IsBegin(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -419,21 +418,21 @@ public abstract class GProjectDao
     // - end
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Project>> projectsByEndCache = new Cache<ilarkesto.base.time.Date,Set<Project>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Project>>() {
-                public Set<Project> create(ilarkesto.base.time.Date end) {
+    private final Cache<ilarkesto.core.time.Date,Set<Project>> projectsByEndCache = new Cache<ilarkesto.core.time.Date,Set<Project>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Project>>() {
+                public Set<Project> create(ilarkesto.core.time.Date end) {
                     return getEntities(new IsEnd(end));
                 }
             });
 
-    public final Set<Project> getProjectsByEnd(ilarkesto.base.time.Date end) {
+    public final Set<Project> getProjectsByEnd(ilarkesto.core.time.Date end) {
         return new HashSet<Project>(projectsByEndCache.get(end));
     }
-    private Set<ilarkesto.base.time.Date> endsCache;
+    private Set<ilarkesto.core.time.Date> endsCache;
 
-    public final Set<ilarkesto.base.time.Date> getEnds() {
+    public final Set<ilarkesto.core.time.Date> getEnds() {
         if (endsCache == null) {
-            endsCache = new HashSet<ilarkesto.base.time.Date>();
+            endsCache = new HashSet<ilarkesto.core.time.Date>();
             for (Project e : getEntities()) {
                 if (e.isEndSet()) endsCache.add(e.getEnd());
             }
@@ -443,9 +442,9 @@ public abstract class GProjectDao
 
     private static class IsEnd implements Predicate<Project> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsEnd(ilarkesto.base.time.Date value) {
+        public IsEnd(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -1688,21 +1687,21 @@ public abstract class GProjectDao
     // - lastOpenedDateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<Project>> projectsByLastOpenedDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<Project>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<Project>>() {
-                public Set<Project> create(ilarkesto.base.time.DateAndTime lastOpenedDateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<Project>> projectsByLastOpenedDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<Project>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<Project>>() {
+                public Set<Project> create(ilarkesto.core.time.DateAndTime lastOpenedDateAndTime) {
                     return getEntities(new IsLastOpenedDateAndTime(lastOpenedDateAndTime));
                 }
             });
 
-    public final Set<Project> getProjectsByLastOpenedDateAndTime(ilarkesto.base.time.DateAndTime lastOpenedDateAndTime) {
+    public final Set<Project> getProjectsByLastOpenedDateAndTime(ilarkesto.core.time.DateAndTime lastOpenedDateAndTime) {
         return new HashSet<Project>(projectsByLastOpenedDateAndTimeCache.get(lastOpenedDateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> lastOpenedDateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> lastOpenedDateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getLastOpenedDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getLastOpenedDateAndTimes() {
         if (lastOpenedDateAndTimesCache == null) {
-            lastOpenedDateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            lastOpenedDateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (Project e : getEntities()) {
                 if (e.isLastOpenedDateAndTimeSet()) lastOpenedDateAndTimesCache.add(e.getLastOpenedDateAndTime());
             }
@@ -1712,9 +1711,9 @@ public abstract class GProjectDao
 
     private static class IsLastOpenedDateAndTime implements Predicate<Project> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsLastOpenedDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsLastOpenedDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

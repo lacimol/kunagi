@@ -18,13 +18,14 @@ import ilarkesto.base.Bytes;
 import ilarkesto.base.Proc;
 import ilarkesto.base.Sys;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
-import ilarkesto.base.time.TimePeriod;
 import ilarkesto.core.logging.LogRecord;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.TimePeriod;
 import ilarkesto.gwt.server.AGwtConversation;
 import ilarkesto.logging.DefaultLogRecordHandler;
 import ilarkesto.ui.web.HtmlRenderer;
 import ilarkesto.webapp.AWebSession;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,31 +37,28 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import scrum.server.GwtConversation;
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class AdminServlet extends AHttpServlet {
+public class AdminServlet extends AKunagiServlet {
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		tokenLogin(req, resp, session);
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		tokenLogin(req);
 
-		User user = session.getUser();
+		User user = req.getSession().getUser();
 		if (user == null) {
-			redirectToLogin(req, resp, session);
+			redirectToLogin(req);
 			return;
 		}
 
 		if (!user.isAdmin()) {
-			resp.sendError(403);
+			req.sendErrorForbidden();
 			return;
 		}
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Administration");
+		HtmlRenderer html = createDefaultHtmlWithHeader(req, "Administration");
 
 		html.startBODY().setStyle("font-size: 10px");
 

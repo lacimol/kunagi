@@ -18,34 +18,28 @@ import ilarkesto.core.base.Str;
 import ilarkesto.core.logging.Log;
 import ilarkesto.io.IO;
 import ilarkesto.ui.web.HtmlRenderer;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class ConfirmEmailServlet extends AHttpServlet {
+public class ConfirmEmailServlet extends AKunagiServlet {
 
 	private static Log log = Log.get(ConfirmEmailServlet.class);
 	private static final long serialVersionUID = 1;
 
-	private static ScrumWebApplication webApplication;
-
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
 		User user = getEntityByParameter(req, "user", User.class);
 		if (user == null) {
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+			req.sendErrorForbidden();
 			return;
 		}
-		String email = req.getParameter("email");
+		String email = req.get("email");
 		if (Str.isBlank(email) || !user.isEmail(email)) {
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+			req.sendErrorForbidden();
 			return;
 		}
 
@@ -53,13 +47,13 @@ public class ConfirmEmailServlet extends AHttpServlet {
 		webApplication.getTransactionService().commit();
 		log.info("Email verified:", user);
 
-		returnConfirmationPage(resp);
+		returnConfirmationPage(req);
 	}
 
-	private void returnConfirmationPage(HttpServletResponse resp) throws IOException {
-		resp.setContentType("text/html");
+	private void returnConfirmationPage(RequestWrapper<WebSession> req) throws IOException {
+		req.setContentTypeHtml();
 		String url = webApplication.createUrl(null);
-		HtmlRenderer html = new HtmlRenderer(resp.getWriter(), IO.UTF_8);
+		HtmlRenderer html = new HtmlRenderer(req.getWriter(), IO.UTF_8);
 		html.startHTML();
 		html.startHEAD("Email confirmed", "en");
 		html.METArefresh(3, url);
@@ -74,11 +68,4 @@ public class ConfirmEmailServlet extends AHttpServlet {
 		html.endHTML();
 		html.flush();
 	}
-
-	@Override
-	protected void onInit(ServletConfig config) {
-		super.onInit(config);
-		webApplication = ScrumWebApplication.get();
-	}
-
 }

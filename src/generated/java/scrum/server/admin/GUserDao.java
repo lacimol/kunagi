@@ -14,12 +14,11 @@
 package scrum.server.admin;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GUserDao
             extends ilarkesto.auth.AUserDao<User> {
@@ -382,21 +381,21 @@ public abstract class GUserDao
     // - lastLoginDateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<User>> usersByLastLoginDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<User>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<User>>() {
-                public Set<User> create(ilarkesto.base.time.DateAndTime lastLoginDateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<User>> usersByLastLoginDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<User>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<User>>() {
+                public Set<User> create(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
                     return getEntities(new IsLastLoginDateAndTime(lastLoginDateAndTime));
                 }
             });
 
-    public final Set<User> getUsersByLastLoginDateAndTime(ilarkesto.base.time.DateAndTime lastLoginDateAndTime) {
+    public final Set<User> getUsersByLastLoginDateAndTime(ilarkesto.core.time.DateAndTime lastLoginDateAndTime) {
         return new HashSet<User>(usersByLastLoginDateAndTimeCache.get(lastLoginDateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> lastLoginDateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> lastLoginDateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getLastLoginDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getLastLoginDateAndTimes() {
         if (lastLoginDateAndTimesCache == null) {
-            lastLoginDateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            lastLoginDateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (User e : getEntities()) {
                 if (e.isLastLoginDateAndTimeSet()) lastLoginDateAndTimesCache.add(e.getLastLoginDateAndTime());
             }
@@ -406,9 +405,9 @@ public abstract class GUserDao
 
     private static class IsLastLoginDateAndTime implements Predicate<User> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsLastLoginDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsLastLoginDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 
@@ -422,21 +421,21 @@ public abstract class GUserDao
     // - registrationDateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<User>> usersByRegistrationDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<User>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<User>>() {
-                public Set<User> create(ilarkesto.base.time.DateAndTime registrationDateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<User>> usersByRegistrationDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<User>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<User>>() {
+                public Set<User> create(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
                     return getEntities(new IsRegistrationDateAndTime(registrationDateAndTime));
                 }
             });
 
-    public final Set<User> getUsersByRegistrationDateAndTime(ilarkesto.base.time.DateAndTime registrationDateAndTime) {
+    public final Set<User> getUsersByRegistrationDateAndTime(ilarkesto.core.time.DateAndTime registrationDateAndTime) {
         return new HashSet<User>(usersByRegistrationDateAndTimeCache.get(registrationDateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> registrationDateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> registrationDateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getRegistrationDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getRegistrationDateAndTimes() {
         if (registrationDateAndTimesCache == null) {
-            registrationDateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            registrationDateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (User e : getEntities()) {
                 if (e.isRegistrationDateAndTimeSet()) registrationDateAndTimesCache.add(e.getRegistrationDateAndTime());
             }
@@ -446,9 +445,9 @@ public abstract class GUserDao
 
     private static class IsRegistrationDateAndTime implements Predicate<User> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsRegistrationDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsRegistrationDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

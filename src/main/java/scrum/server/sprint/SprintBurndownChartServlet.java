@@ -14,38 +14,35 @@
  */
 package scrum.server.sprint;
 
-import ilarkesto.webapp.Servlet;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import scrum.client.project.ProjectOverviewWidget;
 import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 import scrum.server.common.Chart;
 import scrum.server.common.UserBurndownChart;
 
-public class SprintBurndownChartServlet extends AHttpServlet {
+public class SprintBurndownChartServlet extends AKunagiServlet {
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
 
-		String sprintId = req.getParameter("sprintId");
-		String widthParam = req.getParameter("width");
+		String sprintId = req.get("sprintId");
+		String widthParam = req.get("width");
 		if (widthParam == null) widthParam = String.valueOf(ProjectOverviewWidget.CHART_WIDTH);
-		String heightParam = req.getParameter("height");
+		String heightParam = req.get("height");
 		if (heightParam == null) heightParam = String.valueOf(ProjectOverviewWidget.CHART_HEIGHT);
-		String chartName = req.getParameter("chart");
-		String userNameParam = req.getParameter("userName");
+		String chartName = req.get("chart");
+		String userNameParam = req.get("userName");
 		String userName = (userNameParam == null || userNameParam.isEmpty() || "null".equals(userNameParam)) ? null
 				: userNameParam;
 
-		Servlet.preventCaching(resp);
-		resp.setContentType("image/png");
+		req.preventCaching();
+		req.setContentType("image/png");
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int width = Integer.parseInt(widthParam);
@@ -58,7 +55,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 			chart.writeChart(out, sprintId, width, height);
 		}
 
-		resp.getOutputStream().write(out.toByteArray());
+		req.write(out.toByteArray());
 	}
 
 	protected Chart getChart(String chartName) {
@@ -77,6 +74,7 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		boolean isStoryThemeChart = "storyThemeChart".equals(chartName);
 		boolean isStoryBurnThemeChart = "storyBurnThemeChart".equals(chartName);
 		boolean isProjectEffiChart = "projectEffiChart".equals(chartName);
+		boolean isTeamMemberBurnChart = "teamMemberBurnPieChart".equals(chartName);
 
 		if (isWorkChart) {
 			// team or user burned hours
@@ -111,6 +109,8 @@ public class SprintBurndownChartServlet extends AHttpServlet {
 		} else if (isProjectEffiChart) {
 			// project effi chart
 			chart = scrumWebApp.getProjectEfficiencyChart();
+		} else if (isTeamMemberBurnChart) {
+			chart = scrumWebApp.getTeamMemberBurnPieChart();
 		} else {
 			// sprint burndown
 			chart = scrumWebApp.getBurndownChart();

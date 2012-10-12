@@ -65,6 +65,7 @@ public class User extends GUser {
 
 	public void updateByGravatar() {
 		Profile profile = Gravatar.loadProfile(getEmail());
+		if (profile == null) return;
 		Name name = profile.getName();
 		if (name != null) {
 			if (!isFullNameSet()) setFullName(name.getFormatted());

@@ -146,7 +146,7 @@ pageTracker._trackPageview();
     <div class="separator"></div>
     <div class="section">
         <div class="sidebar">
-          <div class="starter"> <a onclick="kunagihp.subscribe('${kunagiUrl}subscribe?subject=$entity.id&email=')" title="Subscribe to changes and comments on this entity">Subscribe</a> </div>
+          <div class="starter"> <a onclick="kunagihp.subscribe('${config.kunagiUrl}subscribe?subject=$entity.id&email=')" title="Subscribe to changes and comments on this entity">Subscribe</a> </div>
         </div>
         <h2>Comments</h2>
         #foreach( $comment in $entity.comments )
@@ -231,7 +231,7 @@ pageTracker._trackPageview();
     <script type="text/javascript">
         var buttonHtml = '<input id="commentFormSubmitButton" type="submit" name="submit" class="submit" value="$submitLabel">';
         $(document.getElementById('commentFormSubmitButtonContainer')).append(buttonHtml);
-		$(document.getElementById('commentForm')).attr('action', '${kunagiUrl}${servlet}');
+		$(document.getElementById('commentForm')).attr('action', '${config.kunagiUrl}${servlet}');
 		var spamPreventionCode = 'no-spam';
 		$(document.getElementById('spamPreventionCodeField')).attr('value', spamPreventionCode);
     </script>

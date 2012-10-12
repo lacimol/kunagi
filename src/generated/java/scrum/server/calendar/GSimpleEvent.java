@@ -14,11 +14,13 @@
 package scrum.server.calendar;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GSimpleEvent
             extends AEntity
@@ -191,13 +193,13 @@ public abstract class GSimpleEvent
     // - date
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date date;
+    private ilarkesto.core.time.Date date;
 
-    public final ilarkesto.base.time.Date getDate() {
+    public final ilarkesto.core.time.Date getDate() {
         return date;
     }
 
-    public final void setDate(ilarkesto.base.time.Date date) {
+    public final void setDate(ilarkesto.core.time.Date date) {
         date = prepareDate(date);
         if (isDate(date)) return;
         this.date = date;
@@ -205,7 +207,7 @@ public abstract class GSimpleEvent
         fireModified("date="+date);
     }
 
-    protected ilarkesto.base.time.Date prepareDate(ilarkesto.base.time.Date date) {
+    protected ilarkesto.core.time.Date prepareDate(ilarkesto.core.time.Date date) {
         return date;
     }
 
@@ -213,27 +215,27 @@ public abstract class GSimpleEvent
         return this.date != null;
     }
 
-    public final boolean isDate(ilarkesto.base.time.Date date) {
+    public final boolean isDate(ilarkesto.core.time.Date date) {
         if (this.date == null && date == null) return true;
         return this.date != null && this.date.equals(date);
     }
 
     protected final void updateDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
     // - time
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Time time;
+    private ilarkesto.core.time.Time time;
 
-    public final ilarkesto.base.time.Time getTime() {
+    public final ilarkesto.core.time.Time getTime() {
         return time;
     }
 
-    public final void setTime(ilarkesto.base.time.Time time) {
+    public final void setTime(ilarkesto.core.time.Time time) {
         time = prepareTime(time);
         if (isTime(time)) return;
         this.time = time;
@@ -241,7 +243,7 @@ public abstract class GSimpleEvent
         fireModified("time="+time);
     }
 
-    protected ilarkesto.base.time.Time prepareTime(ilarkesto.base.time.Time time) {
+    protected ilarkesto.core.time.Time prepareTime(ilarkesto.core.time.Time time) {
         return time;
     }
 
@@ -249,14 +251,14 @@ public abstract class GSimpleEvent
         return this.time != null;
     }
 
-    public final boolean isTime(ilarkesto.base.time.Time time) {
+    public final boolean isTime(ilarkesto.core.time.Time time) {
         if (this.time == null && time == null) return true;
         return this.time != null && this.time.equals(time);
     }
 
     protected final void updateTime(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Time((String)value);
-        setTime((ilarkesto.base.time.Time)value);
+        value = value == null ? null : new ilarkesto.core.time.Time((String)value);
+        setTime((ilarkesto.core.time.Time)value);
     }
 
     // -----------------------------------------------------------

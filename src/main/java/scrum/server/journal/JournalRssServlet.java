@@ -14,39 +14,37 @@
  */
 package scrum.server.journal;
 
+import ilarkesto.io.IO;
+import ilarkesto.webapp.RequestWrapper;
+
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 import scrum.server.project.Project;
 import scrum.server.project.ProjectDao;
 
-public class JournalRssServlet extends AHttpServlet {
+public class JournalRssServlet extends AKunagiServlet {
 
 	private static final long serialVersionUID = 1;
 
 	private ProjectDao projectDao;
-	private ScrumWebApplication app;
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
 		// TODO auth
-		String projectId = req.getParameter("projectId");
-		if (projectId == null) throw new RuntimeException("projectId == null");
+		String projectId = req.getMandatory("projectId");
 		Project project = projectDao.getById(projectId);
-		resp.setContentType("application/rss+xml");
-		project.writeJournalAsRss(resp.getOutputStream(), "UTF-8");
+		req.setContentTypeRss();
+		project.writeJournalAsRss(req.getOutputStream(), IO.UTF_8);
 	}
 
 	@Override
 	protected void onInit(ServletConfig config) {
-		app = ScrumWebApplication.get(config);
-		projectDao = app.getProjectDao();
+		super.onInit(config);
+		projectDao = webApplication.getProjectDao();
 	}
 
 }

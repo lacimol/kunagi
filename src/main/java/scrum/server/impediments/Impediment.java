@@ -14,8 +14,8 @@
  */
 package scrum.server.impediments;
 
-import ilarkesto.base.time.Date;
 import ilarkesto.core.base.Utl;
+import ilarkesto.core.time.Date;
 import scrum.client.common.LabelSupport;
 import scrum.client.common.ReferenceSupport;
 import scrum.server.admin.User;
@@ -53,7 +53,7 @@ public class Impediment extends GImpediment implements Numbered, ReferenceSuppor
 		if (!isDateSet()) setDate(Date.today());
 
 		// delete when closed and older than 4 weeks
-		if (isClosed() && getDate().getPeriodToNow().toWeeks() > 4) getDao().deleteEntity(this);
+		if (isClosed() && getDate().getPeriodToToday().toWeeks() > 4) getDao().deleteEntity(this);
 
 	}
 

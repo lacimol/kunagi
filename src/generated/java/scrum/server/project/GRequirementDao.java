@@ -14,12 +14,11 @@
 package scrum.server.project;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GRequirementDao
             extends ilarkesto.persistence.ADao<Requirement> {
@@ -454,21 +453,21 @@ public abstract class GRequirementDao
     // - rejectDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Requirement>> requirementsByRejectDateCache = new Cache<ilarkesto.base.time.Date,Set<Requirement>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Requirement>>() {
-                public Set<Requirement> create(ilarkesto.base.time.Date rejectDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Requirement>> requirementsByRejectDateCache = new Cache<ilarkesto.core.time.Date,Set<Requirement>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Requirement>>() {
+                public Set<Requirement> create(ilarkesto.core.time.Date rejectDate) {
                     return getEntities(new IsRejectDate(rejectDate));
                 }
             });
 
-    public final Set<Requirement> getRequirementsByRejectDate(ilarkesto.base.time.Date rejectDate) {
+    public final Set<Requirement> getRequirementsByRejectDate(ilarkesto.core.time.Date rejectDate) {
         return new HashSet<Requirement>(requirementsByRejectDateCache.get(rejectDate));
     }
-    private Set<ilarkesto.base.time.Date> rejectDatesCache;
+    private Set<ilarkesto.core.time.Date> rejectDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getRejectDates() {
+    public final Set<ilarkesto.core.time.Date> getRejectDates() {
         if (rejectDatesCache == null) {
-            rejectDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            rejectDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Requirement e : getEntities()) {
                 if (e.isRejectDateSet()) rejectDatesCache.add(e.getRejectDate());
             }
@@ -478,9 +477,9 @@ public abstract class GRequirementDao
 
     private static class IsRejectDate implements Predicate<Requirement> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsRejectDate(ilarkesto.base.time.Date value) {
+        public IsRejectDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

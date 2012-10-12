@@ -16,58 +16,48 @@
 package scrum.server.common;
 
 import ilarkesto.core.logging.Log;
-import ilarkesto.core.time.Date;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.Set;
 
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.gantt.TaskSeries;
-import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.general.DefaultPieDataset;
 
+import scrum.server.admin.User;
+import scrum.server.project.Project;
 import scrum.server.sprint.Sprint;
-import scrum.server.sprint.Task;
+import scrum.server.sprint.UserEfficiency;
 
-public class TaskRangeChart extends Chart {
+public class TeamMemberBurnPieChart extends Chart {
 
-	private static final Log LOG = Log.get(TaskRangeChart.class);
-	private int maxTaskNr = 35;
-
-	public TaskRangeChart() {}
-
-	public TaskRangeChart(int maxTaskNr) {
-		this.maxTaskNr = maxTaskNr;
-	}
+	private static final Log LOG = Log.get(TeamMemberBurnPieChart.class);
 
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new TaskRangeChart().writeChart(out, sprint, width, height);
+		new TeamMemberBurnPieChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
-		TaskSeriesCollection dataset = new TaskSeriesCollection();
-		final TaskSeries s1 = new TaskSeries("S1");
-		dataset.add(s1);
+		DefaultPieDataset dataset = new DefaultPieDataset();
 
-		int count = 0;
-		Date begin;
-		Date end;
-		Set<Task> tasks = sprint.getTasks();
-		for (Task task : tasks) {
-			begin = task.getBurnBegin(sprint);
-			end = task.getBurnEnd(sprint);
-			if (task.getOwner() != null && task.getBurnedWork() > 0) {
-				s1.add(getGanttTask(task, begin, end));
-				if (++count >= maxTaskNr) break;
-			}
+		Project project = sprint.getProject();
+		int allInitialHours = 0;
+		for (User user : project.getTeamMembers()) {
+			allInitialHours += project.getUserEfficiency(user.getName()).getInitialBurnableHours();
 		}
 
-		final JFreeChart chart = createGanttChart(dataset, -1);
-		setDayDateAxis(s1, chart, sprint);
-		createPic(out, width, Math.min(count * 30, height), chart);
+		UserEfficiency efficiency = null;
+		for (User user : project.getTeamMembers()) {
+			efficiency = project.getUserEfficiency(user.getName());
+			int percent = (int) (((double) efficiency.getInitialBurnableHours() / (double) allInitialHours) * 100.0);
+			dataset.setValue(user.getName() + " (" + efficiency.getInitialBurnableHours() + ")", percent);
+		}
+
+		final JFreeChart chart = createPercentPieChart(dataset);
+		createPic(out, width, height, chart);
 	}
+
 }

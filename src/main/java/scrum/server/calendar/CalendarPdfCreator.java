@@ -14,7 +14,7 @@
  */
 package scrum.server.calendar;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.pdf.APdfContainerElement;
 import ilarkesto.pdf.FieldList;
 

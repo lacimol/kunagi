@@ -15,7 +15,7 @@
 package scrum.server.pr;
 
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 import scrum.client.common.LabelSupport;
 import scrum.client.common.ReferenceSupport;
 import scrum.server.admin.User;

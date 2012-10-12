@@ -14,12 +14,11 @@
 package scrum.server.issues;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GIssueDao
             extends ilarkesto.persistence.ADao<Issue> {
@@ -266,21 +265,21 @@ public abstract class GIssueDao
     // - date
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<Issue>> issuesByDateCache = new Cache<ilarkesto.base.time.DateAndTime,Set<Issue>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<Issue>>() {
-                public Set<Issue> create(ilarkesto.base.time.DateAndTime date) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<Issue>> issuesByDateCache = new Cache<ilarkesto.core.time.DateAndTime,Set<Issue>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<Issue>>() {
+                public Set<Issue> create(ilarkesto.core.time.DateAndTime date) {
                     return getEntities(new IsDate(date));
                 }
             });
 
-    public final Set<Issue> getIssuesByDate(ilarkesto.base.time.DateAndTime date) {
+    public final Set<Issue> getIssuesByDate(ilarkesto.core.time.DateAndTime date) {
         return new HashSet<Issue>(issuesByDateCache.get(date));
     }
-    private Set<ilarkesto.base.time.DateAndTime> datesCache;
+    private Set<ilarkesto.core.time.DateAndTime> datesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getDates() {
+    public final Set<ilarkesto.core.time.DateAndTime> getDates() {
         if (datesCache == null) {
-            datesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            datesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (Issue e : getEntities()) {
                 if (e.isDateSet()) datesCache.add(e.getDate());
             }
@@ -290,9 +289,9 @@ public abstract class GIssueDao
 
     private static class IsDate implements Predicate<Issue> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsDate(ilarkesto.base.time.DateAndTime value) {
+        public IsDate(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 
@@ -546,21 +545,21 @@ public abstract class GIssueDao
     // - acceptDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Issue>> issuesByAcceptDateCache = new Cache<ilarkesto.base.time.Date,Set<Issue>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Issue>>() {
-                public Set<Issue> create(ilarkesto.base.time.Date acceptDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Issue>> issuesByAcceptDateCache = new Cache<ilarkesto.core.time.Date,Set<Issue>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Issue>>() {
+                public Set<Issue> create(ilarkesto.core.time.Date acceptDate) {
                     return getEntities(new IsAcceptDate(acceptDate));
                 }
             });
 
-    public final Set<Issue> getIssuesByAcceptDate(ilarkesto.base.time.Date acceptDate) {
+    public final Set<Issue> getIssuesByAcceptDate(ilarkesto.core.time.Date acceptDate) {
         return new HashSet<Issue>(issuesByAcceptDateCache.get(acceptDate));
     }
-    private Set<ilarkesto.base.time.Date> acceptDatesCache;
+    private Set<ilarkesto.core.time.Date> acceptDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getAcceptDates() {
+    public final Set<ilarkesto.core.time.Date> getAcceptDates() {
         if (acceptDatesCache == null) {
-            acceptDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            acceptDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Issue e : getEntities()) {
                 if (e.isAcceptDateSet()) acceptDatesCache.add(e.getAcceptDate());
             }
@@ -570,9 +569,9 @@ public abstract class GIssueDao
 
     private static class IsAcceptDate implements Predicate<Issue> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsAcceptDate(ilarkesto.base.time.Date value) {
+        public IsAcceptDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -695,21 +694,21 @@ public abstract class GIssueDao
     // - fixDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Issue>> issuesByFixDateCache = new Cache<ilarkesto.base.time.Date,Set<Issue>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Issue>>() {
-                public Set<Issue> create(ilarkesto.base.time.Date fixDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Issue>> issuesByFixDateCache = new Cache<ilarkesto.core.time.Date,Set<Issue>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Issue>>() {
+                public Set<Issue> create(ilarkesto.core.time.Date fixDate) {
                     return getEntities(new IsFixDate(fixDate));
                 }
             });
 
-    public final Set<Issue> getIssuesByFixDate(ilarkesto.base.time.Date fixDate) {
+    public final Set<Issue> getIssuesByFixDate(ilarkesto.core.time.Date fixDate) {
         return new HashSet<Issue>(issuesByFixDateCache.get(fixDate));
     }
-    private Set<ilarkesto.base.time.Date> fixDatesCache;
+    private Set<ilarkesto.core.time.Date> fixDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getFixDates() {
+    public final Set<ilarkesto.core.time.Date> getFixDates() {
         if (fixDatesCache == null) {
-            fixDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            fixDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Issue e : getEntities()) {
                 if (e.isFixDateSet()) fixDatesCache.add(e.getFixDate());
             }
@@ -719,9 +718,9 @@ public abstract class GIssueDao
 
     private static class IsFixDate implements Predicate<Issue> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsFixDate(ilarkesto.base.time.Date value) {
+        public IsFixDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -735,21 +734,21 @@ public abstract class GIssueDao
     // - closeDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Issue>> issuesByCloseDateCache = new Cache<ilarkesto.base.time.Date,Set<Issue>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Issue>>() {
-                public Set<Issue> create(ilarkesto.base.time.Date closeDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Issue>> issuesByCloseDateCache = new Cache<ilarkesto.core.time.Date,Set<Issue>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Issue>>() {
+                public Set<Issue> create(ilarkesto.core.time.Date closeDate) {
                     return getEntities(new IsCloseDate(closeDate));
                 }
             });
 
-    public final Set<Issue> getIssuesByCloseDate(ilarkesto.base.time.Date closeDate) {
+    public final Set<Issue> getIssuesByCloseDate(ilarkesto.core.time.Date closeDate) {
         return new HashSet<Issue>(issuesByCloseDateCache.get(closeDate));
     }
-    private Set<ilarkesto.base.time.Date> closeDatesCache;
+    private Set<ilarkesto.core.time.Date> closeDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getCloseDates() {
+    public final Set<ilarkesto.core.time.Date> getCloseDates() {
         if (closeDatesCache == null) {
-            closeDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            closeDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Issue e : getEntities()) {
                 if (e.isCloseDateSet()) closeDatesCache.add(e.getCloseDate());
             }
@@ -759,9 +758,9 @@ public abstract class GIssueDao
 
     private static class IsCloseDate implements Predicate<Issue> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsCloseDate(ilarkesto.base.time.Date value) {
+        public IsCloseDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 
@@ -775,21 +774,21 @@ public abstract class GIssueDao
     // - suspendedUntilDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Issue>> issuesBySuspendedUntilDateCache = new Cache<ilarkesto.base.time.Date,Set<Issue>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Issue>>() {
-                public Set<Issue> create(ilarkesto.base.time.Date suspendedUntilDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Issue>> issuesBySuspendedUntilDateCache = new Cache<ilarkesto.core.time.Date,Set<Issue>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Issue>>() {
+                public Set<Issue> create(ilarkesto.core.time.Date suspendedUntilDate) {
                     return getEntities(new IsSuspendedUntilDate(suspendedUntilDate));
                 }
             });
 
-    public final Set<Issue> getIssuesBySuspendedUntilDate(ilarkesto.base.time.Date suspendedUntilDate) {
+    public final Set<Issue> getIssuesBySuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         return new HashSet<Issue>(issuesBySuspendedUntilDateCache.get(suspendedUntilDate));
     }
-    private Set<ilarkesto.base.time.Date> suspendedUntilDatesCache;
+    private Set<ilarkesto.core.time.Date> suspendedUntilDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getSuspendedUntilDates() {
+    public final Set<ilarkesto.core.time.Date> getSuspendedUntilDates() {
         if (suspendedUntilDatesCache == null) {
-            suspendedUntilDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            suspendedUntilDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Issue e : getEntities()) {
                 if (e.isSuspendedUntilDateSet()) suspendedUntilDatesCache.add(e.getSuspendedUntilDate());
             }
@@ -799,9 +798,9 @@ public abstract class GIssueDao
 
     private static class IsSuspendedUntilDate implements Predicate<Issue> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsSuspendedUntilDate(ilarkesto.base.time.Date value) {
+        public IsSuspendedUntilDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

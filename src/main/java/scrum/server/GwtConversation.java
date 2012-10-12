@@ -15,8 +15,8 @@
 package scrum.server;
 
 import ilarkesto.auth.Auth;
-import ilarkesto.base.time.TimePeriod;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.TimePeriod;
 import ilarkesto.gwt.server.AGwtConversation;
 import ilarkesto.persistence.AEntity;
 import scrum.client.DataTransferObject;

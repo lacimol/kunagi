@@ -14,8 +14,8 @@
  */
 package scrum.server.calendar;
 
-import ilarkesto.base.time.Date;
 import ilarkesto.core.base.Utl;
+import ilarkesto.core.time.Date;
 import scrum.server.admin.User;
 import scrum.server.common.Numbered;
 

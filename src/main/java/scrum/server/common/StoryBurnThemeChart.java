@@ -72,12 +72,11 @@ public class StoryBurnThemeChart extends Chart {
 			}
 		}
 
-		// TODO percent
 		for (Map.Entry<String, Integer> theme : themes.entrySet()) {
 			dataset.setValue(theme.getKey(), new Double(theme.getValue()));
 		}
 
-		final JFreeChart chart = createPieChart(dataset);
+		final JFreeChart chart = createAmountPieChart(dataset);
 		createPic(out, width, height, chart);
 	}
 

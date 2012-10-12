@@ -15,11 +15,11 @@
 package scrum.mda;
 
 import ilarkesto.base.Str;
-import ilarkesto.base.time.Date;
-import ilarkesto.base.time.DateAndTime;
-import ilarkesto.base.time.Time;
 import ilarkesto.core.logging.Log;
 import ilarkesto.core.scope.Scope;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.Time;
 import ilarkesto.di.app.ApplicationStarter;
 import ilarkesto.mda.legacy.model.EntityModel;
 import ilarkesto.mda.legacy.model.PropertyModel;

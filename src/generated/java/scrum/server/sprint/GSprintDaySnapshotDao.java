@@ -14,12 +14,11 @@
 package scrum.server.sprint;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GSprintDaySnapshotDao
             extends ilarkesto.persistence.ADao<SprintDaySnapshot> {
@@ -114,21 +113,21 @@ public abstract class GSprintDaySnapshotDao
     // - date
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<SprintDaySnapshot>> sprintDaySnapshotsByDateCache = new Cache<ilarkesto.base.time.Date,Set<SprintDaySnapshot>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<SprintDaySnapshot>>() {
-                public Set<SprintDaySnapshot> create(ilarkesto.base.time.Date date) {
+    private final Cache<ilarkesto.core.time.Date,Set<SprintDaySnapshot>> sprintDaySnapshotsByDateCache = new Cache<ilarkesto.core.time.Date,Set<SprintDaySnapshot>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<SprintDaySnapshot>>() {
+                public Set<SprintDaySnapshot> create(ilarkesto.core.time.Date date) {
                     return getEntities(new IsDate(date));
                 }
             });
 
-    public final Set<SprintDaySnapshot> getSprintDaySnapshotsByDate(ilarkesto.base.time.Date date) {
+    public final Set<SprintDaySnapshot> getSprintDaySnapshotsByDate(ilarkesto.core.time.Date date) {
         return new HashSet<SprintDaySnapshot>(sprintDaySnapshotsByDateCache.get(date));
     }
-    private Set<ilarkesto.base.time.Date> datesCache;
+    private Set<ilarkesto.core.time.Date> datesCache;
 
-    public final Set<ilarkesto.base.time.Date> getDates() {
+    public final Set<ilarkesto.core.time.Date> getDates() {
         if (datesCache == null) {
-            datesCache = new HashSet<ilarkesto.base.time.Date>();
+            datesCache = new HashSet<ilarkesto.core.time.Date>();
             for (SprintDaySnapshot e : getEntities()) {
                 if (e.isDateSet()) datesCache.add(e.getDate());
             }
@@ -138,9 +137,9 @@ public abstract class GSprintDaySnapshotDao
 
     private static class IsDate implements Predicate<SprintDaySnapshot> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsDate(ilarkesto.base.time.Date value) {
+        public IsDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

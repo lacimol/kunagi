@@ -16,36 +16,34 @@ package scrum.server.admin;
 
 import ilarkesto.di.app.BackupApplicationDataDirTask;
 import ilarkesto.ui.web.HtmlRenderer;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class BackupServlet extends AHttpServlet {
+public class BackupServlet extends AKunagiServlet {
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		tokenLogin(req, resp, session);
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		tokenLogin(req);
 
-		User user = session.getUser();
+		User user = req.getSession().getUser();
 		if (user == null) {
-			redirectToLogin(req, resp, session);
+			redirectToLogin(req);
 			return;
 		}
 
 		if (!user.isAdmin()) {
-			resp.sendError(403);
+			req.sendErrorForbidden();
 			return;
 		}
 
 		// TODO show message
 		webApplication.getTaskManager().start(webApplication.autowire(new BackupApplicationDataDirTask()));
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Backup running", 3, "admin.html");
+		HtmlRenderer html = createDefaultHtmlWithHeader(req, "Backup running", 3, "admin.html");
 		html.startBODY();
 		html.H1("Backup initiated");
 		html.startP();

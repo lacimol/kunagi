@@ -16,8 +16,8 @@ package scrum.server.sprint;
 
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.Date;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -495,7 +495,7 @@ public class Sprint extends GSprint implements Numbered {
 			// sprint history
 			for (TeamMemberSnapshot snapshot : sprintReport.getTeamMemberStatistics()) {
 				String teamMember = snapshot.getTeamMember().getName();
-				log.info(teamMember + "'s stored efficiency: " + snapshot.getEfficiency());
+				log.debug(teamMember + "'s stored efficiency: " + snapshot.getEfficiency());
 				if (TEAM.equals(userName) || userName.equals(teamMember)) {
 					allBurnedHours += snapshot.getBurnedWork();
 					initialWork = snapshot.getInitialWork();

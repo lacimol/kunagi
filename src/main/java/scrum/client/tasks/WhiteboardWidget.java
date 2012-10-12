@@ -113,7 +113,9 @@ public class WhiteboardWidget extends AScrumWidget implements TaskBlockContainer
 	}
 
 	private String getPageHeader() {
-		return whiteboardManager.isMyRequirementsVisible() ? "Whiteboard (only my tasks)" : "Whiteboard";
+		Sprint sprint = getCurrentProject().getCurrentSprint();
+		return whiteboardManager.isMyRequirementsVisible() ? "Whiteboard (only my tasks)" : ("Whiteboard ("
+				+ sprint.getLabel() + ")");
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class SprintWorkTextWidget extends AScrumWidget {
 
 	@Override
 	protected void onUpdate() {
-		Project project = getCurrentProject();
+		Project project = getCurrentSprint().getProject();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='SprintWorkTextWidget'>");
 

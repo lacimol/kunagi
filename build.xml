@@ -31,7 +31,7 @@
             <fileset dir="src/generated/java" />
             <fileset dir="${ilarkesto.dir}/src/main/java" />
         </copy>
-		<javac target="1.6" srcdir="${classes.output.dir}" destdir="${classes.output.dir}" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
+		<javac source="1.6" target="1.6" srcdir="${classes.output.dir}" destdir="${classes.output.dir}" encoding="UTF-8" nowarn="true" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
 			<classpath>
 				<fileset dir="${ilarkesto.dir}/lib" />
 			</classpath>
@@ -103,8 +103,8 @@
         </copy>
         <copy todir="${build.dir}/webapp/WEB-INF/lib" preservelastmodified="true">
             <fileset dir="${ilarkesto.dir}/lib">
-                <exclude name="**/src/" />
-                <exclude name="**/javadoc/" />
+				<exclude name="**/src/**" />
+				<exclude name="**/javadoc/**" />
                 <exclude name="**/gwt-dev.jar" />
             	<exclude name="**/gwt-user.jar" />
                 <exclude name="**/servlet-api-*.jar" />

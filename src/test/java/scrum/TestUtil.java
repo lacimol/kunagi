@@ -17,10 +17,10 @@ package scrum;
 import ilarkesto.base.Str;
 import ilarkesto.base.Sys;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
-import ilarkesto.base.time.DateAndTime;
-import ilarkesto.base.time.Time;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.DateAndTime;
+import ilarkesto.core.time.Time;
 import ilarkesto.io.IO;
 import ilarkesto.persistence.AEntity;
 import ilarkesto.testng.ATest;
@@ -323,6 +323,7 @@ public class TestUtil {
 		project.setShortDescription(Str.generateRandomSentence(4, 4));
 		project.setDescription(Str.generateRandomParagraph());
 		project.setLongDescription(Str.generateRandomParagraphs(5, null, null, "\n\n"));
+		project.setHomepageUrl("http://kunagi.org");
 		return project;
 	}
 

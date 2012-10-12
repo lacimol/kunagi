@@ -17,43 +17,41 @@ package scrum.server.admin;
 import ilarkesto.core.base.Str;
 import ilarkesto.core.time.Tm;
 import ilarkesto.ui.web.HtmlRenderer;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class ShutdownServlet extends AHttpServlet {
+public class ShutdownServlet extends AKunagiServlet {
 
 	private boolean shutdownInitiated;
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		tokenLogin(req, resp, session);
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		tokenLogin(req);
 
-		User user = session.getUser();
+		User user = req.getSession().getUser();
 		if (user == null) {
-			redirectToLogin(req, resp, session);
+			redirectToLogin(req);
 			return;
 		}
 
 		if (!user.isAdmin()) {
-			resp.sendError(403);
+			req.sendErrorForbidden();
 			return;
 		}
 
 		if (!shutdownInitiated) {
 			shutdownInitiated = true;
-			String sDelay = req.getParameter("delay");
+			String sDelay = req.get("delay");
 			long delayInMillis = 0;
 			if (!Str.isBlank(sDelay)) delayInMillis = Long.parseLong(sDelay) * Tm.MINUTE;
 			webApplication.shutdown(delayInMillis);
 		}
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Shutdown initiated", 3, "admin.html");
+		HtmlRenderer html = createDefaultHtmlWithHeader(req, "Shutdown initiated", 3, "admin.html");
 		html.startBODY();
 		html.H1("Shutdown initiated");
 		html.endBODY();

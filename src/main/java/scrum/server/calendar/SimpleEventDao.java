@@ -14,8 +14,8 @@
  */
 package scrum.server.calendar;
 
-import ilarkesto.base.time.Date;
-import ilarkesto.base.time.Time;
+import ilarkesto.core.time.Date;
+import ilarkesto.core.time.Time;
 import ilarkesto.fp.Predicate;
 import scrum.server.project.Project;
 
@@ -24,6 +24,7 @@ public class SimpleEventDao extends GSimpleEventDao {
 	public SimpleEvent getSimpleEventByNumber(final int number, final Project project) {
 		return getEntity(new Predicate<SimpleEvent>() {
 
+			@Override
 			public boolean test(SimpleEvent t) {
 				return t.isNumber(number) && t.isProject(project);
 			}

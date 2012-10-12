@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Witoslaw Koczewsi <wi@koczewski.de>, Artjom Kochtchi
+ * Copyright 2011 Laszlo Molnar <lacimol@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
  * General Public License as published by the Free Software Foundation, either version 3 of the License, or
@@ -12,16 +12,14 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package scrum.server.common;
 
-import ilarkesto.core.time.Date;
+package scrum.client.statistics;
 
-public interface BurndownSnapshot {
+public class TeamMemberBurnWidget extends ChartWidget {
 
-	public Date getDate();
-
-	public int getBurnedWorkTotal();
-
-	public int getRemainingWork();
+	@Override
+	String getChartUrl(int width) {
+		return getCurrentSprint().getTeamMemberBurnPieChartUrl(width, 300);
+	}
 
 }

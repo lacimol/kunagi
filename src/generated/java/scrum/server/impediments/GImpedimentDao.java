@@ -14,12 +14,11 @@
 package scrum.server.impediments;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GImpedimentDao
             extends ilarkesto.persistence.ADao<Impediment> {
@@ -197,21 +196,21 @@ public abstract class GImpedimentDao
     // - date
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Impediment>> impedimentsByDateCache = new Cache<ilarkesto.base.time.Date,Set<Impediment>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Impediment>>() {
-                public Set<Impediment> create(ilarkesto.base.time.Date date) {
+    private final Cache<ilarkesto.core.time.Date,Set<Impediment>> impedimentsByDateCache = new Cache<ilarkesto.core.time.Date,Set<Impediment>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Impediment>>() {
+                public Set<Impediment> create(ilarkesto.core.time.Date date) {
                     return getEntities(new IsDate(date));
                 }
             });
 
-    public final Set<Impediment> getImpedimentsByDate(ilarkesto.base.time.Date date) {
+    public final Set<Impediment> getImpedimentsByDate(ilarkesto.core.time.Date date) {
         return new HashSet<Impediment>(impedimentsByDateCache.get(date));
     }
-    private Set<ilarkesto.base.time.Date> datesCache;
+    private Set<ilarkesto.core.time.Date> datesCache;
 
-    public final Set<ilarkesto.base.time.Date> getDates() {
+    public final Set<ilarkesto.core.time.Date> getDates() {
         if (datesCache == null) {
-            datesCache = new HashSet<ilarkesto.base.time.Date>();
+            datesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Impediment e : getEntities()) {
                 if (e.isDateSet()) datesCache.add(e.getDate());
             }
@@ -221,9 +220,9 @@ public abstract class GImpedimentDao
 
     private static class IsDate implements Predicate<Impediment> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsDate(ilarkesto.base.time.Date value) {
+        public IsDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

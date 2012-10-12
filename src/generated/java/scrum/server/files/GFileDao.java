@@ -14,12 +14,11 @@
 package scrum.server.files;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GFileDao
             extends ilarkesto.persistence.ADao<File> {
@@ -156,21 +155,21 @@ public abstract class GFileDao
     // - uploadTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<File>> filesByUploadTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<File>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<File>>() {
-                public Set<File> create(ilarkesto.base.time.DateAndTime uploadTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<File>> filesByUploadTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<File>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<File>>() {
+                public Set<File> create(ilarkesto.core.time.DateAndTime uploadTime) {
                     return getEntities(new IsUploadTime(uploadTime));
                 }
             });
 
-    public final Set<File> getFilesByUploadTime(ilarkesto.base.time.DateAndTime uploadTime) {
+    public final Set<File> getFilesByUploadTime(ilarkesto.core.time.DateAndTime uploadTime) {
         return new HashSet<File>(filesByUploadTimeCache.get(uploadTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> uploadTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> uploadTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getUploadTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getUploadTimes() {
         if (uploadTimesCache == null) {
-            uploadTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            uploadTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (File e : getEntities()) {
                 if (e.isUploadTimeSet()) uploadTimesCache.add(e.getUploadTime());
             }
@@ -180,9 +179,9 @@ public abstract class GFileDao
 
     private static class IsUploadTime implements Predicate<File> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsUploadTime(ilarkesto.base.time.DateAndTime value) {
+        public IsUploadTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

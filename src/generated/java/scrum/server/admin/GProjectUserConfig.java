@@ -14,11 +14,13 @@
 package scrum.server.admin;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GProjectUserConfig
             extends AEntity
@@ -457,20 +459,20 @@ public abstract class GProjectUserConfig
     // - lastActivityDateAndTime
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.DateAndTime lastActivityDateAndTime;
+    private ilarkesto.core.time.DateAndTime lastActivityDateAndTime;
 
-    public final ilarkesto.base.time.DateAndTime getLastActivityDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getLastActivityDateAndTime() {
         return lastActivityDateAndTime;
     }
 
-    public final void setLastActivityDateAndTime(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
+    public final void setLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         lastActivityDateAndTime = prepareLastActivityDateAndTime(lastActivityDateAndTime);
         if (isLastActivityDateAndTime(lastActivityDateAndTime)) return;
         this.lastActivityDateAndTime = lastActivityDateAndTime;
         updateLastModified();
     }
 
-    protected ilarkesto.base.time.DateAndTime prepareLastActivityDateAndTime(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
+    protected ilarkesto.core.time.DateAndTime prepareLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         return lastActivityDateAndTime;
     }
 
@@ -478,14 +480,14 @@ public abstract class GProjectUserConfig
         return this.lastActivityDateAndTime != null;
     }
 
-    public final boolean isLastActivityDateAndTime(ilarkesto.base.time.DateAndTime lastActivityDateAndTime) {
+    public final boolean isLastActivityDateAndTime(ilarkesto.core.time.DateAndTime lastActivityDateAndTime) {
         if (this.lastActivityDateAndTime == null && lastActivityDateAndTime == null) return true;
         return this.lastActivityDateAndTime != null && this.lastActivityDateAndTime.equals(lastActivityDateAndTime);
     }
 
     protected final void updateLastActivityDateAndTime(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.DateAndTime((String)value);
-        setLastActivityDateAndTime((ilarkesto.base.time.DateAndTime)value);
+        value = value == null ? null : new ilarkesto.core.time.DateAndTime((String)value);
+        setLastActivityDateAndTime((ilarkesto.core.time.DateAndTime)value);
     }
 
     // -----------------------------------------------------------
@@ -675,13 +677,13 @@ public abstract class GProjectUserConfig
     // - pblFilterDateFrom
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date pblFilterDateFrom;
+    private ilarkesto.core.time.Date pblFilterDateFrom;
 
-    public final ilarkesto.base.time.Date getPblFilterDateFrom() {
+    public final ilarkesto.core.time.Date getPblFilterDateFrom() {
         return pblFilterDateFrom;
     }
 
-    public final void setPblFilterDateFrom(ilarkesto.base.time.Date pblFilterDateFrom) {
+    public final void setPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         pblFilterDateFrom = preparePblFilterDateFrom(pblFilterDateFrom);
         if (isPblFilterDateFrom(pblFilterDateFrom)) return;
         this.pblFilterDateFrom = pblFilterDateFrom;
@@ -689,7 +691,7 @@ public abstract class GProjectUserConfig
         fireModified("pblFilterDateFrom="+pblFilterDateFrom);
     }
 
-    protected ilarkesto.base.time.Date preparePblFilterDateFrom(ilarkesto.base.time.Date pblFilterDateFrom) {
+    protected ilarkesto.core.time.Date preparePblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         return pblFilterDateFrom;
     }
 
@@ -697,27 +699,27 @@ public abstract class GProjectUserConfig
         return this.pblFilterDateFrom != null;
     }
 
-    public final boolean isPblFilterDateFrom(ilarkesto.base.time.Date pblFilterDateFrom) {
+    public final boolean isPblFilterDateFrom(ilarkesto.core.time.Date pblFilterDateFrom) {
         if (this.pblFilterDateFrom == null && pblFilterDateFrom == null) return true;
         return this.pblFilterDateFrom != null && this.pblFilterDateFrom.equals(pblFilterDateFrom);
     }
 
     protected final void updatePblFilterDateFrom(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setPblFilterDateFrom((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setPblFilterDateFrom((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
     // - pblFilterDateTo
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date pblFilterDateTo;
+    private ilarkesto.core.time.Date pblFilterDateTo;
 
-    public final ilarkesto.base.time.Date getPblFilterDateTo() {
+    public final ilarkesto.core.time.Date getPblFilterDateTo() {
         return pblFilterDateTo;
     }
 
-    public final void setPblFilterDateTo(ilarkesto.base.time.Date pblFilterDateTo) {
+    public final void setPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         pblFilterDateTo = preparePblFilterDateTo(pblFilterDateTo);
         if (isPblFilterDateTo(pblFilterDateTo)) return;
         this.pblFilterDateTo = pblFilterDateTo;
@@ -725,7 +727,7 @@ public abstract class GProjectUserConfig
         fireModified("pblFilterDateTo="+pblFilterDateTo);
     }
 
-    protected ilarkesto.base.time.Date preparePblFilterDateTo(ilarkesto.base.time.Date pblFilterDateTo) {
+    protected ilarkesto.core.time.Date preparePblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         return pblFilterDateTo;
     }
 
@@ -733,14 +735,14 @@ public abstract class GProjectUserConfig
         return this.pblFilterDateTo != null;
     }
 
-    public final boolean isPblFilterDateTo(ilarkesto.base.time.Date pblFilterDateTo) {
+    public final boolean isPblFilterDateTo(ilarkesto.core.time.Date pblFilterDateTo) {
         if (this.pblFilterDateTo == null && pblFilterDateTo == null) return true;
         return this.pblFilterDateTo != null && this.pblFilterDateTo.equals(pblFilterDateTo);
     }
 
     protected final void updatePblFilterDateTo(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setPblFilterDateTo((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setPblFilterDateTo((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------

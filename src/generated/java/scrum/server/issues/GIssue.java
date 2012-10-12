@@ -14,11 +14,13 @@
 package scrum.server.issues;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GIssue
             extends AEntity
@@ -259,13 +261,13 @@ public abstract class GIssue
     // - date
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.DateAndTime date;
+    private ilarkesto.core.time.DateAndTime date;
 
-    public final ilarkesto.base.time.DateAndTime getDate() {
+    public final ilarkesto.core.time.DateAndTime getDate() {
         return date;
     }
 
-    public final void setDate(ilarkesto.base.time.DateAndTime date) {
+    public final void setDate(ilarkesto.core.time.DateAndTime date) {
         date = prepareDate(date);
         if (isDate(date)) return;
         this.date = date;
@@ -273,7 +275,7 @@ public abstract class GIssue
         fireModified("date="+date);
     }
 
-    protected ilarkesto.base.time.DateAndTime prepareDate(ilarkesto.base.time.DateAndTime date) {
+    protected ilarkesto.core.time.DateAndTime prepareDate(ilarkesto.core.time.DateAndTime date) {
         return date;
     }
 
@@ -281,14 +283,14 @@ public abstract class GIssue
         return this.date != null;
     }
 
-    public final boolean isDate(ilarkesto.base.time.DateAndTime date) {
+    public final boolean isDate(ilarkesto.core.time.DateAndTime date) {
         if (this.date == null && date == null) return true;
         return this.date != null && this.date.equals(date);
     }
 
     protected final void updateDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.DateAndTime((String)value);
-        setDate((ilarkesto.base.time.DateAndTime)value);
+        value = value == null ? null : new ilarkesto.core.time.DateAndTime((String)value);
+        setDate((ilarkesto.core.time.DateAndTime)value);
     }
 
     // -----------------------------------------------------------
@@ -527,13 +529,13 @@ public abstract class GIssue
     // - acceptDate
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date acceptDate;
+    private ilarkesto.core.time.Date acceptDate;
 
-    public final ilarkesto.base.time.Date getAcceptDate() {
+    public final ilarkesto.core.time.Date getAcceptDate() {
         return acceptDate;
     }
 
-    public final void setAcceptDate(ilarkesto.base.time.Date acceptDate) {
+    public final void setAcceptDate(ilarkesto.core.time.Date acceptDate) {
         acceptDate = prepareAcceptDate(acceptDate);
         if (isAcceptDate(acceptDate)) return;
         this.acceptDate = acceptDate;
@@ -541,7 +543,7 @@ public abstract class GIssue
         fireModified("acceptDate="+acceptDate);
     }
 
-    protected ilarkesto.base.time.Date prepareAcceptDate(ilarkesto.base.time.Date acceptDate) {
+    protected ilarkesto.core.time.Date prepareAcceptDate(ilarkesto.core.time.Date acceptDate) {
         return acceptDate;
     }
 
@@ -549,14 +551,14 @@ public abstract class GIssue
         return this.acceptDate != null;
     }
 
-    public final boolean isAcceptDate(ilarkesto.base.time.Date acceptDate) {
+    public final boolean isAcceptDate(ilarkesto.core.time.Date acceptDate) {
         if (this.acceptDate == null && acceptDate == null) return true;
         return this.acceptDate != null && this.acceptDate.equals(acceptDate);
     }
 
     protected final void updateAcceptDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setAcceptDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setAcceptDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
@@ -675,13 +677,13 @@ public abstract class GIssue
     // - fixDate
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date fixDate;
+    private ilarkesto.core.time.Date fixDate;
 
-    public final ilarkesto.base.time.Date getFixDate() {
+    public final ilarkesto.core.time.Date getFixDate() {
         return fixDate;
     }
 
-    public final void setFixDate(ilarkesto.base.time.Date fixDate) {
+    public final void setFixDate(ilarkesto.core.time.Date fixDate) {
         fixDate = prepareFixDate(fixDate);
         if (isFixDate(fixDate)) return;
         this.fixDate = fixDate;
@@ -689,7 +691,7 @@ public abstract class GIssue
         fireModified("fixDate="+fixDate);
     }
 
-    protected ilarkesto.base.time.Date prepareFixDate(ilarkesto.base.time.Date fixDate) {
+    protected ilarkesto.core.time.Date prepareFixDate(ilarkesto.core.time.Date fixDate) {
         return fixDate;
     }
 
@@ -697,27 +699,27 @@ public abstract class GIssue
         return this.fixDate != null;
     }
 
-    public final boolean isFixDate(ilarkesto.base.time.Date fixDate) {
+    public final boolean isFixDate(ilarkesto.core.time.Date fixDate) {
         if (this.fixDate == null && fixDate == null) return true;
         return this.fixDate != null && this.fixDate.equals(fixDate);
     }
 
     protected final void updateFixDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setFixDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setFixDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
     // - closeDate
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date closeDate;
+    private ilarkesto.core.time.Date closeDate;
 
-    public final ilarkesto.base.time.Date getCloseDate() {
+    public final ilarkesto.core.time.Date getCloseDate() {
         return closeDate;
     }
 
-    public final void setCloseDate(ilarkesto.base.time.Date closeDate) {
+    public final void setCloseDate(ilarkesto.core.time.Date closeDate) {
         closeDate = prepareCloseDate(closeDate);
         if (isCloseDate(closeDate)) return;
         this.closeDate = closeDate;
@@ -725,7 +727,7 @@ public abstract class GIssue
         fireModified("closeDate="+closeDate);
     }
 
-    protected ilarkesto.base.time.Date prepareCloseDate(ilarkesto.base.time.Date closeDate) {
+    protected ilarkesto.core.time.Date prepareCloseDate(ilarkesto.core.time.Date closeDate) {
         return closeDate;
     }
 
@@ -733,27 +735,27 @@ public abstract class GIssue
         return this.closeDate != null;
     }
 
-    public final boolean isCloseDate(ilarkesto.base.time.Date closeDate) {
+    public final boolean isCloseDate(ilarkesto.core.time.Date closeDate) {
         if (this.closeDate == null && closeDate == null) return true;
         return this.closeDate != null && this.closeDate.equals(closeDate);
     }
 
     protected final void updateCloseDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setCloseDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setCloseDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------
     // - suspendedUntilDate
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date suspendedUntilDate;
+    private ilarkesto.core.time.Date suspendedUntilDate;
 
-    public final ilarkesto.base.time.Date getSuspendedUntilDate() {
+    public final ilarkesto.core.time.Date getSuspendedUntilDate() {
         return suspendedUntilDate;
     }
 
-    public final void setSuspendedUntilDate(ilarkesto.base.time.Date suspendedUntilDate) {
+    public final void setSuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         suspendedUntilDate = prepareSuspendedUntilDate(suspendedUntilDate);
         if (isSuspendedUntilDate(suspendedUntilDate)) return;
         this.suspendedUntilDate = suspendedUntilDate;
@@ -761,7 +763,7 @@ public abstract class GIssue
         fireModified("suspendedUntilDate="+suspendedUntilDate);
     }
 
-    protected ilarkesto.base.time.Date prepareSuspendedUntilDate(ilarkesto.base.time.Date suspendedUntilDate) {
+    protected ilarkesto.core.time.Date prepareSuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         return suspendedUntilDate;
     }
 
@@ -769,14 +771,14 @@ public abstract class GIssue
         return this.suspendedUntilDate != null;
     }
 
-    public final boolean isSuspendedUntilDate(ilarkesto.base.time.Date suspendedUntilDate) {
+    public final boolean isSuspendedUntilDate(ilarkesto.core.time.Date suspendedUntilDate) {
         if (this.suspendedUntilDate == null && suspendedUntilDate == null) return true;
         return this.suspendedUntilDate != null && this.suspendedUntilDate.equals(suspendedUntilDate);
     }
 
     protected final void updateSuspendedUntilDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setSuspendedUntilDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setSuspendedUntilDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------

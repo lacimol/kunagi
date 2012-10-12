@@ -14,11 +14,13 @@
 package scrum.server.collaboration;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GComment
             extends AEntity
@@ -341,13 +343,13 @@ public abstract class GComment
     // - dateAndTime
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.DateAndTime dateAndTime;
+    private ilarkesto.core.time.DateAndTime dateAndTime;
 
-    public final ilarkesto.base.time.DateAndTime getDateAndTime() {
+    public final ilarkesto.core.time.DateAndTime getDateAndTime() {
         return dateAndTime;
     }
 
-    public final void setDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    public final void setDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         dateAndTime = prepareDateAndTime(dateAndTime);
         if (isDateAndTime(dateAndTime)) return;
         this.dateAndTime = dateAndTime;
@@ -355,7 +357,7 @@ public abstract class GComment
         fireModified("dateAndTime="+dateAndTime);
     }
 
-    protected ilarkesto.base.time.DateAndTime prepareDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    protected ilarkesto.core.time.DateAndTime prepareDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return dateAndTime;
     }
 
@@ -363,14 +365,14 @@ public abstract class GComment
         return this.dateAndTime != null;
     }
 
-    public final boolean isDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    public final boolean isDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         if (this.dateAndTime == null && dateAndTime == null) return true;
         return this.dateAndTime != null && this.dateAndTime.equals(dateAndTime);
     }
 
     protected final void updateDateAndTime(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.DateAndTime((String)value);
-        setDateAndTime((ilarkesto.base.time.DateAndTime)value);
+        value = value == null ? null : new ilarkesto.core.time.DateAndTime((String)value);
+        setDateAndTime((ilarkesto.core.time.DateAndTime)value);
     }
 
     public void updateProperties(Map<?, ?> properties) {

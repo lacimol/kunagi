@@ -757,9 +757,9 @@ public class Project extends GProject implements ForumSupport {
 
 	public List<Sprint> getFormerSprints(int toIndex) {
 		List<Sprint> sprints = new ArrayList<Sprint>(getSprints());
-		Collections.sort(sprints, Sprint.END_DATE_COMPARATOR);
+		Collections.sort(sprints, Sprint.END_DATE_REVERSE_COMPARATOR);
 		List<Sprint> reverseSprints = sprints.subList(0, Math.min(toIndex, sprints.size()));
-		Collections.sort(reverseSprints, Sprint.END_DATE_REVERSE_COMPARATOR);
+		Collections.sort(reverseSprints, Sprint.END_DATE_COMPARATOR);
 		return reverseSprints;
 	}
 

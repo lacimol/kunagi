@@ -14,7 +14,7 @@
  */
 package scrum.server.sprint;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.base.Tm;
 import ilarkesto.pdf.APdfContainerElement;
 import ilarkesto.pdf.FieldList;
 
@@ -43,9 +43,9 @@ public class SprintBacklogPdfCreator extends APdfCreator {
 		FieldList fields = pdf.fieldList().setLabelFontStyle(fieldLabelFont);
 		fields.field("Sprint").paragraph().text(sprint.getReference() + " ", referenceFont).text(sprint.getLabel());
 		fields.field("Period").text(
-			sprint.getBegin().toString(Date.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY) + "  -  "
-					+ sprint.getEnd().toString(Date.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY) + "   ("
-					+ sprint.getLengthInDays() + " days)");
+			Tm.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY.format(sprint.getBegin()) + "  -  "
+					+ Tm.FORMAT_SHORTWEEKDAY_SHORTMONTH_DAY.format(sprint.getEnd()) + "   (" + sprint.getLengthInDays()
+					+ " days)");
 		int burned = sprint.getBurnedWork();
 		int remaining = sprint.getRemainingWork();
 		int total = remaining + burned;

@@ -14,7 +14,7 @@
  */
 package scrum.server.admin;
 
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 
 public class ProjectUserConfig extends GProjectUserConfig {
 

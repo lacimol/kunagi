@@ -14,12 +14,11 @@
 package scrum.server.release;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GReleaseDao
             extends ilarkesto.persistence.ADao<Release> {
@@ -326,21 +325,21 @@ public abstract class GReleaseDao
     // - releaseDate
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<Release>> releasesByReleaseDateCache = new Cache<ilarkesto.base.time.Date,Set<Release>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<Release>>() {
-                public Set<Release> create(ilarkesto.base.time.Date releaseDate) {
+    private final Cache<ilarkesto.core.time.Date,Set<Release>> releasesByReleaseDateCache = new Cache<ilarkesto.core.time.Date,Set<Release>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<Release>>() {
+                public Set<Release> create(ilarkesto.core.time.Date releaseDate) {
                     return getEntities(new IsReleaseDate(releaseDate));
                 }
             });
 
-    public final Set<Release> getReleasesByReleaseDate(ilarkesto.base.time.Date releaseDate) {
+    public final Set<Release> getReleasesByReleaseDate(ilarkesto.core.time.Date releaseDate) {
         return new HashSet<Release>(releasesByReleaseDateCache.get(releaseDate));
     }
-    private Set<ilarkesto.base.time.Date> releaseDatesCache;
+    private Set<ilarkesto.core.time.Date> releaseDatesCache;
 
-    public final Set<ilarkesto.base.time.Date> getReleaseDates() {
+    public final Set<ilarkesto.core.time.Date> getReleaseDates() {
         if (releaseDatesCache == null) {
-            releaseDatesCache = new HashSet<ilarkesto.base.time.Date>();
+            releaseDatesCache = new HashSet<ilarkesto.core.time.Date>();
             for (Release e : getEntities()) {
                 if (e.isReleaseDateSet()) releaseDatesCache.add(e.getReleaseDate());
             }
@@ -350,9 +349,9 @@ public abstract class GReleaseDao
 
     private static class IsReleaseDate implements Predicate<Release> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsReleaseDate(ilarkesto.base.time.Date value) {
+        public IsReleaseDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

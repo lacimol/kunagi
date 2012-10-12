@@ -14,11 +14,13 @@
 package scrum.server.project;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GRequirement
             extends AEntity
@@ -519,13 +521,13 @@ public abstract class GRequirement
     // - rejectDate
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date rejectDate;
+    private ilarkesto.core.time.Date rejectDate;
 
-    public final ilarkesto.base.time.Date getRejectDate() {
+    public final ilarkesto.core.time.Date getRejectDate() {
         return rejectDate;
     }
 
-    public final void setRejectDate(ilarkesto.base.time.Date rejectDate) {
+    public final void setRejectDate(ilarkesto.core.time.Date rejectDate) {
         rejectDate = prepareRejectDate(rejectDate);
         if (isRejectDate(rejectDate)) return;
         this.rejectDate = rejectDate;
@@ -533,7 +535,7 @@ public abstract class GRequirement
         fireModified("rejectDate="+rejectDate);
     }
 
-    protected ilarkesto.base.time.Date prepareRejectDate(ilarkesto.base.time.Date rejectDate) {
+    protected ilarkesto.core.time.Date prepareRejectDate(ilarkesto.core.time.Date rejectDate) {
         return rejectDate;
     }
 
@@ -541,14 +543,14 @@ public abstract class GRequirement
         return this.rejectDate != null;
     }
 
-    public final boolean isRejectDate(ilarkesto.base.time.Date rejectDate) {
+    public final boolean isRejectDate(ilarkesto.core.time.Date rejectDate) {
         if (this.rejectDate == null && rejectDate == null) return true;
         return this.rejectDate != null && this.rejectDate.equals(rejectDate);
     }
 
     protected final void updateRejectDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setRejectDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setRejectDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------

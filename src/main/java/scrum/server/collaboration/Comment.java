@@ -16,7 +16,7 @@ package scrum.server.collaboration;
 
 import ilarkesto.auth.Auth;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 import scrum.server.admin.User;
 
 public class Comment extends GComment implements Comparable<Comment> {

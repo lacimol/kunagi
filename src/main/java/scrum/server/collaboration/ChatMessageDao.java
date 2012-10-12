@@ -14,7 +14,7 @@
  */
 package scrum.server.collaboration;
 
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 import scrum.server.project.Project;
 
 public class ChatMessageDao extends GChatMessageDao {

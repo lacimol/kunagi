@@ -14,12 +14,11 @@
 package scrum.server.journal;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GChangeDao
             extends ilarkesto.persistence.ADao<Change> {
@@ -158,21 +157,21 @@ public abstract class GChangeDao
     // - dateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<Change>> changesByDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<Change>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<Change>>() {
-                public Set<Change> create(ilarkesto.base.time.DateAndTime dateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<Change>> changesByDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<Change>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<Change>>() {
+                public Set<Change> create(ilarkesto.core.time.DateAndTime dateAndTime) {
                     return getEntities(new IsDateAndTime(dateAndTime));
                 }
             });
 
-    public final Set<Change> getChangesByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    public final Set<Change> getChangesByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return new HashSet<Change>(changesByDateAndTimeCache.get(dateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> dateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getDateAndTimes() {
         if (dateAndTimesCache == null) {
-            dateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            dateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (Change e : getEntities()) {
                 if (e.isDateAndTimeSet()) dateAndTimesCache.add(e.getDateAndTime());
             }
@@ -182,9 +181,9 @@ public abstract class GChangeDao
 
     private static class IsDateAndTime implements Predicate<Change> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

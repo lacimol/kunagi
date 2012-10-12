@@ -14,12 +14,11 @@
 package scrum.server.task;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GTaskDaySnapshotDao
             extends ilarkesto.persistence.ADao<TaskDaySnapshot> {
@@ -114,21 +113,21 @@ public abstract class GTaskDaySnapshotDao
     // - date
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.Date,Set<TaskDaySnapshot>> taskDaySnapshotsByDateCache = new Cache<ilarkesto.base.time.Date,Set<TaskDaySnapshot>>(
-            new Cache.Factory<ilarkesto.base.time.Date,Set<TaskDaySnapshot>>() {
-                public Set<TaskDaySnapshot> create(ilarkesto.base.time.Date date) {
+    private final Cache<ilarkesto.core.time.Date,Set<TaskDaySnapshot>> taskDaySnapshotsByDateCache = new Cache<ilarkesto.core.time.Date,Set<TaskDaySnapshot>>(
+            new Cache.Factory<ilarkesto.core.time.Date,Set<TaskDaySnapshot>>() {
+                public Set<TaskDaySnapshot> create(ilarkesto.core.time.Date date) {
                     return getEntities(new IsDate(date));
                 }
             });
 
-    public final Set<TaskDaySnapshot> getTaskDaySnapshotsByDate(ilarkesto.base.time.Date date) {
+    public final Set<TaskDaySnapshot> getTaskDaySnapshotsByDate(ilarkesto.core.time.Date date) {
         return new HashSet<TaskDaySnapshot>(taskDaySnapshotsByDateCache.get(date));
     }
-    private Set<ilarkesto.base.time.Date> datesCache;
+    private Set<ilarkesto.core.time.Date> datesCache;
 
-    public final Set<ilarkesto.base.time.Date> getDates() {
+    public final Set<ilarkesto.core.time.Date> getDates() {
         if (datesCache == null) {
-            datesCache = new HashSet<ilarkesto.base.time.Date>();
+            datesCache = new HashSet<ilarkesto.core.time.Date>();
             for (TaskDaySnapshot e : getEntities()) {
                 if (e.isDateSet()) datesCache.add(e.getDate());
             }
@@ -138,9 +137,9 @@ public abstract class GTaskDaySnapshotDao
 
     private static class IsDate implements Predicate<TaskDaySnapshot> {
 
-        private ilarkesto.base.time.Date value;
+        private ilarkesto.core.time.Date value;
 
-        public IsDate(ilarkesto.base.time.Date value) {
+        public IsDate(ilarkesto.core.time.Date value) {
             this.value = value;
         }
 

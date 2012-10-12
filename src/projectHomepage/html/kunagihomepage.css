@@ -42,7 +42,7 @@ input, textarea {border: 1px solid #192666; font: 14px/19px monospace; padding: 
         ol {margin-left: 30px; margin-top: 10px; margin-bottom: 10px;}
         .secondaryText {color: #666;}
         .smallText {font-size: 10px;}
-        .codeBlock {display: block; border: 1px solid #DDD; padding: 5px; margin: 0 10px 10px 10px; background: #EEE; max-width: 660px; max-height: 600px; overflow: auto;}
+        .codeBlock {display: block; border: 1px solid #DDD; padding: 5px; margin: 0 10px 10px 10px; background: #EEE; max-width: 640px; max-height: 600px; overflow: auto;}
         label.optional {}
         div.sublabel {color: #AAA; font-size: 9px; line-height: 9px;}
         div.socialbuttons {}

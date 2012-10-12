@@ -14,11 +14,13 @@
 package scrum.server.impediments;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
+import ilarkesto.persistence.ADatob;
+import ilarkesto.persistence.AEntity;
+import ilarkesto.persistence.AStructure;
+import ilarkesto.auth.AUser;
+import ilarkesto.persistence.EntityDoesNotExistException;
+import ilarkesto.base.Str;
 
 public abstract class GImpediment
             extends AEntity
@@ -192,13 +194,13 @@ public abstract class GImpediment
     // - date
     // -----------------------------------------------------------
 
-    private ilarkesto.base.time.Date date;
+    private ilarkesto.core.time.Date date;
 
-    public final ilarkesto.base.time.Date getDate() {
+    public final ilarkesto.core.time.Date getDate() {
         return date;
     }
 
-    public final void setDate(ilarkesto.base.time.Date date) {
+    public final void setDate(ilarkesto.core.time.Date date) {
         date = prepareDate(date);
         if (isDate(date)) return;
         this.date = date;
@@ -206,7 +208,7 @@ public abstract class GImpediment
         fireModified("date="+date);
     }
 
-    protected ilarkesto.base.time.Date prepareDate(ilarkesto.base.time.Date date) {
+    protected ilarkesto.core.time.Date prepareDate(ilarkesto.core.time.Date date) {
         return date;
     }
 
@@ -214,14 +216,14 @@ public abstract class GImpediment
         return this.date != null;
     }
 
-    public final boolean isDate(ilarkesto.base.time.Date date) {
+    public final boolean isDate(ilarkesto.core.time.Date date) {
         if (this.date == null && date == null) return true;
         return this.date != null && this.date.equals(date);
     }
 
     protected final void updateDate(Object value) {
-        value = value == null ? null : new ilarkesto.base.time.Date((String)value);
-        setDate((ilarkesto.base.time.Date)value);
+        value = value == null ? null : new ilarkesto.core.time.Date((String)value);
+        setDate((ilarkesto.core.time.Date)value);
     }
 
     // -----------------------------------------------------------

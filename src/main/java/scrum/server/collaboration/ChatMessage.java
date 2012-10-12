@@ -14,7 +14,7 @@
  */
 package scrum.server.collaboration;
 
-import ilarkesto.base.time.TimePeriod;
+import ilarkesto.core.time.TimePeriod;
 import scrum.server.admin.User;
 
 public class ChatMessage extends GChatMessage {

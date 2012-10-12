@@ -16,8 +16,8 @@ package scrum.server.admin;
 
 import ilarkesto.auth.OpenId;
 import ilarkesto.base.Str;
-import ilarkesto.base.time.DateAndTime;
 import ilarkesto.core.logging.Log;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.integration.gravatar.Gravatar;
 import ilarkesto.integration.gravatar.Profile;
 import java.util.ArrayList;

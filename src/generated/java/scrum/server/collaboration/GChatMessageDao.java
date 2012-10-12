@@ -14,12 +14,11 @@
 package scrum.server.collaboration;
 
 import java.util.*;
-import ilarkesto.persistence.*;
 import ilarkesto.core.logging.Log;
-import ilarkesto.base.*;
-import ilarkesto.base.time.*;
-import ilarkesto.auth.*;
-import ilarkesto.fp.*;
+import ilarkesto.auth.Auth;
+import ilarkesto.base.Cache;
+import ilarkesto.persistence.EntityEvent;
+import ilarkesto.fp.Predicate;
 
 public abstract class GChatMessageDao
             extends ilarkesto.persistence.ADao<ChatMessage> {
@@ -192,21 +191,21 @@ public abstract class GChatMessageDao
     // - dateAndTime
     // -----------------------------------------------------------
 
-    private final Cache<ilarkesto.base.time.DateAndTime,Set<ChatMessage>> chatMessagesByDateAndTimeCache = new Cache<ilarkesto.base.time.DateAndTime,Set<ChatMessage>>(
-            new Cache.Factory<ilarkesto.base.time.DateAndTime,Set<ChatMessage>>() {
-                public Set<ChatMessage> create(ilarkesto.base.time.DateAndTime dateAndTime) {
+    private final Cache<ilarkesto.core.time.DateAndTime,Set<ChatMessage>> chatMessagesByDateAndTimeCache = new Cache<ilarkesto.core.time.DateAndTime,Set<ChatMessage>>(
+            new Cache.Factory<ilarkesto.core.time.DateAndTime,Set<ChatMessage>>() {
+                public Set<ChatMessage> create(ilarkesto.core.time.DateAndTime dateAndTime) {
                     return getEntities(new IsDateAndTime(dateAndTime));
                 }
             });
 
-    public final Set<ChatMessage> getChatMessagesByDateAndTime(ilarkesto.base.time.DateAndTime dateAndTime) {
+    public final Set<ChatMessage> getChatMessagesByDateAndTime(ilarkesto.core.time.DateAndTime dateAndTime) {
         return new HashSet<ChatMessage>(chatMessagesByDateAndTimeCache.get(dateAndTime));
     }
-    private Set<ilarkesto.base.time.DateAndTime> dateAndTimesCache;
+    private Set<ilarkesto.core.time.DateAndTime> dateAndTimesCache;
 
-    public final Set<ilarkesto.base.time.DateAndTime> getDateAndTimes() {
+    public final Set<ilarkesto.core.time.DateAndTime> getDateAndTimes() {
         if (dateAndTimesCache == null) {
-            dateAndTimesCache = new HashSet<ilarkesto.base.time.DateAndTime>();
+            dateAndTimesCache = new HashSet<ilarkesto.core.time.DateAndTime>();
             for (ChatMessage e : getEntities()) {
                 if (e.isDateAndTimeSet()) dateAndTimesCache.add(e.getDateAndTime());
             }
@@ -216,9 +215,9 @@ public abstract class GChatMessageDao
 
     private static class IsDateAndTime implements Predicate<ChatMessage> {
 
-        private ilarkesto.base.time.DateAndTime value;
+        private ilarkesto.core.time.DateAndTime value;
 
-        public IsDateAndTime(ilarkesto.base.time.DateAndTime value) {
+        public IsDateAndTime(ilarkesto.core.time.DateAndTime value) {
             this.value = value;
         }
 

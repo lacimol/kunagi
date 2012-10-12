@@ -15,14 +15,11 @@
 package scrum.server.common;
 
 import ilarkesto.base.PermissionDeniedException;
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.integration.itext.PdfBuilder;
-import ilarkesto.webapp.Servlet;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import scrum.server.WebSession;
 import scrum.server.calendar.CalendarPdfCreator;
@@ -40,90 +37,88 @@ import scrum.server.sprint.Sprint;
 import scrum.server.sprint.SprintBacklogPdfCreator;
 import scrum.server.sprint.SprintReportPdfCreator;
 
-public class PdfServlet extends AHttpServlet {
+public class PdfServlet extends AKunagiServlet {
 
-	private APdfCreator getPdfCreator(String pdfId, HttpServletRequest req, WebSession session) {
-		if (pdfId.equals("sprintReport")) return createSprintReport(req, session);
-		if (pdfId.equals("wikipage")) return createWikipage(req, session);
-		if (pdfId.equals("productBacklog")) return createProductBacklog(req, session);
-		if (pdfId.equals("sprintBacklog")) return createSprintBacklog(req, session);
-		if (pdfId.equals("qualityBacklog")) return createQualityBacklog(req, session);
-		if (pdfId.equals("impedimentList")) return createImpedimentList(req, session);
-		if (pdfId.equals("riskList")) return createRiskList(req, session);
-		if (pdfId.equals("calendar")) return createCalendar(req, session);
-		if (pdfId.equals("bugList")) return createBugList(req, session);
-		if (pdfId.equals("ideaList")) return createIdeaList(req, session);
-		if (pdfId.equals("releasePlan")) return createReleasePlan(req, session);
-		if (pdfId.equals("releaseHistory")) return createReleaseHistory(req, session);
+	private APdfCreator getPdfCreator(String pdfId, RequestWrapper<WebSession> req) {
+		if (pdfId.equals("sprintReport")) return createSprintReport(req);
+		if (pdfId.equals("wikipage")) return createWikipage(req);
+		if (pdfId.equals("productBacklog")) return createProductBacklog(req);
+		if (pdfId.equals("sprintBacklog")) return createSprintBacklog(req);
+		if (pdfId.equals("qualityBacklog")) return createQualityBacklog(req);
+		if (pdfId.equals("impedimentList")) return createImpedimentList(req);
+		if (pdfId.equals("riskList")) return createRiskList(req);
+		if (pdfId.equals("calendar")) return createCalendar(req);
+		if (pdfId.equals("bugList")) return createBugList(req);
+		if (pdfId.equals("ideaList")) return createIdeaList(req);
+		if (pdfId.equals("releasePlan")) return createReleasePlan(req);
+		if (pdfId.equals("releaseHistory")) return createReleaseHistory(req);
 		throw new RuntimeException("Unknown pdfId: " + pdfId);
 	}
 
-	private APdfCreator createCalendar(HttpServletRequest req, WebSession session) {
-		Date from = new Date(req.getParameter("from"));
-		Date to = new Date(req.getParameter("to"));
-		return new CalendarPdfCreator(getProject(session, req), from, to);
+	private APdfCreator createCalendar(RequestWrapper<WebSession> req) {
+		Date from = req.getDate("from");
+		Date to = req.getDate("to");
+		return new CalendarPdfCreator(getProject(req), from, to);
 	}
 
-	private APdfCreator createReleasePlan(HttpServletRequest req, WebSession session) {
-		return new ReleasePlanPdfCreator(getProject(session, req));
+	private APdfCreator createReleasePlan(RequestWrapper<WebSession> req) {
+		return new ReleasePlanPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createReleaseHistory(HttpServletRequest req, WebSession session) {
-		return new ReleaseHistoryPdfCreator(getProject(session, req));
+	private APdfCreator createReleaseHistory(RequestWrapper<WebSession> req) {
+		return new ReleaseHistoryPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createRiskList(HttpServletRequest req, WebSession session) {
-		return new RiskListPdfCreator(getProject(session, req));
+	private APdfCreator createRiskList(RequestWrapper<WebSession> req) {
+		return new RiskListPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createImpedimentList(HttpServletRequest req, WebSession session) {
-		return new ImpedimentListPdfCreator(getProject(session, req));
+	private APdfCreator createImpedimentList(RequestWrapper<WebSession> req) {
+		return new ImpedimentListPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createSprintBacklog(HttpServletRequest req, WebSession session) {
-		return new SprintBacklogPdfCreator(getProject(session, req));
+	private APdfCreator createSprintBacklog(RequestWrapper<WebSession> req) {
+		return new SprintBacklogPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createQualityBacklog(HttpServletRequest req, WebSession session) {
-		return new QualityBacklogPdfCreator(getProject(session, req));
+	private APdfCreator createQualityBacklog(RequestWrapper<WebSession> req) {
+		return new QualityBacklogPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createProductBacklog(HttpServletRequest req, WebSession session) {
-		return new ProductBacklogPdfCreator(getProject(session, req));
+	private APdfCreator createProductBacklog(RequestWrapper<WebSession> req) {
+		return new ProductBacklogPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createBugList(HttpServletRequest req, WebSession session) {
-		return new BugListPdfCreator(getProject(session, req));
+	private APdfCreator createBugList(RequestWrapper<WebSession> req) {
+		return new BugListPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createIdeaList(HttpServletRequest req, WebSession session) {
-		return new IdeaListPdfCreator(getProject(session, req));
+	private APdfCreator createIdeaList(RequestWrapper<WebSession> req) {
+		return new IdeaListPdfCreator(getProject(req));
 	}
 
-	private APdfCreator createWikipage(HttpServletRequest req, WebSession session) {
+	private APdfCreator createWikipage(RequestWrapper<WebSession> req) {
 		Wikipage wikipage = getEntityByParameter(req, Wikipage.class);
-		if (!wikipage.isProject(getProject(session, req))) throw new PermissionDeniedException();
+		if (!wikipage.isProject(getProject(req))) throw new PermissionDeniedException();
 		return new WikipagePdfCreator(wikipage);
 	}
 
-	private APdfCreator createSprintReport(HttpServletRequest req, WebSession session) {
+	private APdfCreator createSprintReport(RequestWrapper<WebSession> req) {
 		Sprint sprint = getEntityByParameter(req, Sprint.class);
-		if (!sprint.isProject(getProject(session, req))) throw new PermissionDeniedException();
+		if (!sprint.isProject(getProject(req))) throw new PermissionDeniedException();
 		return new SprintReportPdfCreator(sprint);
 	}
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		String pdfId = req.getParameter("pdfId");
-		if (pdfId == null) throw new RuntimeException("pdfId==null");
-		APdfCreator creator = getPdfCreator(pdfId, req, session);
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		String pdfId = req.getMandatory("pdfId");
+		APdfCreator creator = getPdfCreator(pdfId, req);
 
-		resp.setContentType("application/pdf");
-		Servlet.setFilename(creator.getFilename() + ".pdf", resp);
+		req.setContentTypePdf();
+		req.setFilename(creator.getFilename() + ".pdf");
 
 		PdfBuilder pdf = new PdfBuilder();
 		creator.build(pdf);
-		pdf.write(resp.getOutputStream());
+		req.write(pdf);
 	}
-
 }

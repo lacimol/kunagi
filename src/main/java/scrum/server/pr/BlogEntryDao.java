@@ -14,7 +14,7 @@
  */
 package scrum.server.pr;
 
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.fp.Predicate;
 import scrum.server.project.Project;
 

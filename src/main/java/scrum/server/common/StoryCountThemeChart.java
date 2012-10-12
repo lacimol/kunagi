@@ -62,7 +62,7 @@ public class StoryCountThemeChart extends Chart {
 			dataset.setValue(theme.getKey(), new Double(theme.getValue()));
 		}
 
-		final JFreeChart chart = createPieChart(dataset);
+		final JFreeChart chart = createAmountPieChart(dataset);
 		createPic(out, width, height, chart);
 	}
 }

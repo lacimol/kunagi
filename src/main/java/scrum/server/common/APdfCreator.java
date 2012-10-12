@@ -14,8 +14,9 @@
  */
 package scrum.server.common;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.base.Tm;
 import ilarkesto.core.base.Str;
+import ilarkesto.core.time.Date;
 import ilarkesto.pdf.ACell;
 import ilarkesto.pdf.AParagraph;
 import ilarkesto.pdf.APdfBuilder;
@@ -81,7 +82,7 @@ public abstract class APdfCreator {
 	protected void reportHeader(APdfContainerElement pdf, String title, String projectLabel) {
 		pdf.paragraph().setDefaultFontStyle(headerFonts[0]).text(projectLabel);
 		pdf.paragraph().setDefaultFontStyle(miniLabelFont).text(title + ", ")
-				.text(Date.today().toString(Date.FORMAT_LONGMONTH_DAY_YEAR));
+				.text(Tm.FORMAT_LONGMONTH_DAY_YEAR.format(Date.today()));
 	}
 
 	protected void wiki(APdfContainerElement parent, String wikiCode) {

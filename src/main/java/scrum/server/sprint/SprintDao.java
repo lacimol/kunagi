@@ -16,8 +16,8 @@ package scrum.server.sprint;
 
 import ilarkesto.base.Str;
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.Date;
 import ilarkesto.core.scope.In;
+import ilarkesto.core.time.Date;
 import ilarkesto.fp.Predicate;
 
 import java.util.Arrays;

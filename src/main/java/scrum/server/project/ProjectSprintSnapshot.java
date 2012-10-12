@@ -14,7 +14,7 @@
  */
 package scrum.server.project;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import scrum.server.admin.User;
 import scrum.server.common.BurndownSnapshot;
 

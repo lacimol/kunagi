@@ -126,6 +126,10 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 		getRequirement().setClosed(false);
 	}
 
+	public boolean isClaimed() {
+		return !isClosed() && isOwnerSet();
+	}
+
 	public boolean isClosed() {
 		return getRemainingWork() == 0;
 	}
@@ -141,7 +145,7 @@ public class Task extends GTask implements ReferenceSupport, LabelSupport, Forum
 			work = String.valueOf(burned);
 		} else {
 			int remaining = getRemainingWork();
-			if (isOwnerSet()) {
+			if (isClaimed()) {
 				int total = remaining + burned;
 				work = burned + " of " + total;
 			} else {

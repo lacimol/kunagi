@@ -16,7 +16,7 @@ package scrum.server.journal;
 
 import ilarkesto.base.AFactoryCache;
 import ilarkesto.base.Cache;
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 import ilarkesto.fp.Predicate;
 import ilarkesto.persistence.AEntity;
 

@@ -18,39 +18,40 @@ import ilarkesto.base.Str;
 import ilarkesto.core.logging.Log;
 import ilarkesto.io.IO;
 import ilarkesto.ui.web.HtmlRenderer;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletConfig;
 
+import scrum.server.ScrumWebApplication;
 import scrum.server.WebSession;
 
-public class StartServlet extends AHttpServlet {
+public class StartServlet extends AKunagiServlet {
 
 	private static Log log = Log.get(StartServlet.class);
 
 	private static boolean first = true;
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
 
 		if (first) {
 			first = false;
-			String requestUrl = req.getRequestURL().toString();
+			String requestUrl = req.getUri();
 			requestUrl = Str.removeSuffix(requestUrl, "index.html");
 			if (!systemConfig.isUrlSet()) systemConfig.setUrl(requestUrl);
 		}
 
-		if (session.getUser() == null) {
-			redirectToLogin(req, resp, session);
+		if (req.getSession().getUser() == null) {
+			redirectToLogin(req);
 			return;
 		}
 
 		String charset = IO.UTF_8;
-		resp.setContentType("text/html");
+		req.setContentTypeHtml();
 
-		HtmlRenderer html = new HtmlRenderer(resp.getOutputStream(), charset);
+		HtmlRenderer html = new HtmlRenderer(req.getWriter(), charset);
 		html.startHTMLstandard();
 
 		String title = "Kunagi";
@@ -72,4 +73,11 @@ public class StartServlet extends AHttpServlet {
 		html.endHTML();
 		html.flush();
 	}
+
+	@Override
+	protected void onPreInit(ServletConfig servletConfig) {
+		super.onPreInit(servletConfig);
+		ScrumWebApplication.get(servletConfig);
+	}
+
 }

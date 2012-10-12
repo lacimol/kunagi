@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ $# -lt 1 ]]
+then
+	echo " "
+	echo "$0: Illegal arguments."
+	echo " "
+	echo "Syntax:"
+	echo "$0 release-name"
+	exit 1
+fi
+
+VERSION=$1
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $DIR
+git tag -af r$VERSION -m "release $VERSION"
+git push origin r$VERSION
+
+cd ../ilarkesto
+git tag -af kunagi-r$VERSION -m "kunagi release $VERSION"
+git push origin kunagi-r$VERSION
+

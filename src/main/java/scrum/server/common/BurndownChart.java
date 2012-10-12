@@ -1,6 +1,6 @@
 package scrum.server.common;
 
-import ilarkesto.base.time.Date;
+import ilarkesto.core.time.Date;
 import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;

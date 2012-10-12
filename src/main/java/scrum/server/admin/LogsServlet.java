@@ -17,34 +17,32 @@ package scrum.server.admin;
 import ilarkesto.core.logging.LogRecord;
 import ilarkesto.logging.DefaultLogRecordHandler;
 import ilarkesto.ui.web.HtmlRenderer;
+import ilarkesto.webapp.RequestWrapper;
 
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import scrum.server.WebSession;
-import scrum.server.common.AHttpServlet;
+import scrum.server.common.AKunagiServlet;
 
-public class LogsServlet extends AHttpServlet {
+public class LogsServlet extends AKunagiServlet {
 
 	@Override
-	protected void onRequest(HttpServletRequest req, HttpServletResponse resp, WebSession session) throws IOException {
-		tokenLogin(req, resp, session);
+	protected void onRequest(RequestWrapper<WebSession> req) throws IOException {
+		tokenLogin(req);
 
-		User user = session.getUser();
+		User user = req.getSession().getUser();
 		if (user == null) {
-			redirectToLogin(req, resp, session);
+			redirectToLogin(req);
 			return;
 		}
 
 		if (!user.isAdmin()) {
-			resp.sendError(403);
+			req.sendErrorForbidden();
 			return;
 		}
 
-		HtmlRenderer html = createDefaultHtmlWithHeader(resp, "Latest logs");
+		HtmlRenderer html = createDefaultHtmlWithHeader(req, "Latest logs");
 
 		html.startBODY().setStyle("font-size: 10px");
 

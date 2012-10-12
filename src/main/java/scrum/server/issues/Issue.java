@@ -15,7 +15,7 @@
 package scrum.server.issues;
 
 import ilarkesto.base.Utl;
-import ilarkesto.base.time.DateAndTime;
+import ilarkesto.core.time.DateAndTime;
 
 import java.util.Comparator;
 import java.util.Set;
