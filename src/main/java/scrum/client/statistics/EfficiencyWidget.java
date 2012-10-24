@@ -31,7 +31,7 @@ public class EfficiencyWidget extends ChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return sprint.getEfficiencyChartUrl(width, TEAM_CHART_HEIGHT);
+		return sprint.getChartUrl(width, TEAM_CHART_HEIGHT, "efficiency");
 	}
 
 }

@@ -47,7 +47,7 @@ public abstract class ChartWidget extends AScrumWidget {
 
 	abstract String getChartUrl(int width);
 
-	public int getChartWidth() {
+	protected int getChartWidth() {
 		int width = Window.getClientWidth() - MENU_WIDTH;
 		width = width / 2;
 		if (width < MIN_CHART_WIDTH) width = MIN_CHART_WIDTH;

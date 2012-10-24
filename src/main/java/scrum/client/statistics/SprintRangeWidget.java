@@ -19,7 +19,7 @@ public class SprintRangeWidget extends TwoThirdsChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getSprintRangeChartUrl(width, 250);
+		return getCurrentSprint().getChartUrl(width, 250, "sprintRange");
 	}
 
 }

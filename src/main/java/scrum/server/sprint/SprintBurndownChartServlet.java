@@ -18,6 +18,7 @@ import ilarkesto.webapp.RequestWrapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import scrum.client.project.ProjectOverviewWidget;
 import scrum.server.ScrumWebApplication;
@@ -49,7 +50,7 @@ public class SprintBurndownChartServlet extends AKunagiServlet {
 		int height = Integer.parseInt(heightParam);
 
 		Chart chart = getChart(chartName);
-		if ("workChart".equals(chartName)) {
+		if ("userBurndownChart".equals(chartName)) {
 			((UserBurndownChart) chart).writeChart(out, sprintId, width, height, userName);
 		} else {
 			chart.writeChart(out, sprintId, width, height);
@@ -58,63 +59,21 @@ public class SprintBurndownChartServlet extends AKunagiServlet {
 		req.write(out.toByteArray());
 	}
 
-	protected Chart getChart(String chartName) {
+	private Chart getChart(String chartName) {
 
-		// XXX Factory pattern
-		Chart chart = null;
 		ScrumWebApplication scrumWebApp = ScrumWebApplication.get();
-		boolean isWorkChart = "workChart".equals(chartName);
-		boolean isEfficiencyChart = "efficiencyChart".equals(chartName);
-		boolean isAccomplishChart = "accomplishChart".equals(chartName);
-		boolean isVelocityChart = "velocityChart".equals(chartName);
-		boolean isSprintWorkChart = "sprintWorkChart".equals(chartName);
-		boolean isSprintRangeChart = "sprintRangeChart".equals(chartName);
-		boolean isCurrentSprintRangeChart = "currentSprintRangeChart".equals(chartName);
-		boolean isTaskRangeChart = "taskRangeChart".equals(chartName);
-		boolean isStoryThemeChart = "storyThemeChart".equals(chartName);
-		boolean isStoryBurnThemeChart = "storyBurnThemeChart".equals(chartName);
-		boolean isProjectEffiChart = "projectEffiChart".equals(chartName);
-		boolean isTeamMemberBurnChart = "teamMemberBurnPieChart".equals(chartName);
+		Chart chart = scrumWebApp.getBurndownChart();
 
-		if (isWorkChart) {
-			// team or user burned hours
-			chart = scrumWebApp.getUserBurndownChart();
-		} else if (isEfficiencyChart) {
-			// initial / burned hours at closed tasks
-			chart = scrumWebApp.getEfficiencyChart();
-		} else if (isVelocityChart) {
-			// velocity history
-			chart = scrumWebApp.getVelocityChart();
-		} else if (isSprintWorkChart) {
-			// sprint work history
-			chart = scrumWebApp.getSprintWorkChart();
-		} else if (isSprintRangeChart) {
-			// sprint range history
-			chart = scrumWebApp.getSprintRangeChart();
-		} else if (isCurrentSprintRangeChart) {
-			// current sprint range history
-			chart = scrumWebApp.getCurrentSprintRangeChart();
-		} else if (isTaskRangeChart) {
-			// task range history
-			chart = scrumWebApp.getTaskRangeChart();
-		} else if (isAccomplishChart) {
-			// burned hours per user
-			chart = scrumWebApp.getAccomplishChart();
-		} else if (isStoryThemeChart) {
-			// story theme pie chart
-			chart = scrumWebApp.getStoryThemeChart();
-		} else if (isStoryBurnThemeChart) {
-			// story burn theme pie chart
-			chart = scrumWebApp.getStoryBurnThemeChart();
-		} else if (isProjectEffiChart) {
-			// project effi chart
-			chart = scrumWebApp.getProjectEfficiencyChart();
-		} else if (isTeamMemberBurnChart) {
-			chart = scrumWebApp.getTeamMemberBurnPieChart();
-		} else {
-			// sprint burndown
-			chart = scrumWebApp.getBurndownChart();
+		try {
+			if (chartName != null) {
+				String methodName = "get" + chartName.substring(0, 1).toUpperCase().concat(chartName.substring(1));
+				Method method = scrumWebApp.getClass().getMethod(methodName, new Class[] {});
+				chart = (Chart) method.invoke(scrumWebApp, new Object[] {});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
 		chart.setSprintDao(scrumWebApp.getSprintDao());
 		return chart;
 

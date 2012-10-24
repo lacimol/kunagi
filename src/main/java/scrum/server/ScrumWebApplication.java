@@ -55,6 +55,7 @@ import scrum.server.admin.SystemConfig;
 import scrum.server.admin.User;
 import scrum.server.admin.UserDao;
 import scrum.server.common.AccomplishChart;
+import scrum.server.common.ArrearsChart;
 import scrum.server.common.BurndownChart;
 import scrum.server.common.EfficiencyChart;
 import scrum.server.common.ProjectEfficiencyChart;
@@ -91,6 +92,7 @@ public class ScrumWebApplication extends GScrumWebApplication {
 	private StoryBurnThemeChart storyBurnThemeChart;
 	private ProjectEfficiencyChart projectEfficiencyChart;
 	private TeamMemberBurnPieChart teamMemberBurnPieChart;
+	private ArrearsChart arrearsChart;
 	private KunagiRootConfig config;
 	private ScrumEntityfilePreparator entityfilePreparator;
 	private SystemMessage systemMessage;
@@ -193,6 +195,13 @@ public class ScrumWebApplication extends GScrumWebApplication {
 			projectEfficiencyChart = new ProjectEfficiencyChart();
 		}
 		return projectEfficiencyChart;
+	}
+
+	public ArrearsChart getArrearsChart() {
+		if (arrearsChart == null) {
+			arrearsChart = new ArrearsChart();
+		}
+		return arrearsChart;
 	}
 
 	public SystemConfig getSystemConfig() {

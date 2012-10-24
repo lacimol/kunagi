@@ -28,7 +28,7 @@ public class UserWorkWidget extends ChartWidget {
 	@Override
 	String getChartUrl(int width) {
 		int height = userName == null ? TEAM_CHART_HEIGHT : USER_CHART_HEIGHT;
-		return getCurrentSprint().getUserChartUrl(width, height, userName);
+		return getCurrentSprint().getUserChartUrl(width, height, "userBurndown", userName);
 	}
 
 }

@@ -15,9 +15,6 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
-
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 import org.jfree.chart.JFreeChart;
@@ -31,14 +28,7 @@ public class SprintWorkChart extends Chart {
 	private static final String REMAINED_SERIES = "Remained";
 	private static final String EXTRA_SERIES = "Extra";
 	private static final String INITIAL_SERIES = "Initial";
-	private static final Log LOG = Log.get(SprintWorkChart.class);
 	private static final String AVG = "average";
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new SprintWorkChart().writeChart(out, sprint, width, height);
-		return out.toByteArray();
-	}
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {

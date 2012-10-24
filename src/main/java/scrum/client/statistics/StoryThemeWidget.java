@@ -19,7 +19,7 @@ public class StoryThemeWidget extends ChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getStoryThemeChartUrl(width, 300);
+		return getCurrentSprint().getChartUrl(width, 300, "storyTheme");
 	}
 
 }

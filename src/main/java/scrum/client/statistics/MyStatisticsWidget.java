@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class MyStatisticsWidget extends TeamBurnHoursWidget {
 
-	private static final int daysBefore = 7;
+	private static final int daysBefore = 21;
 
 	@Override
 	protected Widget onInitialization() {

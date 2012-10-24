@@ -24,6 +24,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
@@ -73,7 +74,7 @@ import scrum.server.sprint.SprintDao;
 
 public abstract class Chart {
 
-	private static final Log LOG = Log.get(Chart.class);
+	protected static final Log LOG = Log.get(Chart.class);
 
 	protected static final Color COLOR_PAST_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownLine);
 	protected static final Color COLOR_PROJECTION_LINE = Utl.parseHtmlColor(ScreenCssBuilder.cBurndownProjectionLine);
@@ -110,6 +111,12 @@ public abstract class Chart {
 		userColors.put("darkgray", Color.DARK_GRAY);
 		userColors.put("orange", Color.ORANGE);
 		userColors.put("green", Color.GREEN);
+	}
+
+	public static byte[] createChartAsByteArray(Chart chart, Sprint sprint, int width, int height) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		chart.writeChart(out, sprint, width, height);
+		return out.toByteArray();
 	}
 
 	public static JFreeChart createXYLineChart(Sprint sprint, int dateMarkTickUnit, float widthPerDay,

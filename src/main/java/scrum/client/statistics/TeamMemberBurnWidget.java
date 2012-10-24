@@ -19,7 +19,7 @@ public class TeamMemberBurnWidget extends ChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getTeamMemberBurnPieChartUrl(width, 300);
+		return getCurrentSprint().getChartUrl(width, 300, "teamMemberBurnPie");
 	}
 
 }

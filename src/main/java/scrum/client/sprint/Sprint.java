@@ -118,60 +118,12 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 				+ height;
 	}
 
-	public String getTaskBurndownChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=taskBurndownChart";
+	public String getChartUrl(int width, int height, String chartName) {
+		return getChartUrl(width, height) + "&chart=" + chartName + "Chart";
 	}
 
-	public String getWorkChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=workChart";
-	}
-
-	public String getUserChartUrl(int width, int height, String userName) {
-		return getWorkChartUrl(width, height) + "&userName=" + userName;
-	}
-
-	public String getEfficiencyChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=efficiencyChart";
-	}
-
-	public String getProjectEfficiencyChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=projectEffiChart";
-	}
-
-	public String getAccomplishChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=accomplishChart";
-	}
-
-	public String getVelocityChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=velocityChart";
-	}
-
-	public String getSprintWorkChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=sprintWorkChart";
-	}
-
-	public String getSprintRangeChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=sprintRangeChart";
-	}
-
-	public String getCurrentSprintRangeChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=currentSprintRangeChart";
-	}
-
-	public String getTaskRangeChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=taskRangeChart";
-	}
-
-	public String getStoryThemeChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=storyThemeChart";
-	}
-
-	public String getStoryBurnThemeChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=storyBurnThemeChart";
-	}
-
-	public String getTeamMemberBurnPieChartUrl(int width, int height) {
-		return getChartUrl(width, height) + "&chart=teamMemberBurnPieChart";
+	public String getUserChartUrl(int width, int height, String chartName, String userName) {
+		return getChartUrl(width, height, chartName) + "&userName=" + userName;
 	}
 
 	public boolean isCompleted() {

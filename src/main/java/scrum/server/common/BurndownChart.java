@@ -1,7 +1,6 @@
 package scrum.server.common;
 
 import ilarkesto.core.time.Date;
-import ilarkesto.core.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -17,22 +16,11 @@ import scrum.server.sprint.SprintDaySnapshot;
 
 public class BurndownChart extends Chart {
 
-	private static final Log LOG = Log.get(BurndownChart.class);
-
 	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		new BurndownChart().writeChart(out, sprint, width, height);
 		return out.toByteArray();
 	}
-
-	// public void writeProjectBurndownChart(OutputStream out, String projectId, int width, int height) {
-	// Project project = projectDao.getById(projectId);
-	// List<ProjectSprintSnapshot> snapshots = project.getSprintSnapshots();
-	// project.getCurrentSprintSnapshot().update();
-	//
-	// writeProjectBurndownChart(out, snapshots, project.getBegin(), project.getEnd().addDays(1),
-	// project.getFreeDaysAsWeekdaySelector(), width, height);
-	// }
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {

@@ -19,7 +19,7 @@ public class VelocityWidget extends TwoThirdsChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getVelocityChartUrl(width, 120);
+		return getCurrentSprint().getChartUrl(width, USER_CHART_HEIGHT, "velocity");
 	}
 
 }

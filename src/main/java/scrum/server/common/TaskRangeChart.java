@@ -15,10 +15,8 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
 import ilarkesto.core.time.Date;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
@@ -31,19 +29,12 @@ import scrum.server.sprint.Task;
 
 public class TaskRangeChart extends Chart {
 
-	private static final Log LOG = Log.get(TaskRangeChart.class);
 	private int maxTaskNr = 35;
 
 	public TaskRangeChart() {}
 
 	public TaskRangeChart(int maxTaskNr) {
 		this.maxTaskNr = maxTaskNr;
-	}
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new TaskRangeChart().writeChart(out, sprint, width, height);
-		return out.toByteArray();
 	}
 
 	@Override

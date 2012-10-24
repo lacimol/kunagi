@@ -31,6 +31,7 @@ import scrum.client.sprint.SprintHistoryHelper.StoryInfo;
 import scrum.client.sprint.SprintHistoryHelper.TaskInfo;
 import scrum.server.common.APdfCreator;
 import scrum.server.common.BurndownChart;
+import scrum.server.common.Chart;
 import scrum.server.common.ScrumPdfContext;
 import scrum.server.common.StoryBurnThemeChart;
 import scrum.server.common.WikiToPdfConverter;
@@ -70,7 +71,7 @@ public class SprintReportPdfCreator extends APdfCreator {
 		pdf.image(BurndownChart.createBurndownChartAsByteArray(sprint, 1000, 500)).setScaleByWidth(150f);
 
 		pdf.nl();
-		pdf.image(StoryBurnThemeChart.createBurndownChartAsByteArray(sprint, 1000, 500)).setScaleByWidth(150f);
+		pdf.image(Chart.createChartAsByteArray(new StoryBurnThemeChart(), sprint, 1000, 500)).setScaleByWidth(150f);
 
 		ScrumPdfContext pdfContext = new ScrumPdfContext(sprint.getProject());
 		if (sprint.isGoalSet()) {

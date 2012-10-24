@@ -20,41 +20,36 @@ import java.io.OutputStream;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import scrum.server.project.Project;
+import scrum.server.ScrumWebApplication;
+import scrum.server.admin.User;
 import scrum.server.sprint.Sprint;
 
-public class VelocityChart extends Chart {
-
-	private static final String AVG = "average";
+public class ArrearsChart extends Chart {
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
 
-		Project project = sprint.getProject();
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
-		barDataset.addValue(0, "S1", AVG);
 
-		int maxVelocity = 0;
-		float sum = 0;
-		int count = 10;
-		Float velocity;
-		for (Sprint completedSprint : project.getFormerSprints(count)) {
-			velocity = completedSprint.getVelocity();
-			if (velocity == null || velocity.intValue() == 0) continue;
-			barDataset.addValue(velocity, "S1", completedSprint.getLabel());
-			maxVelocity = Math.max(velocity.intValue(), maxVelocity);
-			sum += velocity;
+		int maxWorkHours = sprint.getLengthInWorkDays()
+				* ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
+		Double burnedHours = sprint.getUserBurnedHours(Sprint.TEAM);
+		int teamMemberSize = sprint.getProject().getTeamMembers().size();
+		int arrears = (maxWorkHours * teamMemberSize) - burnedHours.intValue();
+		barDataset
+				.setValue(burnedHours / (maxWorkHours * teamMemberSize), "Burned", Sprint.TEAM + " (" + arrears + ")");
+
+		for (User user : sprint.getProject().getTeamMembers()) {
+			String userName = user.getName();
+			burnedHours = sprint.getUserBurnedHours(userName);
+			arrears = maxWorkHours - burnedHours.intValue();
+			barDataset.addValue(burnedHours / maxWorkHours, "Burned", userName + " (" + arrears + ")");
 		}
 
-		int avarage = 0;
-		if (count > 0 && sum > 0) {
-			avarage = (int) sum / count;
-		}
-		barDataset.setValue(avarage, "S1", AVG);
+		JFreeChart chart = createEfficiencyChart(barDataset, sprint);
 
-		JFreeChart chart = createBarChart(barDataset);
-		setChartMarker(chart, avarage, maxVelocity);
-		setUpperBoundary(chart, maxVelocity + 25);
+		setChartMarker(chart, maxWorkHours, maxWorkHours);
+		setUpperBoundary(chart, 1);
 		createPic(out, width, height, chart);
 	}
 

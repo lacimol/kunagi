@@ -15,9 +15,6 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
-
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,14 +26,6 @@ import scrum.server.project.Requirement;
 import scrum.server.sprint.Sprint;
 
 public class StoryCountThemeChart extends Chart {
-
-	private static final Log LOG = Log.get(StoryCountThemeChart.class);
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new StoryCountThemeChart().writeChart(out, sprint, width, height);
-		return out.toByteArray();
-	}
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {

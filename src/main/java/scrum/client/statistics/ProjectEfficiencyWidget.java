@@ -31,7 +31,7 @@ public class ProjectEfficiencyWidget extends TwoThirdsChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return sprint.getProjectEfficiencyChartUrl(width, TEAM_CHART_HEIGHT);
+		return sprint.getChartUrl(width, TEAM_CHART_HEIGHT, "projectEfficiency");
 	}
 
 }

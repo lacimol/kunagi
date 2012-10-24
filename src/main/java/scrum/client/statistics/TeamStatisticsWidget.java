@@ -31,13 +31,17 @@ public class TeamStatisticsWidget extends TeamBurnHoursWidget {
 		teamBurndown.addHeader("Team burndown");
 		teamBurndown.addSection(new FullUserWorkWidget());
 
+		PagePanel arrears = new PagePanel();
+		arrears.addHeader("Team arrears");
+		arrears.addSection(new ArrearsWidget());
+
 		Project project = getCurrentProject();
 		// burned hours
 		Date yesterday = project.getCurrentSprint().getLastWorkDay();
 		PagePanel yesterdayTeamBurnHours = createBurnHoursPanel(project, yesterday);
 		PagePanel todayTeamBurnHours = createBurnHoursPanel(project, Date.today());
 
-		Widget middle = TableBuilder.column(5, teamBurndown, yesterdayTeamBurnHours, todayTeamBurnHours);
+		Widget middle = TableBuilder.column(5, teamBurndown, arrears, yesterdayTeamBurnHours, todayTeamBurnHours);
 
 		return TableBuilder.row(5, middle);
 	}

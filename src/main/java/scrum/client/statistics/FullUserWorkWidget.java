@@ -27,7 +27,7 @@ public class FullUserWorkWidget extends FullChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getUserChartUrl(width, TEAM_CHART_HEIGHT, userName);
+		return getCurrentSprint().getUserChartUrl(width, TEAM_CHART_HEIGHT, "userBurndown", userName);
 	}
 
 }

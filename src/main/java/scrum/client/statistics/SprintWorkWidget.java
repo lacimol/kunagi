@@ -19,7 +19,7 @@ public class SprintWorkWidget extends TwoThirdsChartWidget {
 
 	@Override
 	String getChartUrl(int width) {
-		return getCurrentSprint().getSprintWorkChartUrl(width, TEAM_CHART_HEIGHT);
+		return getCurrentSprint().getChartUrl(width, TEAM_CHART_HEIGHT, "sprintWork");
 	}
 
 }

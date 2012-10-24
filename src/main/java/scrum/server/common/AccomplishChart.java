@@ -15,12 +15,7 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
-
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -28,18 +23,10 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
 import scrum.server.sprint.Sprint;
-import scrum.server.sprint.Task;
 
 public class AccomplishChart extends Chart {
 
-	private static final Log LOG = Log.get(AccomplishChart.class);
 	private static final String TEAM_AVG = Sprint.TEAM + " avg";
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new AccomplishChart().writeChart(out, sprint, width, height);
-		return out.toByteArray();
-	}
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
@@ -49,16 +36,19 @@ public class AccomplishChart extends Chart {
 
 		Double burnedHours = 0.0;
 		Double remainingHours = 0.0;
-		Integer teamMembersCount = sprint.getProject().getTeamMembersCount();
+
 		for (User user : sprint.getProject().getTeamMembers()) {
-			burnedHours = getUserBurnedHours(sprint, user.getName());
-			remainingHours = getUserRemainingHours(sprint, user.getName());
+			String userName = user.getName();
+			burnedHours = sprint.getUserBurnedHours(userName);
+			remainingHours = sprint.getUserRemainingHours(userName);
 			LOG.debug(user, "'s burnedHours: ", burnedHours, ", remining: ", remainingHours);
-			barDataset.addValue(burnedHours, "Burned", user.getName());
-			barDataset.addValue(remainingHours, "Remaining", user.getName());
+			barDataset.addValue(burnedHours, "Burned", userName);
+			barDataset.addValue(remainingHours, "Remaining", userName);
 		}
-		burnedHours = getUserBurnedHours(sprint, Sprint.TEAM);
-		remainingHours = getUserRemainingHours(sprint, Sprint.TEAM);
+		burnedHours = sprint.getUserBurnedHours(Sprint.TEAM);
+		remainingHours = sprint.getUserRemainingHours(Sprint.TEAM);
+
+		Integer teamMembersCount = sprint.getProject().getTeamMembersCount();
 		int teamAvg = (int) (burnedHours / teamMembersCount);
 		barDataset.setValue(teamAvg, "Burned", TEAM_AVG);
 		barDataset.setValue((int) (remainingHours / teamMembersCount), "Remaining", TEAM_AVG);
@@ -69,36 +59,6 @@ public class AccomplishChart extends Chart {
 		setChartMarker(chart, teamAvg, maxWorkHours);
 		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (int) (burnedHours + remainingHours)));
 		createPic(out, width, height, chart);
-	}
-
-	private Double getUserBurnedHours(Sprint sprint, String userName) {
-
-		Double allBurnedHours = 0.0;
-		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
-		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
-
-		for (Task task : sprintTasks) {
-			if (userName.equals(Sprint.TEAM) || (task.isOwnersTask(userName))) {
-				allBurnedHours += task.getBurnedWork();
-			}
-		}
-
-		return allBurnedHours;
-	}
-
-	private Double getUserRemainingHours(Sprint sprint, String userName) {
-
-		Double allRemainingHours = 0.0;
-		// List<Task> sprintTasks = new LinkedList<Task>(sprint.getProject().getTasks());
-		List<Task> sprintTasks = new LinkedList<Task>(sprint.getTasks());
-
-		for (Task task : sprintTasks) {
-			if (task.getOwner() != null && (userName.equals(Sprint.TEAM) || userName.equals(task.getOwner().getName()))) {
-				allRemainingHours += task.getRemainingWork();
-			}
-		}
-
-		return allRemainingHours;
 	}
 
 }

@@ -15,9 +15,6 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
-
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 import org.jfree.chart.JFreeChart;
@@ -29,14 +26,6 @@ import scrum.server.sprint.Sprint;
 import scrum.server.sprint.UserEfficiency;
 
 public class ProjectEfficiencyChart extends Chart {
-
-	private static final Log log = Log.get(ProjectEfficiencyChart.class);
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new ProjectEfficiencyChart().writeChart(out, sprint, width, height);
-		return out.toByteArray();
-	}
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {

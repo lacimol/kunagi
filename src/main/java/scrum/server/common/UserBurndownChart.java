@@ -15,10 +15,8 @@
 
 package scrum.server.common;
 
-import ilarkesto.core.logging.Log;
 import ilarkesto.core.time.Date;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,16 +39,9 @@ import scrum.server.task.TaskDaySnapshot;
 
 public class UserBurndownChart extends Chart {
 
-	private static final Log LOG = Log.get(UserBurndownChart.class);
 	private static Integer teamMembersCount;
 
 	private String userName;
-
-	public static byte[] createBurndownChartAsByteArray(Sprint sprint, int width, int height, String userName) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new UserBurndownChart().writeChart(out, sprint, width, height, userName);
-		return out.toByteArray();
-	}
 
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height, String userName) {
 		this.userName = userName;

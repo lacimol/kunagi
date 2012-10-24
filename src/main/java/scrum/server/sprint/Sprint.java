@@ -600,4 +600,32 @@ public class Sprint extends GSprint implements Numbered {
 		return usefulWorkingHoursPerDay * (getWorkDaysInSprint() - meetingDaysCorrection) * teamMembers;
 	}
 
+	public Double getUserBurnedHours(String userName) {
+
+		Double allBurnedHours = 0.0;
+		List<Task> sprintTasks = new LinkedList<Task>(getTasks());
+
+		for (Task task : sprintTasks) {
+			if (userName.equals(TEAM) || (task.isOwnersTask(userName))) {
+				allBurnedHours += task.getBurnedWork();
+			}
+		}
+
+		return allBurnedHours;
+	}
+
+	public Double getUserRemainingHours(String userName) {
+
+		Double allRemainingHours = 0.0;
+		List<Task> sprintTasks = new LinkedList<Task>(getTasks());
+
+		for (Task task : sprintTasks) {
+			if (task.getOwner() != null && (userName.equals(TEAM) || userName.equals(task.getOwner().getName()))) {
+				allRemainingHours += task.getRemainingWork();
+			}
+		}
+
+		return allRemainingHours;
+	}
+
 }
