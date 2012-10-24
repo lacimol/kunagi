@@ -37,9 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import scrum.client.Dao;
 import scrum.client.ScrumGwt;
 import scrum.client.admin.Auth;
 import scrum.client.admin.ProjectUserConfig;
+import scrum.client.admin.SystemConfig;
 import scrum.client.admin.User;
 import scrum.client.collaboration.Comment;
 import scrum.client.collaboration.ForumSupport;
@@ -774,6 +776,16 @@ public class Project extends GProject implements ForumSupport {
 
 	public boolean isFreeDay(Date date) {
 		WeekdaySelector freeDays = this.getFreeDaysWeekdaySelectorModel().getValue();
-		return freeDays.isFree(date.getWeekday().getDayOfWeek());
+		return freeDays.isFree(date.getWeekday().getDayOfWeek()) || isHoliday(date);
+	}
+
+	private boolean isHoliday(Date date) {
+
+		SystemConfig systemConfig = Dao.get().getSystemConfig();
+		for (Date holiday : systemConfig.getHolidayDates()) {
+			if (holiday.equals(date)) { return true; }
+		}
+
+		return false;
 	}
 }

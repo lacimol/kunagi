@@ -71,6 +71,7 @@ public abstract class GSystemConfig
         properties.put("sprintStatisticsDisabled", this.sprintStatisticsDisabled);
         properties.put("usersStatisticsDisabled", this.usersStatisticsDisabled);
         properties.put("workingHoursPerDay", this.workingHoursPerDay);
+        properties.put("holidays", this.holidays);
     }
 
     public int compareTo(SystemConfig other) {
@@ -1206,6 +1207,42 @@ public abstract class GSystemConfig
         setWorkingHoursPerDay((java.lang.Integer)value);
     }
 
+    // -----------------------------------------------------------
+    // - holidays
+    // -----------------------------------------------------------
+
+    private java.lang.String holidays;
+
+    public final java.lang.String getHolidays() {
+        return holidays;
+    }
+
+    public final void setHolidays(java.lang.String holidays) {
+        holidays = prepareHolidays(holidays);
+        if (isHolidays(holidays)) return;
+        this.holidays = holidays;
+        updateLastModified();
+        fireModified("holidays="+holidays);
+    }
+
+    protected java.lang.String prepareHolidays(java.lang.String holidays) {
+        // holidays = Str.removeUnreadableChars(holidays);
+        return holidays;
+    }
+
+    public final boolean isHolidaysSet() {
+        return this.holidays != null;
+    }
+
+    public final boolean isHolidays(java.lang.String holidays) {
+        if (this.holidays == null && holidays == null) return true;
+        return this.holidays != null && this.holidays.equals(holidays);
+    }
+
+    protected final void updateHolidays(Object value) {
+        setHolidays((java.lang.String)value);
+    }
+
     public void updateProperties(Map<?, ?> properties) {
         for (Map.Entry entry : properties.entrySet()) {
             String property = (String) entry.getKey();
@@ -1244,6 +1281,7 @@ public abstract class GSystemConfig
             if (property.equals("sprintStatisticsDisabled")) updateSprintStatisticsDisabled(value);
             if (property.equals("usersStatisticsDisabled")) updateUsersStatisticsDisabled(value);
             if (property.equals("workingHoursPerDay")) updateWorkingHoursPerDay(value);
+            if (property.equals("holidays")) updateHolidays(value);
         }
     }
 

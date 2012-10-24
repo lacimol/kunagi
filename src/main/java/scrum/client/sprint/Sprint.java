@@ -36,7 +36,6 @@ import scrum.client.collaboration.Wiki;
 import scrum.client.common.LabelSupport;
 import scrum.client.common.ReferenceSupport;
 import scrum.client.common.ShowEntityAction;
-import scrum.client.common.WeekdaySelector;
 import scrum.client.impediments.Impediment;
 import scrum.client.project.Project;
 import scrum.client.project.Requirement;
@@ -472,12 +471,10 @@ public class Sprint extends GSprint implements ForumSupport, ReferenceSupport, L
 	public Date getLastWorkDay() {
 		Date begin = getBegin();
 		Date lastWorkDay = Date.today().prevDay();
-		WeekdaySelector freeDays = getProject().getFreeDaysWeekdaySelectorModel().getValue();
-		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
+
 		int count = 0;
-		while (freeDays.isFree(dayOfWeek) && count < 28 && !begin.isAfter(lastWorkDay)) {
+		while (getProject().isFreeDay(lastWorkDay) && count < 28 && !begin.isAfter(lastWorkDay)) {
 			lastWorkDay = lastWorkDay.prevDay();
-			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
 			count++;
 		}
 		return lastWorkDay;

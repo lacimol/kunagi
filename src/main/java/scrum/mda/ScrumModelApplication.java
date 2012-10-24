@@ -144,6 +144,8 @@ public class ScrumModelApplication extends AGeneratorApplication {
 				"Acitviate this, if you want to disable the users's statistics page for scrum master.");
 			systemConfigModel.addProperty("workingHoursPerDay", Integer.class).setTooltip(
 				"Workig hours per day per user.");
+			systemConfigModel.addStringProperty("holidays").setTooltip(
+				"National holidays: exclude doing normal work (semicolon separated yyyy.MM.dd)");
 			autowire(systemConfigModel);
 		}
 		return systemConfigModel;

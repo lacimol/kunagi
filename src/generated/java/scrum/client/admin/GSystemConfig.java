@@ -1899,6 +1899,61 @@ public abstract class GSystemConfig
 
     }
 
+    // --- holidays ---
+
+    private java.lang.String holidays ;
+
+    public final java.lang.String getHolidays() {
+        return this.holidays ;
+    }
+
+    public final SystemConfig setHolidays(java.lang.String holidays) {
+        if (isHolidays(holidays)) return (SystemConfig)this;
+        this.holidays = holidays ;
+        propertyChanged("holidays", this.holidays);
+        return (SystemConfig)this;
+    }
+
+    public final boolean isHolidays(java.lang.String holidays) {
+        return equals(this.holidays, holidays);
+    }
+
+    private transient HolidaysModel holidaysModel;
+
+    public HolidaysModel getHolidaysModel() {
+        if (holidaysModel == null) holidaysModel = createHolidaysModel();
+        return holidaysModel;
+    }
+
+    protected HolidaysModel createHolidaysModel() { return new HolidaysModel(); }
+
+    protected class HolidaysModel extends ilarkesto.gwt.client.editor.ATextEditorModel {
+
+        @Override
+        public String getId() {
+            return "SystemConfig_holidays";
+        }
+
+        @Override
+        public java.lang.String getValue() {
+            return getHolidays();
+        }
+
+        @Override
+        public void setValue(java.lang.String value) {
+            setHolidays(value);
+        }
+        @Override
+        public String getTooltip() { return "National holidays: exclude doing normal work (semicolon separated yyyy.MM.dd)"; }
+
+        @Override
+        protected void onChangeValue(java.lang.String oldValue, java.lang.String newValue) {
+            super.onChangeValue(oldValue, newValue);
+            addUndo(this, oldValue);
+        }
+
+    }
+
     // --- update properties by map ---
 
     public void updateProperties(Map props) {
@@ -1935,6 +1990,7 @@ public abstract class GSystemConfig
         sprintStatisticsDisabled  = (Boolean) props.get("sprintStatisticsDisabled");
         usersStatisticsDisabled  = (Boolean) props.get("usersStatisticsDisabled");
         workingHoursPerDay  = (java.lang.Integer) props.get("workingHoursPerDay");
+        holidays  = (java.lang.String) props.get("holidays");
         updateLocalModificationTime();
     }
 
@@ -1974,6 +2030,7 @@ public abstract class GSystemConfig
         properties.put("sprintStatisticsDisabled", this.sprintStatisticsDisabled);
         properties.put("usersStatisticsDisabled", this.usersStatisticsDisabled);
         properties.put("workingHoursPerDay", this.workingHoursPerDay);
+        properties.put("holidays", this.holidays);
     }
 
 }

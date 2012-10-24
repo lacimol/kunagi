@@ -144,7 +144,7 @@ public class BurndownChart extends Chart {
 
 			totalWorkDays = sprint.getWorkDaysInSprint();
 
-			setDate(firstDay);
+			setDate(sprint, firstDay);
 			while (true) {
 				if (!workFinished) {
 					burned = snapshot.getBurnedWorkTotal() - totalBurned;
@@ -166,7 +166,7 @@ public class BurndownChart extends Chart {
 
 				if (date.equals(lastDay)) break;
 
-				setDate(date.nextDay());
+				setDate(sprint, date.nextDay());
 				totalBefore = totalAfter;
 			}
 
@@ -176,11 +176,11 @@ public class BurndownChart extends Chart {
 			dataset.addSeries("Ideal", toArray(idealDates, idealValues));
 		}
 
-		private void setDate(Date newDate) {
+		private void setDate(Sprint sprint, Date newDate) {
 			date = newDate;
 			millisBegin = date.toMillis();
 			millisEnd = date.nextDay().toMillis();
-			freeDay = freeDays.isFree(date.getWeekday().getDayOfWeek());
+			freeDay = sprint.getProject().isFreeDay(date);
 			if (!workFinished) snapshot = getSnapshot();
 		}
 

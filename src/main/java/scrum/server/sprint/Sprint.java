@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import scrum.client.common.WeekdaySelector;
 import scrum.client.journal.Change;
 import scrum.server.ScrumWebApplication;
 import scrum.server.admin.User;
@@ -257,9 +256,8 @@ public class Sprint extends GSprint implements Numbered {
 		if (!isBeginSet() || !isEndSet()) return null;
 		Date date = getBegin();
 		int days = 0;
-		WeekdaySelector freeDays = getProject().getFreeDaysAsWeekdaySelector();
 		while (date.isBeforeOrSame(getEnd()) && date.isPastOrToday()) {
-			if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) {
+			if (!getProject().isFreeDay(date)) {
 				days++;
 			}
 			date = date.nextDay();
@@ -563,12 +561,10 @@ public class Sprint extends GSprint implements Numbered {
 	public Date getLastWorkDay() {
 		Date begin = getBegin();
 		Date lastWorkDay = Date.today().prevDay();
-		WeekdaySelector freeDays = getProject().getFreeDaysAsWeekdaySelector();
-		int dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
+
 		int count = 0;
-		while (freeDays.isFree(dayOfWeek) && count < 28 && !begin.isAfter(lastWorkDay)) {
+		while (getProject().isFreeDay(lastWorkDay) && count < 28 && !begin.isAfter(lastWorkDay)) {
 			lastWorkDay = lastWorkDay.prevDay();
-			dayOfWeek = lastWorkDay.getWeekday().getDayOfWeek();
 			count++;
 		}
 		return lastWorkDay;
@@ -577,11 +573,10 @@ public class Sprint extends GSprint implements Numbered {
 	public int getWorkDaysInSprint() {
 
 		int totalWorkDays = 0;
-		WeekdaySelector freeDays = getProject().getFreeDaysAsWeekdaySelector();
 
 		Date date = getBegin();
 		while (date.isBeforeOrSame(getEnd())) {
-			if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) totalWorkDays++;
+			if (!getProject().isFreeDay(date)) totalWorkDays++;
 			date = date.nextDay();
 		}
 		return totalWorkDays;

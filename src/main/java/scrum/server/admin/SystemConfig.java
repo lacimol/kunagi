@@ -15,6 +15,13 @@
 package scrum.server.admin;
 
 import ilarkesto.base.Str;
+import ilarkesto.core.time.Date;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import scrum.server.KunagiRootConfig;
 import scrum.server.ScrumWebApplication;
 
@@ -75,6 +82,25 @@ public class SystemConfig extends GSystemConfig {
 			if (openId.contains(domain)) return true;
 		}
 		return false;
+	}
+
+	public List<Date> getHolidayDates() {
+
+		List<Date> dates = new ArrayList<Date>();
+		if (getHolidays() != null) {
+			String[] holidays = getHolidays().split(";");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+
+			for (String holiday : holidays) {
+				try {
+					dates.add(new Date(sdf.parse(holiday)));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return dates;
+
 	}
 
 	// --- dependencies ---

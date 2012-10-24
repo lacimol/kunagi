@@ -43,6 +43,7 @@ import scrum.client.common.WeekdaySelector;
 import scrum.server.KunagiRootConfig;
 import scrum.server.ScrumWebApplication;
 import scrum.server.admin.ProjectUserConfig;
+import scrum.server.admin.SystemConfig;
 import scrum.server.admin.User;
 import scrum.server.calendar.SimpleEvent;
 import scrum.server.collaboration.Comment;
@@ -1119,6 +1120,21 @@ public class Project extends GProject {
 		result.setBurnedHoursPerInitial(" (" + initialBurnableHours + "/" + allBurnedHours + ")");
 
 		return result;
+	}
+
+	public boolean isFreeDay(Date date) {
+		WeekdaySelector freeDays = getFreeDaysAsWeekdaySelector();
+		return freeDays.isFree(date.getWeekday().getDayOfWeek()) || isHoliday(date);
+	}
+
+	private boolean isHoliday(Date date) {
+
+		SystemConfig systemConfig = ScrumWebApplication.get().getSystemConfig();
+		for (Date holiday : systemConfig.getHolidayDates()) {
+			if (holiday.equals(date)) { return true; }
+		}
+
+		return false;
 	}
 
 }

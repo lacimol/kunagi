@@ -31,7 +31,6 @@ import java.util.TreeMap;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultXYDataset;
 
-import scrum.client.common.WeekdaySelector;
 import scrum.server.ScrumWebApplication;
 import scrum.server.sprint.Sprint;
 import scrum.server.sprint.Task;
@@ -57,11 +56,6 @@ public class UserBurndownChart extends Chart {
 
 	@Override
 	public void writeChart(OutputStream out, Sprint sprint, int width, int height) {
-		WeekdaySelector freeDays = sprint.getProject().getFreeDaysAsWeekdaySelector();
-		writeChart(out, sprint, freeDays, width, height);
-	}
-
-	void writeChart(OutputStream out, Sprint sprint, WeekdaySelector freeDays, int width, int height) {
 
 		Date firstDay = sprint.getBegin();
 		Date lastDay = sprint.getEnd();
@@ -81,8 +75,7 @@ public class UserBurndownChart extends Chart {
 			widthPerDay = (float) width / (float) dayCount * dateMarkTickUnit;
 		}
 
-		JFreeChart chart = createSprintBurndownChart(userBurnedHours, sprint, freeDays, dateMarkTickUnit, widthPerDay,
-			height);
+		JFreeChart chart = createSprintBurndownChart(userBurnedHours, sprint, dateMarkTickUnit, widthPerDay, height);
 		createPic(out, width, height, chart);
 	}
 
@@ -128,21 +121,21 @@ public class UserBurndownChart extends Chart {
 	}
 
 	private JFreeChart createSprintBurndownChart(Map<String, Integer> userBurnedHours, Sprint sprint,
-			WeekdaySelector freeDays, int dateMarkTickUnit, float widthPerDay, int height) {
+			int dateMarkTickUnit, float widthPerDay, int height) {
 
 		Date firstDay = sprint.getBegin();
 		Date lastDay = sprint.getEnd();
 
 		DefaultXYDataset data = null;
 		double max = 0;
-		data = createWorkDataset(userBurnedHours, firstDay, lastDay, freeDays);
+		data = createWorkDataset(sprint, userBurnedHours, firstDay, lastDay);
 		max = Math.max(max, UserBurndownChart.getMaximum(data));
 
 		return createXYLineChart(sprint, dateMarkTickUnit, widthPerDay, data, max, height);
 	}
 
-	public DefaultXYDataset createWorkDataset(final Map<String, Integer> userBurnedHours, final Date firstDay,
-			final Date lastDay, final WeekdaySelector freeDays) {
+	public DefaultXYDataset createWorkDataset(Sprint sprint, final Map<String, Integer> userBurnedHours,
+			final Date firstDay, final Date lastDay) {
 
 		List<Double> mainDates = new ArrayList<Double>();
 		List<Double> mainValues = new ArrayList<Double>();
@@ -178,7 +171,7 @@ public class UserBurndownChart extends Chart {
 			mainValues.add(entry.getValue().doubleValue());
 			all += entry.getValue().doubleValue();
 
-			if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) {
+			if (!sprint.getProject().isFreeDay(date)) {
 				idealDates.add((double) millisBegin);
 				idealValues.add(idealWorkingHours);
 				idealDates.add((double) millisEnd);
@@ -200,7 +193,7 @@ public class UserBurndownChart extends Chart {
 			Date date = new Date(entry.getKey());
 			millisBegin = date.toMillis();
 			millisEnd = date.nextDay().toMillis();
-			if (!freeDays.isFree(date.getWeekday().getDayOfWeek())) {
+			if (!sprint.getProject().isFreeDay(date)) {
 				avgDates.add((double) millisBegin);
 				avgValues.add(average);
 				avgDates.add((double) millisEnd);

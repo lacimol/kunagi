@@ -32,7 +32,7 @@ public class TeamStatisticsWidget extends TeamBurnHoursWidget {
 		teamBurndown.addSection(new FullUserWorkWidget());
 
 		PagePanel arrears = new PagePanel();
-		arrears.addHeader("Team arrears");
+		arrears.addHeader("Team burn percent and arrears");
 		arrears.addSection(new ArrearsWidget());
 
 		Project project = getCurrentProject();

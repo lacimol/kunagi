@@ -15,7 +15,7 @@
 
 package scrum.client.statistics;
 
-public class ArrearsWidget extends ChartWidget {
+public class ArrearsWidget extends FullChartWidget {
 
 	@Override
 	String getChartUrl(int width) {

@@ -97,6 +97,8 @@ public abstract class GSystemConfigDao
         systemConfigsByUsersStatisticsDisabledCache.clear();
         systemConfigsByWorkingHoursPerDayCache.clear();
         workingHoursPerDaysCache = null;
+        systemConfigsByHolidaysCache.clear();
+        holidayssCache = null;
     }
 
     @Override
@@ -1321,6 +1323,46 @@ public abstract class GSystemConfigDao
 
         public boolean test(SystemConfig e) {
             return e.isWorkingHoursPerDay(value);
+        }
+
+    }
+
+    // -----------------------------------------------------------
+    // - holidays
+    // -----------------------------------------------------------
+
+    private final Cache<java.lang.String,Set<SystemConfig>> systemConfigsByHolidaysCache = new Cache<java.lang.String,Set<SystemConfig>>(
+            new Cache.Factory<java.lang.String,Set<SystemConfig>>() {
+                public Set<SystemConfig> create(java.lang.String holidays) {
+                    return getEntities(new IsHolidays(holidays));
+                }
+            });
+
+    public final Set<SystemConfig> getSystemConfigsByHolidays(java.lang.String holidays) {
+        return new HashSet<SystemConfig>(systemConfigsByHolidaysCache.get(holidays));
+    }
+    private Set<java.lang.String> holidayssCache;
+
+    public final Set<java.lang.String> getHolidayss() {
+        if (holidayssCache == null) {
+            holidayssCache = new HashSet<java.lang.String>();
+            for (SystemConfig e : getEntities()) {
+                if (e.isHolidaysSet()) holidayssCache.add(e.getHolidays());
+            }
+        }
+        return holidayssCache;
+    }
+
+    private static class IsHolidays implements Predicate<SystemConfig> {
+
+        private java.lang.String value;
+
+        public IsHolidays(java.lang.String value) {
+            this.value = value;
+        }
+
+        public boolean test(SystemConfig e) {
+            return e.isHolidays(value);
         }
 
     }

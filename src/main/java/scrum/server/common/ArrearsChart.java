@@ -21,6 +21,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import scrum.server.ScrumWebApplication;
+import scrum.server.admin.SystemConfig;
 import scrum.server.admin.User;
 import scrum.server.sprint.Sprint;
 
@@ -31,19 +32,19 @@ public class ArrearsChart extends Chart {
 
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
 
-		int maxWorkHours = sprint.getLengthInWorkDays()
-				* ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
+		SystemConfig systemConfig = ScrumWebApplication.get().getSystemConfig();
+		int maxWorkHours = sprint.getLengthInWorkDays() * systemConfig.getWorkingHoursPerDay();
 		Double burnedHours = sprint.getUserBurnedHours(Sprint.TEAM);
 		int teamMemberSize = sprint.getProject().getTeamMembers().size();
-		int arrears = (maxWorkHours * teamMemberSize) - burnedHours.intValue();
-		barDataset
-				.setValue(burnedHours / (maxWorkHours * teamMemberSize), "Burned", Sprint.TEAM + " (" + arrears + ")");
+		int teamMaxWorkHours = maxWorkHours * teamMemberSize;
+		int arrears = teamMaxWorkHours - burnedHours.intValue();
+		barDataset.setValue(burnedHours / teamMaxWorkHours, "Burned", Sprint.TEAM + " (" + arrears + " hrs)");
 
 		for (User user : sprint.getProject().getTeamMembers()) {
 			String userName = user.getName();
 			burnedHours = sprint.getUserBurnedHours(userName);
 			arrears = maxWorkHours - burnedHours.intValue();
-			barDataset.addValue(burnedHours / maxWorkHours, "Burned", userName + " (" + arrears + ")");
+			barDataset.addValue(burnedHours / maxWorkHours, "Burned", userName + " (" + arrears + " hrs)");
 		}
 
 		JFreeChart chart = createEfficiencyChart(barDataset, sprint);

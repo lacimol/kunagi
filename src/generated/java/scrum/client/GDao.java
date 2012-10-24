@@ -3349,6 +3349,14 @@ public abstract class GDao
         return ret;
     }
 
+    public final List<scrum.client.admin.SystemConfig> getSystemConfigsByHolidays(java.lang.String holidays) {
+        List<scrum.client.admin.SystemConfig> ret = new ArrayList<scrum.client.admin.SystemConfig>();
+        for (scrum.client.admin.SystemConfig entity : systemConfigs.values()) {
+            if (entity.isHolidays(holidays)) ret.add(entity);
+        }
+        return ret;
+    }
+
     // --- Task ---
 
     protected Map<String, scrum.client.sprint.Task> tasks = new HashMap<String, scrum.client.sprint.Task>();
