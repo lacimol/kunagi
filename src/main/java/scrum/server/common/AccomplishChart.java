@@ -49,15 +49,15 @@ public class AccomplishChart extends Chart {
 		remainingHours = sprint.getUserRemainingHours(Sprint.TEAM);
 
 		Integer teamMembersCount = sprint.getProject().getTeamMembersCount();
-		int teamAvg = (int) (burnedHours / teamMembersCount);
-		barDataset.setValue(teamAvg, "Burned", TEAM_AVG);
+		Double teamAvg = burnedHours / teamMembersCount;
+		barDataset.setValue(teamAvg.intValue(), "Burned", TEAM_AVG);
 		barDataset.setValue((int) (remainingHours / teamMembersCount), "Remaining", TEAM_AVG);
 
 		JFreeChart chart = createStackedBarChart(barDataset);
-		int maxWorkHours = sprint.getLengthInWorkDays()
+		Double maxWorkHours = (double) sprint.getLengthInWorkDays()
 				* ScrumWebApplication.get().getSystemConfig().getWorkingHoursPerDay();
 		setChartMarker(chart, teamAvg, maxWorkHours);
-		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (int) (burnedHours + remainingHours)));
+		setUpperBoundary(chart, Math.min(maxWorkHours + 5, (burnedHours + remainingHours)));
 		createPic(out, width, height, chart);
 	}
 

@@ -40,6 +40,7 @@ public class EfficiencyChart extends Chart {
 		}
 
 		JFreeChart chart = createEfficiencyChart(barDataset, sprint);
+		setChartMarker(chart, 1.0, 2.5);
 		createPic(out, width, height, chart);
 	}
 

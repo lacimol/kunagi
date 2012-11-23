@@ -49,8 +49,8 @@ public class ArrearsChart extends Chart {
 
 		JFreeChart chart = createEfficiencyChart(barDataset, sprint);
 
-		setChartMarker(chart, maxWorkHours, maxWorkHours);
-		setUpperBoundary(chart, 1);
+		setChartMarker(chart, 0.85, 1.15);
+		setUpperBoundary(chart, 1.0);
 		createPic(out, width, height, chart);
 	}
 

@@ -73,7 +73,7 @@ public class SprintWorkChart extends Chart {
 
 		JFreeChart chart = createStackedBarChart(barDataset);
 		// setChartMarker(chart, avarageRemained, maxValue);
-		setUpperBoundary(chart, maxValue);
+		setUpperBoundary(chart, (double) maxValue);
 		createPic(out, width, height, chart);
 	}
 

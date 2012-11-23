@@ -34,26 +34,26 @@ public class VelocityChart extends Chart {
 		DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
 		barDataset.addValue(0, "S1", AVG);
 
-		int maxVelocity = 0;
-		float sum = 0;
+		double maxVelocity = 0.0;
+		double sum = 0;
 		int count = 10;
 		Float velocity;
 		for (Sprint completedSprint : project.getFormerSprints(count)) {
 			velocity = completedSprint.getVelocity();
 			if (velocity == null || velocity.intValue() == 0) continue;
 			barDataset.addValue(velocity, "S1", completedSprint.getLabel());
-			maxVelocity = Math.max(velocity.intValue(), maxVelocity);
+			maxVelocity = Math.max(velocity, maxVelocity);
 			sum += velocity;
 		}
 
-		int avarage = 0;
+		Double average = 0.0;
 		if (count > 0 && sum > 0) {
-			avarage = (int) sum / count;
+			average = sum / count;
 		}
-		barDataset.setValue(avarage, "S1", AVG);
+		barDataset.setValue(average.intValue(), "S1", AVG);
 
 		JFreeChart chart = createBarChart(barDataset);
-		setChartMarker(chart, avarage, maxVelocity);
+		setChartMarker(chart, average, maxVelocity);
 		setUpperBoundary(chart, maxVelocity + 25);
 		createPic(out, width, height, chart);
 	}

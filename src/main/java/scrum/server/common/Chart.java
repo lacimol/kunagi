@@ -233,10 +233,7 @@ public abstract class Chart {
 		StandardCategoryItemLabelGenerator itemLabelGenerator = new StandardCategoryItemLabelGenerator("{2}",
 				new DecimalFormat("###%"));
 		JFreeChart chart = createBarChart(dataset, sprint, itemLabelGenerator);
-		final IntervalMarker target = new IntervalMarker(1, 2.5);
-		target.setPaint(new Color(222, 222, 255, 128));
 		CategoryPlot plot = chart.getCategoryPlot();
-		plot.addRangeMarker(target, Layer.BACKGROUND);
 		plot.getDomainAxis().setMaximumCategoryLabelLines(3);
 		return chart;
 
@@ -364,13 +361,13 @@ public abstract class Chart {
 		rangeAxis.setUpperMargin(0.15);
 	}
 
-	public void setChartMarker(JFreeChart chart, int avg, int max) {
+	public void setChartMarker(JFreeChart chart, Double avg, Double max) {
 		final IntervalMarker target = new IntervalMarker(avg, max);
 		target.setPaint(new Color(222, 222, 255, 128));
 		chart.getCategoryPlot().addRangeMarker(target, Layer.BACKGROUND);
 	}
 
-	public void setUpperBoundary(JFreeChart chart, int max) {
+	public void setUpperBoundary(JFreeChart chart, Double max) {
 		double upperBoundary = Math.min(max * 1.15f, max + 15);
 		chart.getCategoryPlot().getRangeAxis().setUpperBound(upperBoundary);
 	}
