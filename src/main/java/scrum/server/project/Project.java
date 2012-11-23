@@ -413,6 +413,17 @@ public class Project extends GProject {
 		return wikipageDao.getWikipageByName(name, this);
 	}
 
+	public Set<Subject> getSubjectsWithoutComment() {
+
+		Set<Subject> subjects = new HashSet<Subject>();
+		for (Subject subject : getSubjects()) {
+			if (subject.getComments().isEmpty()) {
+				subjects.add(subject);
+			}
+		}
+		return subjects;
+	}
+
 	public synchronized int generateTaskNumber() {
 		int number = getLastTaskNumber() + 1;
 		setLastTaskNumber(number);

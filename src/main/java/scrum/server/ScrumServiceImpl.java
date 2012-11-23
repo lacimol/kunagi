@@ -47,7 +47,6 @@ import scrum.server.admin.UserDao;
 import scrum.server.collaboration.ChatMessage;
 import scrum.server.collaboration.Comment;
 import scrum.server.collaboration.CommentDao;
-import scrum.server.collaboration.Subject;
 import scrum.server.collaboration.Wikipage;
 import scrum.server.common.Numbered;
 import scrum.server.common.Transient;
@@ -760,13 +759,15 @@ public class ScrumServiceImpl extends GScrumServiceImpl {
 	public void onRequestForum(GwtConversation conversation, boolean all) {
 		Project project = conversation.getProject();
 		Set<AEntity> parents = new HashSet<AEntity>();
-		for (Subject subject : project.getSubjects()) {
-			if (subject.getComments().isEmpty()) parents.add(subject);
-		}
+		parents.addAll(project.getSubjectsWithoutComment());
+
+		final Integer latestXDays = 30;
 		for (Comment comment : project.getLatestComments()) {
 			AEntity parent = comment.getParent();
-			if (!all && !conversation.isAvailableOnClient(parent)
-					&& comment.getDateAndTime().getPeriodToNow().abs().toDays() > 7) continue;
+			boolean isLatestComment = comment.getDateAndTime().getPeriodToNow().abs().toDays() > latestXDays;
+			if (!all && !conversation.isAvailableOnClient(parent) && isLatestComment) {
+				continue;
+			}
 			conversation.sendToClient(comment);
 			parents.add(parent);
 		}
